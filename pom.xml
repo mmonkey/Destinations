@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.mmonkey</groupId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+
+  <name>Destinations</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <repositories>
+    <repository>
+        <id>sponge-maven-repo</id>
+        <name>Sponge maven repo</name>
+        <url>http://repo.spongepowered.org/maven</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.spongepowered</groupId>
+    	<artifactId>spongeapi</artifactId>
+    	<version>2.0</version>
+    </dependency>
+  </dependencies>
+  <description>Destinations is a transportation plugin for Sponge.
+
+Commands include:
+/back
+/home [name]
+/sethome [name]
+/listhomes
+/delhome &lt;name&gt;
+/warp &lt;name&gt;
+/setwarp &lt;name&gt;
+/delwarp &lt;name&gt;
+/listwarps</description>
+  <artifactId>Destinations</artifactId>
+</project>
