@@ -67,24 +67,39 @@ public class HomeStorageService extends DestinationStorageService {
 	
 	}
 	
-	public boolean removeHome(Player player, Home home) {
+	public boolean removeHome(Player player, String home) {
 		
 		CommentedConfigurationNode config = getConfig().getNode(player.getUniqueId().toString());
 		List<String> list = getHomeList(player);
 		
-		if (list.contains(home.getName())) {
+		if (list.contains(home)) {
 			
-			list.remove(home.getName());
+			list.remove(home);
 			
-			config.removeChild(home.getName());
+			config.removeChild(home);
 			config.removeChild(StorageUtil.CONFIG_NODE_LIST);
 			config.getNode(StorageUtil.CONFIG_NODE_LIST).setValue(list);
 			
+			saveConfig();
 			return true;
 			
 		}
 		
 		return false;
+		
+	}
+	
+	public void updateHome(Player player, Home home) {
+		
+		List<String> list = getHomeList(player);
+		
+		if (list.contains(home.getName())) {
+			
+			Destination destination = home.getDestination();
+			saveDestination(getConfig().getNode(player.getUniqueId().toString(), home.getName()), destination);
+			saveConfig();
+			
+		}
 		
 	}
 

@@ -19,7 +19,7 @@ import com.github.mmonkey.Destinations.Utilities.PaginationUtil;
 
 public class ListHomesCommand implements CommandExecutor {
 	
-	private static final int ITEMS_PER_PAGE = 10;
+	private static final int ITEMS_PER_PAGE = 7;
 	
 	private Destinations plugin;
 
@@ -58,7 +58,7 @@ public class ListHomesCommand implements CommandExecutor {
 		HomeUtil homeUtil = new HomeUtil();
 		
 		// Pad the command window with new lines (Fill the entire window)
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 20; i++) {
 			listText.append(CommandMessageFormatting.NEWLINE_TEXT);
 		}
 		listText.append(Texts.of(TextColors.GREEN, "--- Showing homes page " + pageNum + " of " + numPages + " ---"));
@@ -68,11 +68,7 @@ public class ListHomesCommand implements CommandExecutor {
 		int index = startIndex + 1;
 		for (int i = startIndex; i < startIndex + ITEMS_PER_PAGE; i++) {
 			
-			if (list.size() <= i) {
-			
-				listText.append(CommandMessageFormatting.NEWLINE_TEXT);
-			
-			} else {			
+			if (list.size() > i) {			
 			
 				listText.append(Texts.of(TextColors.WHITE, index + ") "));
 				listText.append(homeUtil.getHomeLink(list.get(i)));
@@ -92,7 +88,6 @@ public class ListHomesCommand implements CommandExecutor {
 		listText.append(Texts.of(TextColors.GREEN, "  " + pageNum));
 		listText.append(pagination.getNextPagination());
 		listText.append(Texts.of(TextColors.WHITE, "  ---"));
-		listText.append(CommandMessageFormatting.NEWLINE_TEXT);
 		
 		player.sendMessage(listText.build());
 		

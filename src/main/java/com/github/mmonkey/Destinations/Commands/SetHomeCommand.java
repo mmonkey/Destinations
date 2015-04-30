@@ -1,6 +1,7 @@
 package com.github.mmonkey.Destinations.Commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
@@ -28,14 +29,43 @@ public class SetHomeCommand implements CommandExecutor {
 			return CommandResult.empty();
 		}
 		
+		boolean force = (args.hasAny("f"))  ? (Boolean) args.getOne("f").get() : false;
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
+		
 		Player player = (Player) src;
+		List<String> list = plugin.getHomeStorageService().getHomeList(player);
 		Home home = createHome(player, name);
 		
+		if (force && list.contains(name)) {
+			
+			plugin.getHomeStorageService().updateHome(player, home);
+			
+			player.sendMessage(
+				Texts.of(TextColors.GREEN, "Home ", TextColors.GOLD, name, TextColors.GREEN, " has been updated to this location!").builder()
+				.build()
+			);
+			
+			return CommandResult.success();
+			
+		}
+		
+		if (list.contains(name)) {
+			
+			plugin.getTemporaryStorage().getTempHomeStorage().put(player, home);
+			
+			player.sendMessage(
+				Texts.of(TextColors.RED, "Home ", TextColors.GOLD, name, TextColors.RED, " already exists!").builder()
+				.build()
+			);
+			
+			return CommandResult.success();
+			
+		}
+		
+		plugin.getHomeStorageService().addHome(player, home);
+		
 		player.sendMessage(
-			Texts.of(TextColors.GREEN, "Home ").builder()
-			.append(Texts.of(TextColors.GOLD, home.getName()))
-			.append(Texts.of(TextColors.GREEN, " was successfully created!"))
+			Texts.of(TextColors.GREEN, "Home ", TextColors.GOLD, home.getName(), TextColors.GREEN, " was successfully created!").builder()
 			.build()
 		);
 		
@@ -54,8 +84,6 @@ public class SetHomeCommand implements CommandExecutor {
 
 		ArrayList<Home> playerHomes = plugin.getHomeStorageService().getHomes(player);
 		Home home = (name.equals("")) ? new Home(getAvailableName(playerHomes), player) : new Home(name, player);
-		
-		plugin.getHomeStorageService().addHome(player, home);
 		
 		return home;
 

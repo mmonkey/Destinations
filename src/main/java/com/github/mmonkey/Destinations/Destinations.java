@@ -14,12 +14,14 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
+import com.github.mmonkey.Destinations.Commands.DelHomeCommand;
 import com.github.mmonkey.Destinations.Commands.HomeCommand;
 import com.github.mmonkey.Destinations.Commands.ListHomesCommand;
 import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Utilities.StorageUtil;
+import com.github.mmonkey.Destinations.Utilities.TemporaryStorageUtil;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
@@ -37,12 +39,22 @@ public class Destinations {
 	private DefaultConfigStorageService defaultConfigService;
 	private HomeStorageService homeStorageService;
 	
+	private TemporaryStorageUtil tempStorage;
+	
 	@Inject
 	@ConfigDir(sharedRoot = false)
 	private File configDir;
 	
 	public Game getGame() {
 		return this.game;
+	}
+	
+	public Optional<PluginContainer> getPluginContainer() {
+		return this.pluginContainer;
+	}
+	
+	public static Logger getLogger() {
+		return logger;
 	}
 	
 	public DefaultConfigStorageService getDefaultConfigService() {
@@ -53,12 +65,8 @@ public class Destinations {
 		return this.homeStorageService;
 	}
 	
-	public Optional<PluginContainer> getPluginContainer() {
-		return this.pluginContainer;
-	}
-	
-	public static Logger getLogger() {
-		return logger;
+	public TemporaryStorageUtil getTemporaryStorage() {
+		return this.tempStorage;
 	}
 	
 	@Subscribe
@@ -79,6 +87,8 @@ public class Destinations {
 		
 		this.defaultConfigService.load();
 		this.homeStorageService.load();
+		
+		this.tempStorage = new TemporaryStorageUtil();
 			
 	}
 	
@@ -92,8 +102,7 @@ public class Destinations {
 			.setDescription(Texts.of("Teleport Home"))
 			.setExtendedDescription(Texts.of("Teleport to the nearest home or to the named home. Optional: /home [name]"))
 			.setExecutor(new HomeCommand(this))
-			.setArguments(GenericArguments.optional(
-				GenericArguments.remainingJoinedStrings(Texts.of("name"))))
+			.setArguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
 			.build();
 		
 		/**
@@ -104,7 +113,8 @@ public class Destinations {
 			.setExtendedDescription(Texts.of("Set this location as a home. Optional: /sethome [name]"))
 			.setExecutor(new SetHomeCommand(this))
 			.setArguments(GenericArguments.optional(
-				GenericArguments.string(Texts.of("name"))))
+				GenericArguments.flags().flag("f").buildWith(GenericArguments.string(Texts.of("name")))
+			))
 			.build();
 		
 		/**
@@ -114,8 +124,17 @@ public class Destinations {
 			.setDescription(Texts.of("Show list of homes"))
 			.setExtendedDescription(Texts.of("Displays a list of your homes. Optional: /listhomes [page]"))
 			.setExecutor(new ListHomesCommand(this))
-			.setArguments(GenericArguments.optional(
-				GenericArguments.remainingJoinedStrings(Texts.of("page"))))
+			.setArguments(GenericArguments.optional(GenericArguments.string(Texts.of("page"))))
+			.build();
+		
+		/**
+		 * /delhome <name>
+		 */
+		CommandSpec delHomeCommand = CommandSpec.builder()
+			.setDescription(Texts.of("Delete a home"))
+			.setExtendedDescription(Texts.of("Delete a home by name. Required: /sethome <name>"))
+			.setExecutor(new DelHomeCommand(this))
+			.setArguments(GenericArguments.optional(GenericArguments.string(Texts.of("name"))))
 			.build();
 		
 		// Register home commands if enabled
@@ -124,6 +143,7 @@ public class Destinations {
 			game.getCommandDispatcher().register(this, homeCommand, "home");
 			game.getCommandDispatcher().register(this, setHomeCommand, "sethome");
 			game.getCommandDispatcher().register(this, listHomesCommand, "listhomes", "homes");
+			game.getCommandDispatcher().register(this, delHomeCommand, "delhome");
 		
 		}
 			
