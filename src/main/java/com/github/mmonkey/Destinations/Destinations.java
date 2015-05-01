@@ -21,7 +21,6 @@ import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Utilities.StorageUtil;
-import com.github.mmonkey.Destinations.Utilities.TemporaryStorageUtil;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
@@ -39,7 +38,7 @@ public class Destinations {
 	private DefaultConfigStorageService defaultConfigService;
 	private HomeStorageService homeStorageService;
 	
-	private TemporaryStorageUtil tempStorage;
+	private StorageUtil tempStorage;
 	
 	@Inject
 	@ConfigDir(sharedRoot = false)
@@ -65,7 +64,7 @@ public class Destinations {
 		return this.homeStorageService;
 	}
 	
-	public TemporaryStorageUtil getTemporaryStorage() {
+	public StorageUtil getTemporaryStorage() {
 		return this.tempStorage;
 	}
 	
@@ -88,7 +87,7 @@ public class Destinations {
 		this.defaultConfigService.load();
 		this.homeStorageService.load();
 		
-		this.tempStorage = new TemporaryStorageUtil();
+		this.tempStorage = new StorageUtil();
 			
 	}
 	
@@ -134,7 +133,10 @@ public class Destinations {
 			.setDescription(Texts.of("Delete a home"))
 			.setExtendedDescription(Texts.of("Delete a home by name. Required: /sethome <name>"))
 			.setExecutor(new DelHomeCommand(this))
-			.setArguments(GenericArguments.optional(GenericArguments.string(Texts.of("name"))))
+			.setArguments(GenericArguments.seq(
+				GenericArguments.optional(GenericArguments.flags().flag("f").buildWith(GenericArguments.string(Texts.of("name")))),
+				GenericArguments.optional(GenericArguments.flags().flag("c").buildWith(GenericArguments.string(Texts.of("name"))))
+			))
 			.build();
 		
 		// Register home commands if enabled

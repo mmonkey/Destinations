@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
@@ -14,6 +13,7 @@ import org.spongepowered.api.world.Location;
 
 import com.github.mmonkey.Destinations.Home;
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class HomeCommand implements CommandExecutor {
 	
@@ -34,7 +34,7 @@ public class HomeCommand implements CommandExecutor {
 		ArrayList<Home> homes = plugin.getHomeStorageService().getHomes(player);
 		
 		if (homes.isEmpty()) {	
-			player.sendMessage(Texts.of(TextColors.RED, "No home has been set!"));
+			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!"));
 			return CommandResult.success();
 		}
 			

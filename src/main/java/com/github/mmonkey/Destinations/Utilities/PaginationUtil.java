@@ -37,11 +37,11 @@ public class PaginationUtil {
 	public Text getPrevPagination() {
 	
 		if (currentPage > 2) {
-			paginationBefore.append(Texts.of("  "), getPaginationLink(PaginationUtil.PREVIEW_FIRST, 1));
+			paginationBefore.append(Texts.of(" "), getPaginationLink(PaginationUtil.PREVIEW_FIRST, 1), Texts.of(" "));
 		}
 		
 		if (currentPage > 1) {
-			paginationBefore.append(Texts.of("  "), getPaginationLink(PaginationUtil.PREVIEW_BACK, (currentPage - 1)));
+			paginationBefore.append(Texts.of(" "), getPaginationLink(PaginationUtil.PREVIEW_BACK, (currentPage - 1)), Texts.of(" "));
 		}
 		
 		return paginationBefore.build();
@@ -56,11 +56,11 @@ public class PaginationUtil {
 	public Text getNextPagination() {
 		
 		if (currentPage < totalPages) {
-			paginationAfter.append(Texts.of("  "), getPaginationLink(PaginationUtil.PREVIEW_NEXT, (currentPage + 1)));
+			paginationAfter.append(Texts.of(" "), getPaginationLink(PaginationUtil.PREVIEW_NEXT, (currentPage + 1)), Texts.of(" "));
 		}
 		
 		if (currentPage < (totalPages - 1)) {
-			paginationAfter.append(Texts.of("  "), getPaginationLink(PaginationUtil.PREVIEW_LAST, totalPages));
+			paginationAfter.append(Texts.of(" "), getPaginationLink(PaginationUtil.PREVIEW_LAST, totalPages), Texts.of(" "));
 		}
 		
 		return paginationAfter.build();
