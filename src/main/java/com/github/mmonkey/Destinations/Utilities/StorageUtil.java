@@ -20,5 +20,8 @@ public class StorageUtil {
 	public static final String CONFIG_NODE_ROTATION_Y = "rotationY";
 	public static final String CONFIG_NODE_ROTATION_Z = "rotationZ";
 	public static final String CONFIG_NODE_LIST = "list";
+	
+	public StorageUtil() {
+	}
 
 }
