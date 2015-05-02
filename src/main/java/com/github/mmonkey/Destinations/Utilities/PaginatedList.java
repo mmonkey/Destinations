@@ -225,7 +225,10 @@ public class PaginatedList {
 		TextBuilder list = Texts.builder();
 		List<Text> items = this.subList(startIndex, startIndex + this.itemsPerPage);
 		
-		list.append(header);
+		if (this.header != null ) {
+			list.append(this.header);
+		}
+		
 		list.append(CommandMessageFormatting.NEWLINE_TEXT);
 		
 		for (Text item: items) {
@@ -250,7 +253,9 @@ public class PaginatedList {
 		list.append(getNextLinks(currentPage));
 		list.append(Texts.of(this.paginationColor, fill(18, this.paginationType)));
 		
-		list.append(footer);
+		if (this.footer != null) {
+			list.append(footer);
+		}
 		
 		return list.build();
 	}
@@ -275,13 +280,13 @@ public class PaginatedList {
 		if (currentPage > 2) {
 			paginationPrev.append(Texts.of(" "), getLink(PaginatedList.PAGINATION_FIRST, 1), Texts.of(" "));
 		} else {
-			paginationPrev.append(Texts.of(" " + PaginatedList.PAGINATION_FIRST + " "));
+			paginationPrev.append(Texts.of(this.nonClickableLinkColor, " " + PaginatedList.PAGINATION_FIRST + " "));
 		}
 		
 		if (currentPage > 1) {
 			paginationPrev.append(Texts.of(" "), getLink(PaginatedList.PAGINATION_BACK, (currentPage - 1)), Texts.of(" "));
 		} else {
-			paginationPrev.append(Texts.of(" " + PaginatedList.PAGINATION_BACK + " "));
+			paginationPrev.append(Texts.of(this.nonClickableLinkColor, " " + PaginatedList.PAGINATION_BACK + " "));
 		}
 		
 		return paginationPrev.build();
@@ -295,7 +300,7 @@ public class PaginatedList {
 		if (currentPage < this.getTotalPages()) {
 			paginationNext.append(Texts.of(" "), getLink(PaginatedList.PAGINATION_NEXT, (currentPage + 1)), Texts.of(" "));
 		} else {
-			paginationNext.append(Texts.of(this.nonClickableLinkColor, " " + PaginatedList.PAGINATION_LAST + " "));
+			paginationNext.append(Texts.of(this.nonClickableLinkColor, " " + PaginatedList.PAGINATION_NEXT + " "));
 		}
 		
 		if (currentPage < (this.getTotalPages() - 1)) {
