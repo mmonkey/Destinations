@@ -6,7 +6,6 @@ import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandMessageFormatting;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
@@ -15,11 +14,9 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 import com.github.mmonkey.Destinations.Utilities.HomeUtil;
-import com.github.mmonkey.Destinations.Utilities.PaginationUtil;
+import com.github.mmonkey.Destinations.Utilities.PaginatedList;
 
 public class ListHomesCommand implements CommandExecutor {
-	
-	private static final int ITEMS_PER_PAGE = 7;
 	
 	private Destinations plugin;
 
@@ -34,10 +31,10 @@ public class ListHomesCommand implements CommandExecutor {
 		}
 		
 		String page = (args.hasAny("page")) ? ((String) args.getOne("page").get()) : "";
-		int pageNum = 1;
+		int currentPage = 1;
 		
 		try {
-			pageNum = (Integer.parseInt(page) == 0) ? 1 : Integer.parseInt(page);
+			currentPage = (Integer.parseInt(page) == 0) ? 1 : Integer.parseInt(page);
 		} catch (NumberFormatException e) {}
 			
 		Player player = (Player) src;
@@ -48,45 +45,25 @@ public class ListHomesCommand implements CommandExecutor {
 			return CommandResult.success();
 		}
 		
-		int numPages = (int) Math.ceil(list.size() / (double)ITEMS_PER_PAGE);
-		
-		if (pageNum > numPages) {
-			pageNum = numPages;
-		}
-		
-		TextBuilder listText = Texts.builder();
 		FormatUtil format = new FormatUtil();
 		HomeUtil homeUtil = new HomeUtil();
 		
-		listText.append(format.empty());
-		listText.append(Texts.of(FormatUtil.HEADLINE, format.getFill(10, '-') + " Showing homes page " + pageNum + " of " + numPages + " " + format.getFill(10, '-')));
-		listText.append(CommandMessageFormatting.NEWLINE_TEXT);
+		TextBuilder message = Texts.builder();
+		PaginatedList paginatedList = new PaginatedList("/listhomes");
 		
-		int startIndex = (pageNum - 1) * ITEMS_PER_PAGE;
-		int index = startIndex + 1;
-		for (int i = startIndex; i < startIndex + ITEMS_PER_PAGE; i++) {
+		for (String name: list) {
+			TextBuilder link = Texts.builder();
+			link.append(homeUtil.getHomeLink(name), Texts.of(" - "));
+			link.append(homeUtil.getDeleteHomeLink(name, "delete"));
 			
-			if (list.size() > i) {
-				
-				listText.append(Texts.of(FormatUtil.DIALOG, (index < 10) ?  "  " + index + ") " : index + ") "));
-				listText.append(homeUtil.getHomeLink(list.get(i)), Texts.of(" - "));
-				listText.append(homeUtil.getDeleteHomeLink(list.get(i), "delete"));
-				listText.append(CommandMessageFormatting.NEWLINE_TEXT);
-			
-			}
-			
-			index++;
-		
+			paginatedList.add(link.build());
 		}
 		
-		PaginationUtil pagination = new PaginationUtil(pageNum, numPages, "/listhomes");
+		paginatedList.setHeader(Texts.of(FormatUtil.HEADLINE, format.getFill(10, '-') + " Showing homes page " + currentPage + " of " + paginatedList.getTotalPages() + " " + format.getFill(10, '-')));
 		
-		listText.append(CommandMessageFormatting.NEWLINE_TEXT);
-		listText.append(Texts.of(format.getFill(10, '-')), pagination.getPrevPagination());
-		listText.append(Texts.of(FormatUtil.OBJECT, " " + pageNum + " "));
-		listText.append(pagination.getNextPagination(), Texts.of(format.getFill(10, '-')));
-		
-		player.sendMessage(listText.build());
+		message.append(format.empty());
+		message.append(paginatedList.getPage(currentPage));
+		player.sendMessage(message.build());
 		
 		return CommandResult.success();
 
