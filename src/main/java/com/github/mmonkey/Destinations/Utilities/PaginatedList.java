@@ -28,7 +28,7 @@ public class PaginatedList {
 	
 	// Style options - line numbers
 	private boolean displayLineNumbers = true;
-	private String lineNumberType = PaginatedListUtil.LINE_NUMBER_TYPE_DASH;
+	private String lineNumberType = PaginatedListUtil.LINE_NUMBER_TYPE_PARENTHESIS;
 	private TextColor lineNumberColor = TextColors.WHITE;
 	
 	public boolean add(Text text) {
