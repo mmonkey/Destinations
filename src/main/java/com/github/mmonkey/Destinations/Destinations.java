@@ -105,38 +105,33 @@ public class Destinations {
 			.build();
 		
 		/**
-		 * /sethome [name]
+		 * /sethome [-f] [name]
 		 */
 		CommandSpec setHomeCommand = CommandSpec.builder()
 			.setDescription(Texts.of("Set location as home"))
 			.setExtendedDescription(Texts.of("Set this location as a home. Optional: /sethome [name]"))
 			.setExecutor(new SetHomeCommand(this))
-			.setArguments(GenericArguments.optional(
-				GenericArguments.flags().flag("f").buildWith(GenericArguments.string(Texts.of("name")))
-			))
+			.setArguments(GenericArguments.flags().flag("f").buildWith(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("name")))))
 			.build();
 		
 		/**
-		 * /listhomes [name]
+		 * /listhomes [page]
 		 */
 		CommandSpec listHomesCommand = CommandSpec.builder()
 			.setDescription(Texts.of("Show list of homes"))
 			.setExtendedDescription(Texts.of("Displays a list of your homes. Optional: /listhomes [page]"))
 			.setExecutor(new ListHomesCommand(this))
-			.setArguments(GenericArguments.optional(GenericArguments.string(Texts.of("page"))))
+			.setArguments(GenericArguments.optional(GenericArguments.integer(Texts.of("page"))))
 			.build();
 		
 		/**
-		 * /delhome <name>
+		 * /delhome [-f] [-c] <name>
 		 */
 		CommandSpec delHomeCommand = CommandSpec.builder()
 			.setDescription(Texts.of("Delete a home"))
 			.setExtendedDescription(Texts.of("Delete a home by name. Required: /sethome <name>"))
 			.setExecutor(new DelHomeCommand(this))
-			.setArguments(GenericArguments.seq(
-				GenericArguments.optional(GenericArguments.flags().flag("f").buildWith(GenericArguments.string(Texts.of("name")))),
-				GenericArguments.optional(GenericArguments.flags().flag("c").buildWith(GenericArguments.string(Texts.of("name"))))
-			))
+			.setArguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
 			.build();
 		
 		// Register home commands if enabled

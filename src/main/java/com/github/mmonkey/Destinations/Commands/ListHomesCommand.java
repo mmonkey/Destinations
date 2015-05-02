@@ -32,9 +32,8 @@ public class ListHomesCommand implements CommandExecutor {
 		}
 		Player player = (Player) src;
 		
-		// Parse the page number from arguments if there is any
-		String page = (args.hasAny("page")) ? ((String) args.getOne("page").get()) : "";
-		int currentPage = parseInt(page);
+		// Get the page number from arguments, defaults to 1
+		int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
 		
 		// Get this players list of homes
 		List<String> list = plugin.getHomeStorageService().getHomeList(player);
@@ -80,23 +79,6 @@ public class ListHomesCommand implements CommandExecutor {
 		
 		return CommandResult.success();
 
-	}
-	
-	/**
-	 * Parses int from string, defaults to 1
-	 * @param input String
-	 * @return int
-	 */
-	private int parseInt(String input) {
-		int result = 1;
-		
-		try {
-			result = (Integer.parseInt(input) == 0) ? 1 : Integer.parseInt(input);
-		} catch (NumberFormatException e) {
-			// Do nothing
-		}
-		
-		return result;
 	}
 
 }
