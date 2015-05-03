@@ -38,8 +38,6 @@ public class Destinations {
 	private DefaultConfigStorageService defaultConfigService;
 	private HomeStorageService homeStorageService;
 	
-	private StorageUtil tempStorage;
-	
 	@Inject
 	@ConfigDir(sharedRoot = false)
 	private File configDir;
@@ -64,10 +62,6 @@ public class Destinations {
 		return this.homeStorageService;
 	}
 	
-	public StorageUtil getTemporaryStorage() {
-		return this.tempStorage;
-	}
-	
 	@Subscribe
 	public void onPreInit(PreInitializationEvent event) {
 		
@@ -86,8 +80,6 @@ public class Destinations {
 		
 		this.defaultConfigService.load();
 		this.homeStorageService.load();
-		
-		this.tempStorage = new StorageUtil();
 			
 	}
 	

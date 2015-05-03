@@ -7,7 +7,7 @@
   <packaging>jar</packaging>
 
   <name>Destinations</name>
-  <url>http://maven.apache.org</url>
+  <url>https://github.com/mmonkey/Destinations</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
