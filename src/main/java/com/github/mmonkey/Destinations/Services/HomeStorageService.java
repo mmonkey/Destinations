@@ -16,16 +16,15 @@ public class HomeStorageService extends DestinationStorageService {
 
 	public void saveHome(CommentedConfigurationNode config, Home home) {
 		
-		String name = home.getName();
-		Destination destination = home.getDestination();
 		List<String> list = getList(config);
-		list.add(name);
 		
-		// Add list item
-		config.getNode(StorageService.LIST).setValue(list);
+		if (!list.contains(home.getName())) {
+			
+			list.add(home.getName());
+			config.getNode(StorageService.LIST).setValue(list);
+			saveDestination(config.getNode(home.getName()), home.getDestination());
 		
-		// Add destination
-		saveDestination(config.getNode(name), destination);
+		}
 		
 	}
 	
@@ -43,9 +42,11 @@ public class HomeStorageService extends DestinationStorageService {
 		ArrayList<Home> homes = new ArrayList<Home>();
 		
 		for (String name: list) {
+			
 			Destination destination = getDestination(config.getNode(name));
 			Home home = new Home(name, destination);
 			homes.add(home);
+			
 		}
 		
 		return homes;
