@@ -18,6 +18,7 @@ public class WarpStorageService extends DestinationStorageService {
 	public static final String OWNER = "owner";
 	public static final String IS_PUBLIC = "isPublic";
 	public static final String WHITELIST = "whitelist";
+	public static final String EDITORS = "editors";
 	
 	public boolean addWarp(Warp warp) {
 
@@ -33,6 +34,7 @@ public class WarpStorageService extends DestinationStorageService {
 		config.getNode(OWNER).setValue(warp.getOwnerUniqueId().toString());
 		config.getNode(IS_PUBLIC).setValue(warp.isPublic());
 		config.getNode(WHITELIST).setValue(warp.getWhitelist());
+		config.getNode(EDITORS).setValue(warp.getEditors());
 		saveDestination(config, warp.getDestination());
 		
 		saveConfig();
@@ -105,6 +107,13 @@ public class WarpStorageService extends DestinationStorageService {
 			
 			for (String id: whitelist) {
 				warp.addToWhitelist(UUID.fromString(id));
+			}
+			
+			@SuppressWarnings("unchecked")
+			List<String> editors = (List<String>) config.getNode(EDITORS).getValue();
+			
+			for (String id: editors) {
+				warp.addEditor(UUID.fromString(id));
 			}
 			
 		}
