@@ -12,9 +12,9 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Pagination.PaginatedList;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 import com.github.mmonkey.Destinations.Utilities.HomeUtil;
-import com.github.mmonkey.Destinations.Utilities.PaginatedList;
 
 public class ListHomesCommand implements CommandExecutor {
 	

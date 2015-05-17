@@ -1,4 +1,4 @@
-package com.github.mmonkey.Destinations.Utilities;
+package com.github.mmonkey.Destinations.Pagination;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,7 @@ public class PaginatedList {
 	private Text header;
 	private Text footer;
 	private String command;
+	private String commandSuffix;
 	private int itemsPerPage = PaginatedListUtil.BEST_FIT_WITH_HEADER;
 	
 	// Style options - pagination
@@ -111,6 +112,14 @@ public class PaginatedList {
 	
 	public void setCommand(String command) {
 		this.command = command;
+	}
+	
+	public String getCommandSuffix() {
+		return this.commandSuffix;
+	}
+	
+	public void setCommandSuffix(String commandSuffix) {
+		this.commandSuffix = commandSuffix;
 	}
 	
 	public void setItemsPerPage(int itemsPerPage) {
@@ -232,28 +241,11 @@ public class PaginatedList {
 		list.append(Texts.of(this.paginationColor, fill(18, this.paginationType)));
 		
 		if (this.footer != null) {
+			list.append(CommandMessageFormatting.NEWLINE_TEXT);
 			list.append(footer);
 		}
 		
 		return list.build();
-	}
-	
-	/**
-	 * @param command String
-	 */
-	public PaginatedList(String command) {
-		this.items = new ArrayList<Text>();
-		this.command = command;
-	}
-	
-	/**
-	 * @param command String
-	 * @param itemsPerPage int
-	 */
-	public PaginatedList(String command, int itemsPerPage) {
-		this.items = new ArrayList<Text>();
-		this.command = command;
-		this.itemsPerPage = itemsPerPage;
 	}
 	
 	private Text getPrevLinks(int currentPage) {
@@ -300,8 +292,10 @@ public class PaginatedList {
 	
 	private Text getLink(String preview, int page) {
 		
+		String suffix = (this.commandSuffix != null) ? " " + this.commandSuffix : "";
+		
 		return Texts.builder(preview)
-			.onClick(TextActions.runCommand(this.command + " " + page))
+			.onClick(TextActions.runCommand(this.command + " " + page + suffix))
 			.onHover(TextActions.showText(Texts.of(TextColors.WHITE, "Go to page ", TextColors.GOLD, page)))
 			.color(this.clickableLinkColor)
 			.build();
@@ -310,6 +304,24 @@ public class PaginatedList {
 	
 	private String fill(int length, char character) {
 		return new String(new char[length]).replace('\0', character);
+	}
+	
+	/**
+	 * @param command String
+	 */
+	public PaginatedList(String command) {
+		this.items = new ArrayList<Text>();
+		this.command = command;
+	}
+	
+	/**
+	 * @param command String
+	 * @param itemsPerPage int
+	 */
+	public PaginatedList(String command, int itemsPerPage) {
+		this.items = new ArrayList<Text>();
+		this.command = command;
+		this.itemsPerPage = itemsPerPage;
 	}
 
 }

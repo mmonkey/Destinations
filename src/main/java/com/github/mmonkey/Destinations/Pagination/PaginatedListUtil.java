@@ -1,4 +1,4 @@
-package com.github.mmonkey.Destinations.Utilities;
+package com.github.mmonkey.Destinations.Pagination;
 
 public class PaginatedListUtil {
 
