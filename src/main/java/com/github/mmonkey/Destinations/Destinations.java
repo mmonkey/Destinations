@@ -20,7 +20,6 @@ import com.github.mmonkey.Destinations.Commands.ListHomesCommand;
 import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
-import com.github.mmonkey.Destinations.Utilities.StorageUtil;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
@@ -127,7 +126,7 @@ public class Destinations {
 			.build();
 		
 		// Register home commands if enabled
-		if (this.getDefaultConfigService().getConfig().getNode(StorageUtil.CONFIG_NODE_HOME_SETTINGS, StorageUtil.CONFIG_NODE_ENABLED).getBoolean()) {
+		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.HOME_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
 			
 			game.getCommandDispatcher().register(this, homeCommand, "home");
 			game.getCommandDispatcher().register(this, setHomeCommand, "sethome");

@@ -11,16 +11,8 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import com.github.mmonkey.Destinations.Destination;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Home;
-import com.github.mmonkey.Destinations.Utilities.StorageUtil;
 
 public class HomeStorageService extends DestinationStorageService {
-
-	public HomeStorageService(Destinations plugin, File configDir) {
-		super(plugin, configDir);
-
-		setConfigFile(new File(configDir, "homes.conf"));
-	}
-
 
 	public void saveHome(CommentedConfigurationNode config, Home home) {
 		
@@ -30,7 +22,7 @@ public class HomeStorageService extends DestinationStorageService {
 		list.add(name);
 		
 		// Add list item
-		config.getNode(StorageUtil.CONFIG_NODE_LIST).setValue(list);
+		config.getNode(StorageService.LIST).setValue(list);
 		
 		// Add destination
 		saveDestination(config.getNode(name), destination);
@@ -77,8 +69,8 @@ public class HomeStorageService extends DestinationStorageService {
 			list.remove(home);
 			
 			config.removeChild(home);
-			config.removeChild(StorageUtil.CONFIG_NODE_LIST);
-			config.getNode(StorageUtil.CONFIG_NODE_LIST).setValue(list);
+			config.removeChild(StorageService.LIST);
+			config.getNode(StorageService.LIST).setValue(list);
 			
 			saveConfig();
 			return true;
@@ -101,6 +93,12 @@ public class HomeStorageService extends DestinationStorageService {
 			
 		}
 		
+	}
+	
+	public HomeStorageService(Destinations plugin, File configDir) {
+		super(plugin, configDir);
+
+		setConfigFile(new File(configDir, "homes.conf"));
 	}
 
 }

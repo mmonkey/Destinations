@@ -10,10 +10,11 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Utilities.StorageUtil;
 
 public class StorageService {
 
+	public static final String LIST = "list";
+	
 	private Destinations plugin;
 	private File configDir;
 	private File configFile;
@@ -89,7 +90,7 @@ public class StorageService {
 	public List<String> getList(CommentedConfigurationNode config) {
 		
 		@SuppressWarnings("unchecked")
-		List<String> list = (List<String>) config.getNode(StorageUtil.CONFIG_NODE_LIST).getValue();
+		List<String> list = (List<String>) config.getNode(LIST).getValue();
 		
 		if (list == null) {
 			return new ArrayList<String>();
