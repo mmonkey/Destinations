@@ -45,6 +45,8 @@ public class HomeCommand implements CommandExecutor {
 			player.setRotation(home.getDestination().getRotation());
 			player.setLocation(location);
 		}
+		
+		// TODO add no home found if location == null
 			
 		return CommandResult.success();
 	}

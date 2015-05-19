@@ -74,6 +74,21 @@ public class WarpStorageService extends DestinationStorageService {
 		
 	}
 	
+	private Map<UUID, Boolean> getWhitelist(CommentedConfigurationNode config) {
+		
+		Map<Object, ? extends CommentedConfigurationNode> mappings = config.getNode(WHITELIST).getChildrenMap();
+		Map<UUID, Boolean> whitelist = new HashMap<UUID, Boolean>();
+		
+		for (Map.Entry<Object, ? extends CommentedConfigurationNode> item: mappings.entrySet()) {
+			if (item.getKey() instanceof String) {
+				whitelist.put((UUID) UUID.fromString((String) item.getKey()), item.getValue().getBoolean());
+			}
+		}
+		
+		return whitelist;
+		
+	}
+	
 	public Collection<Warp> getPlayerWarps(Player player) {
 		
 		Collection<Warp> warps = getWarps();
@@ -94,19 +109,17 @@ public class WarpStorageService extends DestinationStorageService {
 		
 	}
 	
-	private Map<UUID, Boolean> getWhitelist(CommentedConfigurationNode config) {
+	public Warp getWarp(String name) {
 		
-		Map<Object, ? extends CommentedConfigurationNode> mappings = config.getNode(WHITELIST).getChildrenMap();
-		Map<UUID, Boolean> whitelist = new HashMap<UUID, Boolean>();
+		Collection<Warp> warps = getWarps();
 		
-		for (Map.Entry<Object, ? extends CommentedConfigurationNode> item: mappings.entrySet()) {
-			if (item.getKey() instanceof String) {
-				whitelist.put((UUID) UUID.fromString((String) item.getKey()), item.getValue().getBoolean());
+		for (Warp warp: warps) {
+			if (warp.getName().equalsIgnoreCase(name)) {
+				return warp;
 			}
 		}
 		
-		return whitelist;
-		
+		return null;
 	}
 	
 	public Collection<Warp> getWarps() {

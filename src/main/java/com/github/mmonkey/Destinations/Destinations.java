@@ -18,8 +18,10 @@ import com.github.mmonkey.Destinations.Commands.DelHomeCommand;
 import com.github.mmonkey.Destinations.Commands.HomeCommand;
 import com.github.mmonkey.Destinations.Commands.ListHomesCommand;
 import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
+import com.github.mmonkey.Destinations.Commands.WarpCommand;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
+import com.github.mmonkey.Destinations.Services.WarpStorageService;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
@@ -36,6 +38,7 @@ public class Destinations {
 	
 	private DefaultConfigStorageService defaultConfigService;
 	private HomeStorageService homeStorageService;
+	private WarpStorageService warpStorageService;
 	
 	@Inject
 	@ConfigDir(sharedRoot = false)
@@ -61,6 +64,10 @@ public class Destinations {
 		return this.homeStorageService;
 	}
 	
+	public WarpStorageService getWarpStorageService() {
+		return this.warpStorageService;
+	}
+	
 	@Subscribe
 	public void onPreInit(PreInitializationEvent event) {
 		
@@ -76,9 +83,11 @@ public class Destinations {
 		
 		this.defaultConfigService = new DefaultConfigStorageService(this, this.configDir);
 		this.homeStorageService = new HomeStorageService(this, this.configDir);
+		this.warpStorageService = new WarpStorageService(this, this.configDir);
 		
 		this.defaultConfigService.load();
 		this.homeStorageService.load();
+		this.warpStorageService.load();
 			
 	}
 	
@@ -134,7 +143,23 @@ public class Destinations {
 			game.getCommandDispatcher().register(this, delHomeCommand, "delhome");
 		
 		}
+		
+		/**
+		 * /warp <warp>
+		 */
+		CommandSpec warpCommand = CommandSpec.builder()
+			.setDescription(Texts.of("Teleport to Warp"))
+			.setExtendedDescription(Texts.of("Teleport to the warp of the provided name."))
+			.setExecutor(new WarpCommand(this))
+			.setArguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
+			.build();
+		
+		// Register warp commands if enabled
+		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.WARP_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
+		
+			game.getCommandDispatcher().register(this, warpCommand, "warp");
 			
+		}
 	}
 	
 	public Destinations() {
