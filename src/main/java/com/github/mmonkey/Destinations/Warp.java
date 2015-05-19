@@ -1,7 +1,7 @@
 package com.github.mmonkey.Destinations;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.spongepowered.api.entity.player.Player;
@@ -14,8 +14,7 @@ public class Warp {
 	private UUID ownerUniqueId;
 	private Destination destination;
 	private boolean isPublic;
-	private Collection<UUID> editors;
-	private Collection<UUID> whitelist;
+	private Map<UUID, Boolean> whitelist;
 	
 	public String getName() {
 		return this.name;
@@ -49,42 +48,27 @@ public class Warp {
 		this.isPublic = isPublic;
 	}
 	
-	public Collection<UUID> getWhitelist() {
+	public Map<UUID, Boolean> getWhitelist() {
 		return this.whitelist;
 	}
 	
-	public void setWhitelist(Collection<UUID> whitelist) {
+	public void setWhitelist(Map<UUID, Boolean> whitelist) {
 		this.whitelist = whitelist;
 	}
 	
-	public boolean addToWhitelist(UUID playerUniqueId) {
-		return this.whitelist.add(playerUniqueId);
+	public boolean addToWhitelist(UUID playerUniqueId, boolean canEdit) {
+		return this.whitelist.put(playerUniqueId, canEdit);
 	}
 	
-	public boolean addToWhitelist(Collection<UUID> playerUniqueIds) {
-		return this.whitelist.addAll(playerUniqueIds);
-	}
-	
-	public Collection<UUID> getEditors() {
-		return this.editors;
-	}
-	
-	public void setEditors(Collection<UUID> editors) {
-		this.editors = editors;
-	}
-	
-	public boolean addEditor(UUID playerUniqueId) {
-		return this.editors.add(playerUniqueId);
-	}
-	
-	public boolean addEditors(Collection<UUID> playerUniqueIds) {
-		return this.editors.addAll(playerUniqueIds);
+	public void addToWhitelist(Map<UUID, Boolean> mappings) {
+		for(Map.Entry<UUID, Boolean> map: mappings.entrySet()) {
+			this.whitelist.put(map.getKey(), map.getValue());
+		}
 	}
 	
 	public Warp() {
 		this.isPublic = true;
-		this.whitelist = new ArrayList<UUID>();
-		this.editors = new ArrayList<UUID>();
+		this.whitelist = new HashMap<UUID, Boolean>();
 	}
 	
 	public Warp(String name, Player player) {
@@ -92,8 +76,7 @@ public class Warp {
 		this.ownerUniqueId = player.getUniqueId();
 		this.destination = new Destination(player, DestinationTypes.WARP);
 		this.isPublic = true;
-		this.whitelist = new ArrayList<UUID>();
-		this.editors = new ArrayList<UUID>();
+		this.whitelist = new HashMap<UUID, Boolean>();
 	}
 	
 }

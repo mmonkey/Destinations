@@ -3,7 +3,9 @@ package com.github.mmonkey.Destinations.Services;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.spongepowered.api.entity.player.Player;
@@ -20,6 +22,13 @@ public class WarpStorageService extends DestinationStorageService {
 	public static final String WHITELIST = "whitelist";
 	public static final String EDITORS = "editors";
 	
+	private void saveWhitelist(Warp warp) {
+		CommentedConfigurationNode config = getConfig().getNode(warp.getName(), WHITELIST);
+		for (Map.Entry<UUID, Boolean> item: warp.getWhitelist().entrySet()) {
+			config.getNode(item.getKey()).setValue(item.getValue());
+		}
+	}
+	
 	public boolean addWarp(Warp warp) {
 
 		List<String> list = getList(getConfig());
@@ -33,10 +42,9 @@ public class WarpStorageService extends DestinationStorageService {
 		CommentedConfigurationNode config = getConfig().getNode(warp.getName());
 		config.getNode(OWNER).setValue(warp.getOwnerUniqueId().toString());
 		config.getNode(IS_PUBLIC).setValue(warp.isPublic());
-		config.getNode(WHITELIST).setValue(warp.getWhitelist());
-		config.getNode(EDITORS).setValue(warp.getEditors());
 		saveDestination(config, warp.getDestination());
 		
+		saveWhitelist(warp);
 		saveConfig();
 		
 		return true;
@@ -73,9 +81,8 @@ public class WarpStorageService extends DestinationStorageService {
 		for (Warp warp: warps) {
 			
 			if (!warp.isPublic()
-				&& !warp.getWhitelist().contains(player.getUniqueId())
-				&& !warp.getOwnerUniqueId().equals(player.getUniqueId())
-				&& !warp.getEditors().contains(player.getUniqueId())) {
+				&& !warp.getWhitelist().containsKey(player.getUniqueId())
+				&& !warp.getOwnerUniqueId().equals(player.getUniqueId())) {
 				
 				warps.remove(warp);
 			
@@ -84,6 +91,21 @@ public class WarpStorageService extends DestinationStorageService {
 		}
 		
 		return warps;
+		
+	}
+	
+	private Map<UUID, Boolean> getWhitelist(CommentedConfigurationNode config) {
+		
+		Map<Object, ? extends CommentedConfigurationNode> mappings = config.getNode(WHITELIST).getChildrenMap();
+		Map<UUID, Boolean> whitelist = new HashMap<UUID, Boolean>();
+		
+		for (Map.Entry<Object, ? extends CommentedConfigurationNode> item: mappings.entrySet()) {
+			if (item.getKey() instanceof String) {
+				whitelist.put((UUID) UUID.fromString((String) item.getKey()), item.getValue().getBoolean());
+			}
+		}
+		
+		return whitelist;
 		
 	}
 	
@@ -101,20 +123,9 @@ public class WarpStorageService extends DestinationStorageService {
 			warp.setOwnerUniqueId(UUID.fromString(config.getNode(OWNER).getString()));
 			warp.setDestination(getDestination(config));
 			warp.isPublic(config.getNode(IS_PUBLIC).getBoolean());
-			
-			@SuppressWarnings("unchecked")
-			List<String> whitelist = (List<String>) config.getNode(WHITELIST).getValue();
-			
-			for (String id: whitelist) {
-				warp.addToWhitelist(UUID.fromString(id));
-			}
-			
-			@SuppressWarnings("unchecked")
-			List<String> editors = (List<String>) config.getNode(EDITORS).getValue();
-			
-			for (String id: editors) {
-				warp.addEditor(UUID.fromString(id));
-			}
+
+			Map<UUID, Boolean> whitelist = getWhitelist(config);
+			warp.setWhitelist(whitelist);
 			
 		}
 		
