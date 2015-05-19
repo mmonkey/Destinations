@@ -40,12 +40,11 @@ public class ListHomesCommand implements CommandExecutor {
 		
 		// If this player doesn't have any homes, return with message
 		if (list.isEmpty()) {
-			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!"));
+			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!").builder().build());
 			return CommandResult.success();
 		}
 		
 		// Get utility classes and new PaginatedList
-		FormatUtil format = new FormatUtil();
 		HomeUtil homeUtil = new HomeUtil();
 		TextBuilder message = Texts.builder();
 		TextBuilder header = Texts.builder();
@@ -53,23 +52,24 @@ public class ListHomesCommand implements CommandExecutor {
 		
 		// Fill paginatedList with items
 		for (String name: list) {
-			TextBuilder item = Texts.builder();
-			item.append(homeUtil.getHomeLink(name), Texts.of(" - "));
-			item.append(homeUtil.getDeleteHomeLink(name, "delete"));
 			
-			paginatedList.add(item.build());
+			TextBuilder row = Texts.builder();
+			row.append(homeUtil.getHomeLink(name), Texts.of(" - "));
+			row.append(homeUtil.getDeleteHomeLink(name, "delete"));
+			
+			paginatedList.add(row.build());
 		}
 		
 		// Created header for paginatedList
-		header.append(Texts.of(FormatUtil.HEADLINE, format.getFill(12, '-')));
+		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
 		header.append(Texts.of(FormatUtil.HEADLINE, " Showing homes page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
-		header.append(Texts.of(FormatUtil.HEADLINE, format.getFill(12, '-')));
+		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
 		
 		// Add header to paginatedList
 		paginatedList.setHeader(header.build());
 		
 		// Clear the chat window
-		message.append(format.empty());
+		message.append(FormatUtil.empty());
 		
 		// Add the paginated list to the message
 		message.append(paginatedList.getPage(currentPage));

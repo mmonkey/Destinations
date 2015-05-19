@@ -17,6 +17,7 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 import com.github.mmonkey.Destinations.Commands.DelHomeCommand;
 import com.github.mmonkey.Destinations.Commands.HomeCommand;
 import com.github.mmonkey.Destinations.Commands.ListHomesCommand;
+import com.github.mmonkey.Destinations.Commands.ListWarpsCommand;
 import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
 import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
 import com.github.mmonkey.Destinations.Commands.WarpCommand;
@@ -165,11 +166,22 @@ public class Destinations {
 			.setArguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
 			.build();
 		
+		/**
+		 * /listwarps [page]
+		 */
+		CommandSpec listWarpsCommand = CommandSpec.builder()
+			.setDescription(Texts.of("Show list of warps"))
+			.setExtendedDescription(Texts.of("Displays a list of your warps. Optional: /listwarps [page]"))
+			.setExecutor(new ListWarpsCommand(this))
+			.setArguments(GenericArguments.optional(GenericArguments.integer(Texts.of("page"))))
+			.build();
+		
 		// Register warp commands if enabled
 		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.WARP_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
 		
 			game.getCommandDispatcher().register(this, warpCommand, "warp", "w");
 			game.getCommandDispatcher().register(this, setWarpCommand, "setwarp");
+			game.getCommandDispatcher().register(this, listWarpsCommand, "listwarps", "warps");
 			
 		}
 	}

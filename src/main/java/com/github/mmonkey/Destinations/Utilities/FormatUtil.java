@@ -31,7 +31,7 @@ public class FormatUtil {
 	//Other
 	public static final TextColor HEADLINE = TextColors.DARK_GREEN;
 	
-	public Text empty() {
+	public static Text empty() {
 		
 		TextBuilder text = Texts.builder();
 		for (int i = 0; i < 20; i++) {
@@ -42,11 +42,11 @@ public class FormatUtil {
 		
 	}
 	
-	public String getFill(int length, char fill) {
+	public static String getFill(int length, char fill) {
 		return new String(new char[length]).replace('\0', fill);
 	}
 	
-	public String getFill(int length) {
+	public static String getFill(int length) {
 		return new String(new char[length]).replace('\0', ' ');
 	}
 	
