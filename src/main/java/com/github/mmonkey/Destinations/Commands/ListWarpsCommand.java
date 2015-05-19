@@ -40,6 +40,8 @@ public class ListWarpsCommand implements CommandExecutor {
 				Texts.of(FormatUtil.ERROR, "No warps have been set.").builder().build()
 			);
 			
+			return CommandResult.success();
+			
 		}
 		
 		PaginatedList paginatedList = new PaginatedList("/listwarps");
@@ -64,7 +66,7 @@ public class ListWarpsCommand implements CommandExecutor {
 		paginatedList.setHeader(header.build());
 		
 		message.append(FormatUtil.empty());
-		message.append(paginatedList.get(currentPage));
+		message.append(paginatedList.getPage(currentPage));
 		
 		player.sendMessage(message.build());
 		

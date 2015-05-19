@@ -25,7 +25,7 @@ public class WarpStorageService extends DestinationStorageService {
 	private void saveWhitelist(Warp warp) {
 		CommentedConfigurationNode config = getConfig().getNode(warp.getName(), WHITELIST);
 		for (Map.Entry<UUID, Boolean> item: warp.getWhitelist().entrySet()) {
-			config.getNode(item.getKey()).setValue(item.getValue());
+			config.getNode(item.getKey().toString()).setValue(item.getValue());
 		}
 	}
 	
@@ -38,6 +38,7 @@ public class WarpStorageService extends DestinationStorageService {
 		}
 		
 		list.add(warp.getName());
+		getConfig().getNode(LIST).setValue(list);
 		
 		CommentedConfigurationNode config = getConfig().getNode(warp.getName());
 		config.getNode(OWNER).setValue(warp.getOwnerUniqueId().toString());
@@ -61,8 +62,8 @@ public class WarpStorageService extends DestinationStorageService {
 			
 			CommentedConfigurationNode config = getConfig().getNode(warp.getName());
 			config.removeChild(warp.getName());
-			config.removeChild(StorageService.LIST);
-			config.getNode(StorageService.LIST).setValue(list);
+			config.removeChild(LIST);
+			config.getNode(LIST).setValue(list);
 			
 			saveConfig();
 			
@@ -139,6 +140,8 @@ public class WarpStorageService extends DestinationStorageService {
 
 			Map<UUID, Boolean> whitelist = getWhitelist(config);
 			warp.setWhitelist(whitelist);
+			
+			warps.add(warp);
 			
 		}
 		

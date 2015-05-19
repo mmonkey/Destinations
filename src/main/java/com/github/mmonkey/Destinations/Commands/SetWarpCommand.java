@@ -1,5 +1,7 @@
 package com.github.mmonkey.Destinations.Commands;
 
+import java.util.UUID;
+
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -37,11 +39,12 @@ public class SetWarpCommand implements CommandExecutor {
 		}
 		
 		Destination destination = new Destination(player, DestinationTypes.WARP);
+		UUID uniqueId = player.getUniqueId();
 		
 		Warp warp = new Warp();
 		warp.setName(name);
-		warp.setOwnerUniqueId(player.getUniqueId());
-		warp.addToWhitelist(player.getUniqueId(), true);
+		warp.setOwnerUniqueId(uniqueId);
+		warp.getWhitelist().put(uniqueId, true);
 		warp.setDestination(destination);
 		
 		plugin.getWarpStorageService().addWarp(warp);

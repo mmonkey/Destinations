@@ -13,8 +13,8 @@ public class Warp {
 	private String name;
 	private UUID ownerUniqueId;
 	private Destination destination;
-	private boolean isPublic;
-	private Map<UUID, Boolean> whitelist;
+	private boolean isPublic = true;
+	private Map<UUID, Boolean> whitelist = new HashMap<UUID, Boolean>();
 	
 	public String getName() {
 		return this.name;
@@ -56,27 +56,13 @@ public class Warp {
 		this.whitelist = whitelist;
 	}
 	
-	public boolean addToWhitelist(UUID playerUniqueId, boolean canEdit) {
-		return this.whitelist.put(playerUniqueId, canEdit);
-	}
-	
-	public void addToWhitelist(Map<UUID, Boolean> mappings) {
-		for(Map.Entry<UUID, Boolean> map: mappings.entrySet()) {
-			this.whitelist.put(map.getKey(), map.getValue());
-		}
-	}
-	
 	public Warp() {
-		this.isPublic = true;
-		this.whitelist = new HashMap<UUID, Boolean>();
 	}
 	
 	public Warp(String name, Player player) {
 		this.name = name;
 		this.ownerUniqueId = player.getUniqueId();
 		this.destination = new Destination(player, DestinationTypes.WARP);
-		this.isPublic = true;
-		this.whitelist = new HashMap<UUID, Boolean>();
 	}
 	
 }

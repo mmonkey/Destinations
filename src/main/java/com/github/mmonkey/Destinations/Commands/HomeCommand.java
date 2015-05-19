@@ -34,7 +34,7 @@ public class HomeCommand implements CommandExecutor {
 		ArrayList<Home> homes = plugin.getHomeStorageService().getHomes(player);
 		
 		if (homes.isEmpty()) {	
-			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!"));
+			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!").builder().build());
 			return CommandResult.success();
 		}
 			
@@ -58,34 +58,29 @@ public class HomeCommand implements CommandExecutor {
 	 * @param homes ArrayList<Home>
 	 * @return Home|null
 	 */
-	public Home getClosestHome(Player player, ArrayList<Home> homes) {
+	private Home getClosestHome(Player player, ArrayList<Home> homes) {
 		
 		Location playerLocation = player.getLocation();
 		
 		double min = -1;
 		double tmp = 0;
-		int result = -1;
+		Home result = null;
 		
-		for(int i = 0; i < homes.size(); i++) {
+		for (Home home: homes) {
 			
-			Location homeLocation = homes.get(i).getDestination().getLocation(plugin.getGame());
-			double x = Math.pow((playerLocation.getX() - homeLocation.getX()), 2);
-			double y = Math.pow((playerLocation.getY() - homeLocation.getY()), 2);
-			double z = Math.pow((playerLocation.getZ() - homeLocation.getZ()), 2);
+			Location location = home.getDestination().getLocation(plugin.getGame());
+			double x = Math.pow((playerLocation.getX() - location.getX()), 2);
+			double y = Math.pow((playerLocation.getY() - location.getY()), 2);
+			double z = Math.pow((playerLocation.getZ() - location.getZ()), 2);
 			tmp = Math.sqrt(x + y + z);
 			
 			if (min == -1 || tmp < min) {
 				min = tmp;
-				result = i;
+				result = home;
 			}
-			
 		}
 		
-		if (result > -1) {
-			return homes.get(result);
-		}
-		
-		return null;
+		return result;
 		
 	}
 	
