@@ -18,6 +18,7 @@ import com.github.mmonkey.Destinations.Commands.DelHomeCommand;
 import com.github.mmonkey.Destinations.Commands.HomeCommand;
 import com.github.mmonkey.Destinations.Commands.ListHomesCommand;
 import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
+import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
 import com.github.mmonkey.Destinations.Commands.WarpCommand;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
@@ -137,7 +138,7 @@ public class Destinations {
 		// Register home commands if enabled
 		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.HOME_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
 			
-			game.getCommandDispatcher().register(this, homeCommand, "home");
+			game.getCommandDispatcher().register(this, homeCommand, "home", "h");
 			game.getCommandDispatcher().register(this, setHomeCommand, "sethome");
 			game.getCommandDispatcher().register(this, listHomesCommand, "listhomes", "homes");
 			game.getCommandDispatcher().register(this, delHomeCommand, "delhome");
@@ -154,10 +155,21 @@ public class Destinations {
 			.setArguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
 			.build();
 		
+		/**
+		 * /setwarp <name>
+		 */
+		CommandSpec setWarpCommand = CommandSpec.builder()
+			.setDescription(Texts.of("Set a warp."))
+			.setExtendedDescription(Texts.of("Set this location as a public warp."))
+			.setExecutor(new SetWarpCommand(this))
+			.setArguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
+			.build();
+		
 		// Register warp commands if enabled
 		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.WARP_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
 		
-			game.getCommandDispatcher().register(this, warpCommand, "warp");
+			game.getCommandDispatcher().register(this, warpCommand, "warp", "w");
+			game.getCommandDispatcher().register(this, setWarpCommand, "setwarp");
 			
 		}
 	}
