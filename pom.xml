@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.mmonkey</groupId>
-  <version>0.0.21</version>
+  <version>0.0.3-2.1</version>
   <packaging>jar</packaging>
 
   <name>Destinations</name>
@@ -37,20 +37,10 @@
     <dependency>
     	<groupId>org.spongepowered</groupId>
     	<artifactId>spongeapi</artifactId>
-    	<version>2.0</version>
+    	<version>2.1-SNAPSHOT</version>
+    	<scope>provided</scope>
     </dependency>
   </dependencies>
-  <description>Destinations is a transportation plugin for Sponge.
-
-Commands include:
-/back
-/home [name]
-/sethome [name]
-/listhomes
-/delhome &lt;name&gt;
-/warp &lt;name&gt;
-/setwarp &lt;name&gt;
-/delwarp &lt;name&gt;
-/listwarps</description>
+  <description>Destinations is a Sponge plugin that specifically handles location based commands.</description>
   <artifactId>Destinations</artifactId>
 </project>

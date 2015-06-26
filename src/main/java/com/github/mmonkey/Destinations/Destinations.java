@@ -32,7 +32,7 @@ public class Destinations {
 	
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
-	public static final String VERSION = "0.0.21";
+	public static final String VERSION = "0.0.3-2.1";
 	
 	private Game game;
 	private Optional<PluginContainer> pluginContainer;
@@ -100,40 +100,40 @@ public class Destinations {
 		 * /home [name]
 		 */
 		CommandSpec homeCommand = CommandSpec.builder()
-			.setDescription(Texts.of("Teleport Home"))
-			.setExtendedDescription(Texts.of("Teleport to the nearest home or to the named home. Optional: /home [name]"))
-			.setExecutor(new HomeCommand(this))
-			.setArguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
+			.description(Texts.of("Teleport Home"))
+			.extendedDescription(Texts.of("Teleport to the nearest home or to the named home. Optional: /home [name]"))
+			.executor(new HomeCommand(this))
+			.arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
 			.build();
 		
 		/**
 		 * /sethome [-f] [name]
 		 */
 		CommandSpec setHomeCommand = CommandSpec.builder()
-			.setDescription(Texts.of("Set location as home"))
-			.setExtendedDescription(Texts.of("Set this location as a home. Optional: /sethome [name]"))
-			.setExecutor(new SetHomeCommand(this))
-			.setArguments(GenericArguments.flags().flag("f").buildWith(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("name")))))
+			.description(Texts.of("Set location as home"))
+			.extendedDescription(Texts.of("Set this location as a home. Optional: /sethome [name]"))
+			.executor(new SetHomeCommand(this))
+			.arguments(GenericArguments.flags().flag("f").buildWith(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("name")))))
 			.build();
 		
 		/**
 		 * /listhomes [page]
 		 */
 		CommandSpec listHomesCommand = CommandSpec.builder()
-			.setDescription(Texts.of("Show list of homes"))
-			.setExtendedDescription(Texts.of("Displays a list of your homes. Optional: /listhomes [page]"))
-			.setExecutor(new ListHomesCommand(this))
-			.setArguments(GenericArguments.optional(GenericArguments.integer(Texts.of("page"))))
+			.description(Texts.of("Show list of homes"))
+			.extendedDescription(Texts.of("Displays a list of your homes. Optional: /listhomes [page]"))
+			.executor(new ListHomesCommand(this))
+			.arguments(GenericArguments.optional(GenericArguments.integer(Texts.of("page"))))
 			.build();
 		
 		/**
 		 * /delhome [-f] [-c] <name>
 		 */
 		CommandSpec delHomeCommand = CommandSpec.builder()
-			.setDescription(Texts.of("Delete a home"))
-			.setExtendedDescription(Texts.of("Delete a home by name. Required: /sethome <name>"))
-			.setExecutor(new DelHomeCommand(this))
-			.setArguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
+			.description(Texts.of("Delete a home"))
+			.extendedDescription(Texts.of("Delete a home by name. Required: /sethome <name>"))
+			.executor(new DelHomeCommand(this))
+			.arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
 			.build();
 		
 		// Register home commands if enabled
@@ -150,30 +150,30 @@ public class Destinations {
 		 * /warp <warp>
 		 */
 		CommandSpec warpCommand = CommandSpec.builder()
-			.setDescription(Texts.of("Teleport to Warp"))
-			.setExtendedDescription(Texts.of("Teleport to the warp of the provided name."))
-			.setExecutor(new WarpCommand(this))
-			.setArguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
+			.description(Texts.of("Teleport to Warp"))
+			.extendedDescription(Texts.of("Teleport to the warp of the provided name."))
+			.executor(new WarpCommand(this))
+			.arguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
 			.build();
 		
 		/**
 		 * /setwarp <name>
 		 */
 		CommandSpec setWarpCommand = CommandSpec.builder()
-			.setDescription(Texts.of("Set a warp."))
-			.setExtendedDescription(Texts.of("Set this location as a public warp."))
-			.setExecutor(new SetWarpCommand(this))
-			.setArguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
+			.description(Texts.of("Set a warp."))
+			.extendedDescription(Texts.of("Set this location as a public warp."))
+			.executor(new SetWarpCommand(this))
+			.arguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
 			.build();
 		
 		/**
 		 * /listwarps [page]
 		 */
 		CommandSpec listWarpsCommand = CommandSpec.builder()
-			.setDescription(Texts.of("Show list of warps"))
-			.setExtendedDescription(Texts.of("Displays a list of your warps. Optional: /listwarps [page]"))
-			.setExecutor(new ListWarpsCommand(this))
-			.setArguments(GenericArguments.optional(GenericArguments.integer(Texts.of("page"))))
+			.description(Texts.of("Show list of warps"))
+			.extendedDescription(Texts.of("Displays a list of your warps. Optional: /listwarps [page]"))
+			.executor(new ListWarpsCommand(this))
+			.arguments(GenericArguments.optional(GenericArguments.integer(Texts.of("page"))))
 			.build();
 		
 		// Register warp commands if enabled
