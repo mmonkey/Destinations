@@ -21,29 +21,6 @@ public class Destination {
 	private Double pitch;
 	private Double roll;
 	
-	public Destination(Player player, DestinationTypes type) {
-		this.type = type;
-		this.world = player.getWorld().getName();
-		this.x = player.getLocation().getX();
-		this.y = player.getLocation().getY();
-		this.z = player.getLocation().getZ();
-		this.yaw = player.getRotation().getX();
-		this.pitch = player.getRotation().getY();
-		this.roll = player.getRotation().getZ();
-	}
-	
-	public Destination(String world, Double x, Double y, Double z, Double yaw, Double pitch, Double roll, DestinationTypes type) {
-		this.type = type;
-		this.world = world;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.yaw = yaw;
-		this.pitch = pitch;
-		this.roll = roll;
-	}
-	
-	
 	public DestinationTypes getType() {
 		return this.type;
 	}
@@ -76,5 +53,26 @@ public class Destination {
 		return (world != null) ? new Location(world, this.x, this.y, this.z) : null;
 	}
 	
+	public Destination(Player player, DestinationTypes type) {
+		this.type = type;
+		this.world = player.getWorld().getName();
+		this.x = player.getLocation().getX();
+		this.y = player.getLocation().getY();
+		this.z = player.getLocation().getZ();
+		this.yaw = player.getRotation().getX();
+		this.pitch = player.getRotation().getY();
+		this.roll = player.getRotation().getZ();
+	}
+	
+	public Destination(String world, Double x, Double y, Double z, Double yaw, Double pitch, Double roll, DestinationTypes type) {
+		this.type = type;
+		this.world = world;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.yaw = yaw;
+		this.pitch = pitch;
+		this.roll = roll;
+	}
 	
 }

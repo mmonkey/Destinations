@@ -3,7 +3,10 @@ package com.github.mmonkey.Destinations.Commands;
 import java.util.List;
 
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandMessageFormatting;
 import org.spongepowered.api.util.command.CommandResult;
@@ -13,15 +16,10 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
-import com.github.mmonkey.Destinations.Utilities.HomeUtil;
 
 public class DelHomeCommand implements CommandExecutor {
 	
 	private Destinations plugin;
-
-	public DelHomeCommand(Destinations plugin) {
-		this.plugin = plugin;
-	}
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -55,14 +53,12 @@ public class DelHomeCommand implements CommandExecutor {
 		
 		if (list.contains(name)) {
 			
-			HomeUtil homeUtil = new HomeUtil();
-			
 			player.sendMessage(
 				Texts.of(CommandMessageFormatting.NEWLINE_TEXT).builder()
 				.append(Texts.of(FormatUtil.DIALOG, "Are you sure you want to delete home ", FormatUtil.OBJECT, name, FormatUtil.DIALOG, "?  "))
-				.append(homeUtil.getDeleteHomeConfirmationLink(name, "Yes"))
+				.append(getDeleteHomeConfirmationAction(name, "Yes"))
 				.append(Texts.of("  "))
-				.append(homeUtil.getDeleteHomeCancelLink(name, "No"))
+				.append(getDeleteHomeCancelAction(name, "No"))
 				.append(CommandMessageFormatting.NEWLINE_TEXT)
 				.build()
 			);
@@ -100,6 +96,32 @@ public class DelHomeCommand implements CommandExecutor {
 			
 		}
 
+	}
+	
+	private Text getDeleteHomeConfirmationAction(String name, String linkText) {
+		
+		return Texts.builder(linkText)
+			.onClick(TextActions.runCommand("/delhome -f " + name))
+			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Delete home ", FormatUtil.OBJECT, name)))
+			.color(FormatUtil.CONFIRM)
+			.style(TextStyles.UNDERLINE)
+			.build();
+	
+	}
+	
+	private Text getDeleteHomeCancelAction(String name, String linkText) {
+		
+		return Texts.builder(linkText)
+			.onClick(TextActions.runCommand("/delhome -c " + name))
+			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Do not delete home ", FormatUtil.OBJECT, name)))
+			.color(FormatUtil.CANCEL)
+			.style(TextStyles.UNDERLINE)
+			.build();
+	
+	}
+	
+	public DelHomeCommand(Destinations plugin) {
+		this.plugin = plugin;
 	}
 
 }

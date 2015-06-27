@@ -15,6 +15,7 @@ import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import com.github.mmonkey.Destinations.Commands.DelHomeCommand;
+import com.github.mmonkey.Destinations.Commands.DelWarpCommand;
 import com.github.mmonkey.Destinations.Commands.HomeCommand;
 import com.github.mmonkey.Destinations.Commands.ListHomesCommand;
 import com.github.mmonkey.Destinations.Commands.ListWarpsCommand;
@@ -32,7 +33,7 @@ public class Destinations {
 	
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
-	public static final String VERSION = "0.0.3-2.1";
+	public static final String VERSION = "0.0.31-2.1";
 	
 	private Game game;
 	private Optional<PluginContainer> pluginContainer;
@@ -176,12 +177,23 @@ public class Destinations {
 			.arguments(GenericArguments.optional(GenericArguments.integer(Texts.of("page"))))
 			.build();
 		
+		/**
+		 * /delwarp [-f] [-c] <name>
+		 */
+		CommandSpec delWarpCommand = CommandSpec.builder()
+			.description(Texts.of("Delete a warp"))
+			.extendedDescription(Texts.of("Delete a warp by name. Required: /delwarp <name>"))
+			.executor(new DelWarpCommand(this))
+			.arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
+			.build();
+		
 		// Register warp commands if enabled
 		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.WARP_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
 		
 			game.getCommandDispatcher().register(this, warpCommand, "warp", "w");
 			game.getCommandDispatcher().register(this, setWarpCommand, "setwarp");
 			game.getCommandDispatcher().register(this, listWarpsCommand, "listwarps", "warps");
+			game.getCommandDispatcher().register(this, delWarpCommand, "delwarp");
 			
 		}
 	}

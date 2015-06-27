@@ -18,10 +18,6 @@ import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 public class SetHomeCommand implements CommandExecutor {
 	
 	private Destinations plugin;
-
-	public SetHomeCommand(Destinations plugin) {
-		this.plugin = plugin;
-	}
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -115,6 +111,10 @@ public class SetHomeCommand implements CommandExecutor {
 		
 		return (homes.size() == 0) ? "home" : "home" + Integer.toString(max + 1);
 		
+	}
+	
+	public SetHomeCommand(Destinations plugin) {
+		this.plugin = plugin;
 	}
 
 }

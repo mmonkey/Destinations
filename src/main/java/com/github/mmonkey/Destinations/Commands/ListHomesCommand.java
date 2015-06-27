@@ -3,8 +3,11 @@ package com.github.mmonkey.Destinations.Commands;
 import java.util.List;
 
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
@@ -14,15 +17,10 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
-import com.github.mmonkey.Destinations.Utilities.HomeUtil;
 
 public class ListHomesCommand implements CommandExecutor {
 	
 	private Destinations plugin;
-
-	public ListHomesCommand(Destinations plugin) {
-		this.plugin = plugin;
-	}
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -45,7 +43,6 @@ public class ListHomesCommand implements CommandExecutor {
 		}
 		
 		// Get utility classes and new PaginatedList
-		HomeUtil homeUtil = new HomeUtil();
 		TextBuilder message = Texts.builder();
 		TextBuilder header = Texts.builder();
 		PaginatedList paginatedList = new PaginatedList("/listhomes");
@@ -54,8 +51,8 @@ public class ListHomesCommand implements CommandExecutor {
 		for (String name: list) {
 			
 			TextBuilder row = Texts.builder();
-			row.append(homeUtil.getHomeLink(name), Texts.of(" - "));
-			row.append(homeUtil.getDeleteHomeLink(name, "delete"));
+			row.append(getHomeAction(name), Texts.of(" - "));
+			row.append(getDeleteHomeAction(name, "delete"));
 			
 			paginatedList.add(row.build());
 		}
@@ -79,6 +76,32 @@ public class ListHomesCommand implements CommandExecutor {
 		
 		return CommandResult.success();
 
+	}
+	
+	private Text getHomeAction(String name) {
+		
+		return Texts.builder(name)
+			.onClick(TextActions.runCommand("/home " + name))
+			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, name)))
+			.color(FormatUtil.GENERIC_LINK)
+			.style(TextStyles.UNDERLINE)
+			.build();
+	
+	}
+	
+	private Text getDeleteHomeAction(String name, String linkText) {
+		
+		return Texts.builder(linkText)
+			.onClick(TextActions.runCommand("/delhome " + name))
+			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Delete home ", FormatUtil.OBJECT, name)))
+			.color(FormatUtil.DELETE)
+			.style(TextStyles.UNDERLINE)
+			.build();
+	
+	}
+	
+	public ListHomesCommand(Destinations plugin) {
+		this.plugin = plugin;
 	}
 
 }

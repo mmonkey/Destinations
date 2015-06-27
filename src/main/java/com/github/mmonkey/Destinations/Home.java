@@ -8,16 +8,6 @@ public class Home {
 	private String name;
 	private Destination destination;
 	
-	public Home(String name, Player player) {
-		this.name = name;
-		this.destination = new Destination(player, DestinationTypes.HOME);
-	}
-	
-	public Home(String name, Destination destination) {
-		this.name = name;
-		this.destination = destination;
-	}
-	
 	public String getName() {
 		return name;
 	}
@@ -33,4 +23,15 @@ public class Home {
 	public void setDestination(Destination destination) {
 		this.destination = destination;
 	}
+	
+	public Home(String name, Player player) {
+		this.name = name;
+		this.destination = new Destination(player, DestinationTypes.HOME);
+	}
+	
+	public Home(String name, Destination destination) {
+		this.name = name;
+		this.destination = destination;
+	}
+	
 }

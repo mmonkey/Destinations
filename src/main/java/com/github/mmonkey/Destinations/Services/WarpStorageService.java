@@ -60,10 +60,9 @@ public class WarpStorageService extends DestinationStorageService {
 			
 			list.remove(warp.getName());
 			
-			CommentedConfigurationNode config = getConfig().getNode(warp.getName());
-			config.removeChild(warp.getName());
-			config.removeChild(LIST);
-			config.getNode(LIST).setValue(list);
+			getConfig().removeChild(warp.getName());
+			getConfig().removeChild(LIST);
+			getConfig().getNode(LIST).setValue(list);
 			
 			saveConfig();
 			

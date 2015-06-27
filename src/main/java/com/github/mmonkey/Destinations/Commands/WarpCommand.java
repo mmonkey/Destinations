@@ -46,8 +46,7 @@ public class WarpCommand implements CommandExecutor {
 			
 		}
 		
-		player.setRotation(warp.getDestination().getRotation());
-		player.setLocation(warp.getDestination().getLocation(plugin.getGame()));
+		player.setLocationAndRotationSafely(warp.getDestination().getLocation(plugin.getGame()), warp.getDestination().getRotation());
 		
 		return CommandResult.success();
 		

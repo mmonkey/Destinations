@@ -19,10 +19,6 @@ public class HomeCommand implements CommandExecutor {
 	
 	private Destinations plugin;
 
-	public HomeCommand(Destinations plugin) {
-		this.plugin = plugin;
-	}
-
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		
 		if (!(src instanceof Player)) {
@@ -42,8 +38,7 @@ public class HomeCommand implements CommandExecutor {
 		Location location = (home != null) ? home.getDestination().getLocation(plugin.getGame()) : null;
 			
 		if (location != null) {
-			player.setRotation(home.getDestination().getRotation());
-			player.setLocation(location);
+			player.setLocationAndRotationSafely(location, home.getDestination().getRotation());
 		}
 		
 		// TODO add no home found if location == null
@@ -104,6 +99,10 @@ public class HomeCommand implements CommandExecutor {
 		
 		return null;
 		
+	}
+	
+	public HomeCommand(Destinations plugin) {
+		this.plugin = plugin;
 	}
 
 }
