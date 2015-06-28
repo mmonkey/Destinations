@@ -22,6 +22,8 @@ import com.github.mmonkey.Destinations.Commands.ListWarpsCommand;
 import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
 import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
 import com.github.mmonkey.Destinations.Commands.WarpCommand;
+import com.github.mmonkey.Destinations.Events.ChatListener;
+import com.github.mmonkey.Destinations.Events.SignListener;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Services.WarpStorageService;
@@ -33,7 +35,7 @@ public class Destinations {
 	
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
-	public static final String VERSION = "0.0.31-2.1";
+	public static final String VERSION = "0.1.0-2.1";
 	
 	private Game game;
 	private Optional<PluginContainer> pluginContainer;
@@ -196,6 +198,9 @@ public class Destinations {
 			game.getCommandDispatcher().register(this, delWarpCommand, "delwarp");
 			
 		}
+		
+		game.getEventManager().register(this, new ChatListener(this));
+		game.getEventManager().register(this, new SignListener(this));
 	}
 	
 	public Destinations() {

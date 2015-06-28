@@ -38,7 +38,8 @@ public class HomeCommand implements CommandExecutor {
 		Location location = (home != null) ? home.getDestination().getLocation(plugin.getGame()) : null;
 			
 		if (location != null) {
-			player.setLocationAndRotationSafely(location, home.getDestination().getRotation());
+			player.setRotation(home.getDestination().getRotation());
+			player.setLocation(location);
 		}
 		
 		// TODO add no home found if location == null
