@@ -19,7 +19,7 @@ public class CommandFilter extends Filter {
 	@Override
 	public Text filter(Match match) {
 		
-		String command = match.getMatch();
+		String command = match.getContent();
 		
 		if (command.startsWith("/")) {
 			command = command.substring(1);
@@ -29,16 +29,17 @@ public class CommandFilter extends Filter {
 		String preview = (words.length > 0) ? words[0] : "";
 		
 		if (command.length() > 0 && preview.length() > 0) {
-			return getCommandAction(command, preview);
+			return getCommandAction(match.getTitle(), command, preview);
 		}
 		
-		return Texts.of(match.getMatch());
+		return Texts.of(match.getContent());
 	}
 	
-	private Text getCommandAction(String command, String preview) {
-		return Texts.builder(preview)
+	private Text getCommandAction(String title, String command, String preview) {
+		String showText = (title.length() > 0) ? title : preview;
+		return Texts.builder(showText)
 			.onClick(TextActions.runCommand("/" + command))
-			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Run command ", FormatUtil.OBJECT, preview)))
+			.onHover(TextActions.showText(Texts.of(FormatUtil.OBJECT, "/" + command)))
 			.color(FormatUtil.GENERIC_LINK)
 			.style(TextStyles.UNDERLINE)
 			.build();

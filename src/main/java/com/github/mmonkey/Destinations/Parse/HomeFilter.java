@@ -27,26 +27,28 @@ public class HomeFilter extends Filter {
 	public Text filter(Match match) {
 		
 		List<String> homeList = plugin.getHomeStorageService().getHomeList(player);
-		if (homeList.contains(match.getMatch())) {
+		if (homeList.contains(match.getContent())) {
 			
 			List<Home> homes = plugin.getHomeStorageService().getHomes(player);
 			for(Home home:homes) {
 				
-				if (home.getName().equalsIgnoreCase(match.getMatch())) {
-					return getHomeAction(home.getName());
+				if (home.getName().equalsIgnoreCase(match.getContent())) {
+					return getHomeAction(match.getTitle(), home.getName());
 				}
 			
 			}
 			
 		}
 		
-		return Texts.of(match.getMatch());
+		return Texts.of(match.getContent());
 	
 	}
 	
-	private Text getHomeAction(String name) {
+	private Text getHomeAction(String title, String name) {
 		
-		return Texts.builder(name)
+		String showText = (title.length() > 0) ? title : name;
+		
+		return Texts.builder(showText)
 			.onClick(TextActions.runCommand("/home " + name))
 			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, name)))
 			.color(FormatUtil.GENERIC_LINK)

@@ -25,20 +25,23 @@ public class WarpFilter extends Filter {
 	public Text filter(Match match) {
 		
 		List<String> warpList = plugin.getWarpStorageService().getWarpList();
-		if (warpList.contains(match.getMatch())) {
+		if (warpList.contains(match.getContent())) {
 		
-			Warp warp = plugin.getWarpStorageService().getWarp(match.getMatch());
-			return getWarpAction(warp.getName());
+			Warp warp = plugin.getWarpStorageService().getWarp(match.getContent());
+			return getWarpAction(match.getTitle(), warp.getName());
 		
 		} else {
 			
-			return Texts.of(match.getMatch());
+			return Texts.of(match.getContent());
 		}
 		
 	}
 	
-	private Text getWarpAction(String name) {
-		return Texts.builder(name)
+	private Text getWarpAction(String title, String name) {
+		
+		String showText = (title.length() > 0) ? title : name;
+		
+		return Texts.builder(showText)
 			.onClick(TextActions.runCommand("/warp " + name))
 			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, name)))
 			.color(FormatUtil.GENERIC_LINK)

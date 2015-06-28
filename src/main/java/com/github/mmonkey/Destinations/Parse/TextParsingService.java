@@ -11,6 +11,8 @@ import org.spongepowered.api.text.Texts;
 
 public class TextParsingService {
 	
+	private static final Pattern titleBefore = Pattern.compile("\\((.+?)\\)\\[([^]]+)\\]");
+	private static final Pattern titleAfter = Pattern.compile("\\[([^]]+)\\]\\((.+?)\\)");
 	private Text text = null;
 	private Filter[] filters;
 	private String raw = null;
@@ -30,9 +32,40 @@ public class TextParsingService {
 		
 		for(Filter filter:filters) {
 			for(Pattern pattern:filter.getPatterns()) {
+				
 				Matcher matcher = pattern.matcher(this.raw);
+				
 				while (matcher.find()) {
-					Match match = new Match(matcher.group(1), filter, matcher.start(), matcher.end());
+					
+					String title = "";
+					int start = -1;
+					int end = -1;
+					
+					String pre = this.raw.substring(0, matcher.end());
+					Matcher preMatch = titleBefore.matcher(pre);
+					if (preMatch.find()) {
+						if (preMatch.end() == matcher.end()) {
+							title = preMatch.group(1);
+							start = preMatch.start();
+						}
+					}
+					
+					String post = this.raw.substring(matcher.start(), this.raw.length());
+					Matcher postMatch = titleAfter.matcher(post);
+					if (postMatch.find()) {
+						if (postMatch.start() == 0) {
+							title = postMatch.group(2);
+							end = postMatch.end() + matcher.start();
+						}
+					}
+					
+					Match match = new Match();
+					match.setTitle(title);
+					match.setContent(matcher.group(1));
+					match.setStart((start > -1) ? start : matcher.start());
+					match.setEnd((end > -1) ? end : matcher.end());
+					match.setFilter(filter);
+
 					matches.add(match);
 				}
 			}

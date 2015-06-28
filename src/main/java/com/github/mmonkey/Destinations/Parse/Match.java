@@ -2,17 +2,26 @@ package com.github.mmonkey.Destinations.Parse;
 
 public class Match {
 	
-	private String match;
+	private String title;
+	private String content;
 	private Filter filter;
 	private int start;
 	private int end;
 	
-	public String getMatch() {
-		return this.match;
+	public String getTitle() {
+		return this.title;
 	}
 	
-	public void setMatch(String match) {
-		this.match = match;
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
+	public String getContent() {
+		return this.content;
+	}
+	
+	public void setContent(String content) {
+		this.content = content;
 	}
 	
 	public Filter getFilter()
@@ -28,7 +37,7 @@ public class Match {
 		return this.start;
 	}
 	
-	public void setBegin(int start) {
+	public void setStart(int start) {
 		this.start = start;
 	}
 	
@@ -40,8 +49,8 @@ public class Match {
 		this.end = end;
 	}
 	
-	public Match(String match, Filter filter, int start, int end) {
-		this.match = match;
+	public Match(String content, Filter filter, int start, int end) {
+		this.content = content;
 		this.filter = filter;
 		this.start = start;
 		this.end = end;
