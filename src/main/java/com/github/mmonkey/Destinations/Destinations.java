@@ -22,8 +22,7 @@ import com.github.mmonkey.Destinations.Commands.ListWarpsCommand;
 import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
 import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
 import com.github.mmonkey.Destinations.Commands.WarpCommand;
-import com.github.mmonkey.Destinations.Events.ChatListener;
-import com.github.mmonkey.Destinations.Events.SignListener;
+import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Services.WarpStorageService;
@@ -199,8 +198,11 @@ public class Destinations {
 			
 		}
 		
-		game.getEventManager().register(this, new ChatListener(this));
-		game.getEventManager().register(this, new SignListener(this));
+		// Load Commando events
+		if (game.getPluginManager().getPlugin("Commando").isPresent()) {
+			game.getEventManager().register(this, new ConvertTextListener(this));
+		}
+		
 	}
 	
 	public Destinations() {

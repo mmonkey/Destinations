@@ -25,6 +25,10 @@
             <enabled>true</enabled>
         </snapshots>
     </repository>
+    <repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
   </repositories>
 
   <dependencies>
@@ -40,6 +44,11 @@
     	<version>2.1-SNAPSHOT</version>
     	<scope>provided</scope>
     </dependency>
+    <dependency>
+	    <groupId>com.github.mmonkey</groupId>
+	    <artifactId>Commando</artifactId>
+	    <version>v0.0.2-2.1</version>
+	</dependency>
   </dependencies>
   <description>Destinations is a Sponge plugin that specifically handles location based commands.</description>
   <artifactId>Destinations</artifactId>

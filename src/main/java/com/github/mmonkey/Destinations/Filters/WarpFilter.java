@@ -1,4 +1,4 @@
-package com.github.mmonkey.Destinations.Parse;
+package com.github.mmonkey.Destinations.Filters;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -11,6 +11,8 @@ import org.spongepowered.api.text.format.TextStyles;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Warp;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import com.gmail.mmonkey.Commando.Match;
+import com.gmail.mmonkey.Commando.Filters.Filter;
 
 public class WarpFilter extends Filter {
 
@@ -18,7 +20,7 @@ public class WarpFilter extends Filter {
 	
 	@Override
 	public Pattern[] getPatterns() {
-		return new Pattern[] {Pattern.compile("\\[warp:(.+?)\\]"), Pattern.compile("\\[w:(.+?)\\]")};
+		return new Pattern[] {Pattern.compile("\\[warp:([^]]+)\\]"), Pattern.compile("\\[w:([^]]+)\\]")};
 	}
 	
 	@Override
