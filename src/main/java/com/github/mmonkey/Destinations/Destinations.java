@@ -14,7 +14,6 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.config.ConfigDir;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.args.CommandElement;
 import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
@@ -208,17 +207,23 @@ public class Destinations {
 			
 		}
 
+		/**
+		 * /call <player>
+		 */
 		CommandSpec callCommand = CommandSpec.builder()
 				.description(Texts.of("Requests a player to teleport you"))
 				.extendedDescription(Texts.of("Requests a player to teleport you to their current location /call <name>"))
-				.executor(new CallCommand(this, callService))
+				.executor(new CallCommand(callService))
 				.arguments(GenericArguments.player(Texts.of("call-ee"), game))
 				.build();
 
+		/**
+		 * /bring <player> [page]
+		 */
 		CommandSpec bringCommand = CommandSpec.builder()
 				.description(Texts.of("Bring a calling player to you"))
 				.extendedDescription(Texts.of("Teleports a player that has issued a call request to your current location. /bring <name>"))
-				.executor(new BringCommand(this, callService))
+				.executor(new BringCommand(callService))
 				.arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Texts.of("caller"), game), GenericArguments.integer(Texts.of("page")))))
 				.build();
 
