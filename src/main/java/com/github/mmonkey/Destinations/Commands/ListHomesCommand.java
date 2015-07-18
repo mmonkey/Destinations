@@ -1,5 +1,6 @@
 package com.github.mmonkey.Destinations.Commands;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.spongepowered.api.entity.player.Player;
@@ -13,6 +14,7 @@ import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
+import org.spongepowered.api.world.World;
 
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
@@ -73,6 +75,12 @@ public class ListHomesCommand implements CommandExecutor {
 		
 		// Send message to this player
 		player.sendMessage(message.build());
+		
+		Iterator<World> worlds = plugin.getGame().getServer().getWorlds().iterator();
+		while (worlds.hasNext()) {
+			World w = worlds.next();
+			player.sendMessage(Texts.of(w.getName() + ": " + w.getUniqueId().toString()));
+		}
 		
 		return CommandResult.success();
 

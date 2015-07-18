@@ -1,6 +1,7 @@
 package com.github.mmonkey.Destinations.Services;
 
 import java.io.File;
+import java.util.UUID;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -16,6 +17,7 @@ public class DestinationStorageService extends StorageService {
 	public static final String DESTINATION = "destination";
 	public static final String DESTINATION_TYPE = "type";
 	public static final String WORLD = "world";
+	public static final String WORLD_UUID = "worldUUID";
 	public static final String LOCATION_X = "locationX";
 	public static final String LOCATION_Y = "locationY";
 	public static final String LOCATION_Z = "locationZ";
@@ -27,11 +29,13 @@ public class DestinationStorageService extends StorageService {
 		
 		String type = destination.getType().name();
 		String world = destination.getWorldName();
+		UUID worldUniqueId = destination.getWorldUniqueId();
 		Location location = destination.getLocation(getPlugin().getGame());
 		Vector3d rotation = destination.getRotation();
 		
 		config.getNode(DESTINATION, DESTINATION_TYPE).setValue(type);
 		config.getNode(DESTINATION, WORLD).setValue(world);
+		config.getNode(DESTINATION, WORLD_UUID).setValue(worldUniqueId.toString());
 		config.getNode(DESTINATION, LOCATION_X).setValue(location.getX());
 		config.getNode(DESTINATION, LOCATION_Y).setValue(location.getY());
 		config.getNode(DESTINATION, LOCATION_Z).setValue(location.getZ());
@@ -45,8 +49,11 @@ public class DestinationStorageService extends StorageService {
 		
 		CommentedConfigurationNode destinationConfig = (CommentedConfigurationNode) config.getNode(DESTINATION);
 		
+		UUID worldUniqueId = (destinationConfig.getNode(WORLD_UUID).getString() == null) ? null : UUID.fromString(destinationConfig.getNode(WORLD_UUID).getString());
+
 		return new Destination(
 			(String) destinationConfig.getNode(WORLD).getString(),
+			worldUniqueId,
 			(Double) destinationConfig.getNode(LOCATION_X).getDouble(),
 			(Double) destinationConfig.getNode(LOCATION_Y).getDouble(),
 			(Double) destinationConfig.getNode(LOCATION_Z).getDouble(),
