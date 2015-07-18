@@ -2,6 +2,9 @@ package com.github.mmonkey.Destinations;
 
 import java.io.File;
 
+import com.github.mmonkey.Destinations.Commands.BringCommand;
+import com.github.mmonkey.Destinations.Commands.CallCommand;
+import com.github.mmonkey.Destinations.Services.CallService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
@@ -11,6 +14,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.config.ConfigDir;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.command.args.CommandElement;
 import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
@@ -43,6 +47,7 @@ public class Destinations {
 	private DefaultConfigStorageService defaultConfigService;
 	private HomeStorageService homeStorageService;
 	private WarpStorageService warpStorageService;
+	private CallService callService;
 	
 	@Inject
 	@ConfigDir(sharedRoot = false)
@@ -71,6 +76,10 @@ public class Destinations {
 	public WarpStorageService getWarpStorageService() {
 		return this.warpStorageService;
 	}
+
+	public CallService getCallService() {
+		return this.callService;
+	}
 	
 	@Subscribe
 	public void onPreInit(PreInitializationEvent event) {
@@ -88,6 +97,7 @@ public class Destinations {
 		this.defaultConfigService = new DefaultConfigStorageService(this, this.configDir);
 		this.homeStorageService = new HomeStorageService(this, this.configDir);
 		this.warpStorageService = new WarpStorageService(this, this.configDir);
+		this.callService = new CallService(this, event.getGame().getScheduler());
 		
 		this.defaultConfigService.load();
 		this.homeStorageService.load();
@@ -187,7 +197,7 @@ public class Destinations {
 			.executor(new DelWarpCommand(this))
 			.arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
 			.build();
-		
+
 		// Register warp commands if enabled
 		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.WARP_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
 		
@@ -197,7 +207,24 @@ public class Destinations {
 			game.getCommandDispatcher().register(this, delWarpCommand, "delwarp");
 			
 		}
-		
+
+		CommandSpec callCommand = CommandSpec.builder()
+				.description(Texts.of("Requests a player to teleport you"))
+				.extendedDescription(Texts.of("Requests a player to teleport you to their current location /call <name>"))
+				.executor(new CallCommand(this, callService))
+				.arguments(GenericArguments.player(Texts.of("call-ee"), game))
+				.build();
+
+		CommandSpec bringCommand = CommandSpec.builder()
+				.description(Texts.of("Bring a calling player to you"))
+				.extendedDescription(Texts.of("Teleports a player that has issued a call request to your current location. /bring <name>"))
+				.executor(new BringCommand(this, callService))
+				.arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Texts.of("caller"), game), GenericArguments.integer(Texts.of("page")))))
+				.build();
+
+		game.getCommandDispatcher().register(this, callCommand, "call");
+		game.getCommandDispatcher().register(this, bringCommand, "bring");
+
 		// Load Commando events
 		if (game.getPluginManager().getPlugin("Commando").isPresent()) {
 			game.getEventManager().register(this, new ConvertTextListener(this));
