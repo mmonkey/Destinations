@@ -59,7 +59,7 @@ public class HomeCommand implements CommandExecutor {
 		Location playerLocation = player.getLocation();
 		
 		double min = -1;
-		double tmp = 0;
+		double tmp;
 		Home result = null;
 		
 		for (Home home: homes) {
@@ -89,13 +89,11 @@ public class HomeCommand implements CommandExecutor {
 	 * @return Home|null
 	 */
 	public Home getNamedHome(Player player, ArrayList<Home> homes, String name) {
-		
-		for(int i = 0; i < homes.size(); i++) {
-			
-			if (homes.get(i).getName().equals(name)) {
-				return homes.get(i);
-			}
 
+		for (Home home : homes) {
+			if (home.getName().equals(name)) {
+				return home;
+			}
 		}
 		
 		return null;
