@@ -2,6 +2,7 @@ package com.github.mmonkey.Destinations;
 
 import java.io.File;
 
+import com.github.mmonkey.Destinations.Database.Database;
 import com.github.mmonkey.Destinations.Migrations.AddDatabaseSettingsToDefaultConfig;
 import com.github.mmonkey.Destinations.Migrations.AddInitialDatabaseTables;
 import com.github.mmonkey.Destinations.Migrations.Migration;
@@ -53,8 +54,7 @@ public class Destinations {
 	private HomeStorageService homeStorageService;
 	private WarpStorageService warpStorageService;
 	
-	private H2EmbeddedDatabase h2db;
-	private boolean isWebServerRunning = false;
+	private Database database;
 	
 	@Inject
 	@ConfigDir(sharedRoot = false)
@@ -82,6 +82,10 @@ public class Destinations {
 	
 	public WarpStorageService getWarpStorageService() {
 		return this.warpStorageService;
+	}
+
+	public Database getDatabase() {
+		return this.database;
 	}
 	
 	@Subscribe
@@ -223,10 +227,9 @@ public class Destinations {
 	
 	@Subscribe
 	public void onServerStop(ServerStoppingEvent event) {
-		if (this.isWebServerRunning) {
-			this.h2db.stopWebServer();
-			this.isWebServerRunning = false;
-		}
+        if (this.database instanceof H2EmbeddedDatabase) {
+            ((H2EmbeddedDatabase) this.database).stopWebServer();
+        }
 	}
 
     private void setupDatabase() {
@@ -234,17 +237,18 @@ public class Destinations {
         CommentedConfigurationNode dbConfig = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.DATABASE_SETTINGS);
         String username = dbConfig.getNode(DefaultConfigStorageService.USERNAME).getString();
         String password = dbConfig.getNode(DefaultConfigStorageService.PASSWORD).getString();
-        this.h2db = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
+        this.database = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
 
         if (dbConfig.getNode(DefaultConfigStorageService.WEBSERVER).getBoolean()) {
-            if (this.h2db.startWebServer()) {
-                String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
-                getLogger().info("H2 console started at " + address + ":8082");
-                this.isWebServerRunning = true;
+            if (this.database instanceof H2EmbeddedDatabase) {
+                if (((H2EmbeddedDatabase) this.database).startWebServer()) {
+                    String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
+                    getLogger().info("H2 console started at " + address + ":8082");
+                }
             }
         }
 
-        TestConnectionService service = new TestConnectionService(this.h2db);
+        TestConnectionService service = new TestConnectionService(this.database);
         if (service.execute()) {
             getLogger().info("Database connected successfully.");
         } else {
@@ -295,7 +299,7 @@ public class Destinations {
 
             switch (configVersion) {
                 case 0:
-                    migration = new AddInitialDatabaseTables(this.h2db);
+                    migration = new AddInitialDatabaseTables(this.database);
                     break;
 
                 default:
