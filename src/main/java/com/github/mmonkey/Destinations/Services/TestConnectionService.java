@@ -1,7 +1,7 @@
 package com.github.mmonkey.Destinations.Services;
 
 import com.github.mmonkey.Destinations.Dams.TestConnectionDam;
-import com.github.mmonkey.Destinations.Database.DatabaseConnection;
+import com.github.mmonkey.Destinations.Database.Database;
 
 public class TestConnectionService extends DatabaseService {
 
@@ -12,8 +12,8 @@ public class TestConnectionService extends DatabaseService {
         return this.testConnectionDam.testConnection();
     }
 
-    public TestConnectionService(DatabaseConnection databaseConnection) {
-        super(databaseConnection);
-        this.testConnectionDam = new TestConnectionDam(this.getDatabaseConnection());
+    public TestConnectionService(Database database) {
+        super(database);
+        this.testConnectionDam = new TestConnectionDam(this.getDatabase());
     }
 }

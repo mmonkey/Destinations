@@ -1,6 +1,6 @@
 package com.github.mmonkey.Destinations.Dams;
 
-import com.github.mmonkey.Destinations.Database.DatabaseConnection;
+import com.github.mmonkey.Destinations.Database.Database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ public class TestConnectionDam {
 
 	public static final String tblName = "connection_tests";
 
-	private DatabaseConnection database;
+	private Database database;
 
 	public boolean testConnection() {
 
@@ -41,7 +41,7 @@ public class TestConnectionDam {
 
 	}
 
-	public TestConnectionDam(DatabaseConnection database) {
+	public TestConnectionDam(Database database) {
         this.database = database;
 	}
 

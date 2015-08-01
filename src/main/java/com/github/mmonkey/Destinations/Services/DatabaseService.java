@@ -1,16 +1,16 @@
 package com.github.mmonkey.Destinations.Services;
 
-import com.github.mmonkey.Destinations.Database.DatabaseConnection;
+import com.github.mmonkey.Destinations.Database.Database;
 
 public class DatabaseService {
 
-    private DatabaseConnection databaseConnection;
+    private Database database;
 
-    protected DatabaseConnection getDatabaseConnection() {
-        return this.databaseConnection;
+    protected Database getDatabase() {
+        return this.database;
     }
 
-    public DatabaseService(DatabaseConnection databaseConnection) {
-        this.databaseConnection = databaseConnection;
+    public DatabaseService(Database database) {
+        this.database = database;
     }
 }
