@@ -15,7 +15,6 @@ public class AddInitialDatabaseTables implements Migration {
 
         Connection connection = null;
         Statement statement = null;
-        ResultSet result = null;
         StringBuilder sql = new StringBuilder();
 
         // Create worlds table
@@ -61,7 +60,7 @@ public class AddInitialDatabaseTables implements Migration {
 
             connection = database.getConnection();
             statement = connection.createStatement();
-            result = statement.executeQuery(sql.toString());
+            statement.execute(sql.toString());
 
         } catch (SQLException e) {
 
@@ -69,7 +68,6 @@ public class AddInitialDatabaseTables implements Migration {
 
         } finally {
 
-            try { if (result != null) result.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
 
