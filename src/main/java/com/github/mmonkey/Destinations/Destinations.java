@@ -1,7 +1,6 @@
 package com.github.mmonkey.Destinations;
 
 import java.io.File;
-import java.util.Iterator;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -9,7 +8,6 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.state.InitializationEvent;
-import org.spongepowered.api.event.state.LoadCompleteEvent;
 import org.spongepowered.api.event.state.PreInitializationEvent;
 import org.spongepowered.api.event.state.ServerStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -18,7 +16,6 @@ import org.spongepowered.api.service.config.ConfigDir;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
-import org.spongepowered.api.world.World;
 
 import com.github.mmonkey.Destinations.Commands.DelHomeCommand;
 import com.github.mmonkey.Destinations.Commands.DelWarpCommand;
@@ -32,8 +29,8 @@ import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Services.WarpStorageService;
-import com.gmail.mmonkey.Destinations.Database.H2EmbededDatabase;
-import com.gmail.mmonkey.Destinations.Database.TestConnectionService;
+import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabase;
+import com.github.mmonkey.Destinations.Database.TestConnectionService;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
@@ -52,7 +49,7 @@ public class Destinations {
 	private HomeStorageService homeStorageService;
 	private WarpStorageService warpStorageService;
 	
-	private H2EmbededDatabase h2db;
+	private H2EmbeddedDatabase h2db;
 	private boolean isWebServerRunning = false;
 	
 	@Inject
@@ -106,28 +103,23 @@ public class Destinations {
 		
 		// Load H2 database
 		CommentedConfigurationNode dbConfig = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.DATABASE_SETTINGS);
-		if (dbConfig.getNode(DefaultConfigStorageService.ENABLED).getBoolean()) {
-			
-			String username = dbConfig.getNode(DefaultConfigStorageService.USERNAME).getString();
-			String password = dbConfig.getNode(DefaultConfigStorageService.PASSWORD).getString();
-			
-			this.h2db = new H2EmbededDatabase(this.getGame(), "destinations", username, password);
-			
-			if (dbConfig.getNode(DefaultConfigStorageService.WEBSERVER).getBoolean()) {
-				if (this.h2db.startWebServer()) {
-					String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
-					getLogger().info("H2 console started at " + address + ":8082");
-					this.isWebServerRunning = true;
-				}
+		String username = dbConfig.getNode(DefaultConfigStorageService.USERNAME).getString();
+		String password = dbConfig.getNode(DefaultConfigStorageService.PASSWORD).getString();
+		this.h2db = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
+
+		if (dbConfig.getNode(DefaultConfigStorageService.WEBSERVER).getBoolean()) {
+			if (this.h2db.startWebServer()) {
+				String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
+				getLogger().info("H2 console started at " + address + ":8082");
+				this.isWebServerRunning = true;
 			}
-			
-			TestConnectionService testService = new TestConnectionService(this.h2db);
-			
-			if (testService.testConnection()) {
-				getLogger().info("Database connected successfully.");
-			} else {
-				getLogger().info("Unable to connect to database.");
-			}
+		}
+
+		TestConnectionService testService = new TestConnectionService(this.h2db);
+		if (testService.testConnection()) {
+			getLogger().info("Database connected successfully.");
+		} else {
+			getLogger().info("Unable to connect to database.");
 		}
 	}
 	

@@ -55,7 +55,6 @@ public class DefaultConfigStorageService extends StorageService {
 			
 		}
 
-		getConfig().getNode(DATABASE_SETTINGS, ENABLED).setValue(false);
 		getConfig().getNode(DATABASE_SETTINGS, USERNAME).setValue("admin");
 		getConfig().getNode(DATABASE_SETTINGS, PASSWORD).setValue("");
 		getConfig().getNode(DATABASE_SETTINGS, WEBSERVER).setValue(false);
