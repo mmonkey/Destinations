@@ -13,7 +13,6 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 import com.github.mmonkey.Destinations.Destination;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Warp;
-import com.github.mmonkey.Destinations.Utilities.DestinationTypes;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class SetWarpCommand implements CommandExecutor {
@@ -38,7 +37,7 @@ public class SetWarpCommand implements CommandExecutor {
 			
 		}
 		
-		Destination destination = new Destination(player, DestinationTypes.WARP);
+		Destination destination = new Destination(player);
 		UUID uniqueId = player.getUniqueId();
 		
 		Warp warp = new Warp();

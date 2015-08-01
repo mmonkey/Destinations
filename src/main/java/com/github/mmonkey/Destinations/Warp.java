@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import org.spongepowered.api.entity.player.Player;
 
-import com.github.mmonkey.Destinations.Utilities.DestinationTypes;
-
 public class Warp {
 
 	private String name;
@@ -62,7 +60,7 @@ public class Warp {
 	public Warp(String name, Player player) {
 		this.name = name;
 		this.ownerUniqueId = player.getUniqueId();
-		this.destination = new Destination(player, DestinationTypes.WARP);
+		this.destination = new Destination(player);
 	}
 	
 }

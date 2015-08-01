@@ -9,11 +9,9 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.github.mmonkey.Destinations.Utilities.DestinationTypes;
 
 public class Destination {
 
-	private DestinationTypes type;
 	private String world;
 	private UUID worldUniqueId;
 	private Double x;
@@ -22,10 +20,6 @@ public class Destination {
 	private Double yaw;
 	private Double pitch;
 	private Double roll;
-	
-	public DestinationTypes getType() {
-		return this.type;
-	}
 	
 	public String getWorldName() {
 		return this.world;
@@ -59,8 +53,7 @@ public class Destination {
 		return (world != null) ? new Location(world, this.x, this.y, this.z) : null;
 	}
 	
-	public Destination(Player player, DestinationTypes type) {
-		this.type = type;
+	public Destination(Player player) {
 		this.world = player.getWorld().getName();
 		this.worldUniqueId = player.getWorld().getUniqueId();
 		this.x = player.getLocation().getX();
@@ -71,8 +64,7 @@ public class Destination {
 		this.roll = player.getRotation().getZ();
 	}
 	
-	public Destination(String world, UUID worldUniqueId, Double x, Double y, Double z, Double yaw, Double pitch, Double roll, DestinationTypes type) {
-		this.type = type;
+	public Destination(String world, UUID worldUniqueId, Double x, Double y, Double z, Double yaw, Double pitch, Double roll) {
 		this.world = world;
 		this.worldUniqueId = worldUniqueId;
 		this.x = x;
