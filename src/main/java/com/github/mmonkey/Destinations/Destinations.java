@@ -43,6 +43,7 @@ public class Destinations {
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
 	public static final String VERSION = "0.1.2-2.1";
+    public static final int CURRENT_CONFIG_VERSION = 1;
 	
 	private Game game;
 	private Optional<PluginContainer> pluginContainer;
@@ -254,28 +255,62 @@ public class Destinations {
 
     private void runConfigMigrations(int configVersion) {
 
-        switch (configVersion) {
-            case 0:
-                Migration defaultConfigMigration = new AddDatabaseSettingsToDefaultConfig(this);
-                defaultConfigMigration.migrate();
-                break;
+        int version = configVersion;
+        boolean isLess = (version < CURRENT_CONFIG_VERSION);
 
-            default:
-                break;
+        while (version != CURRENT_CONFIG_VERSION) {
+
+            Migration migration = null;
+
+            switch (configVersion) {
+                case 0:
+                    migration = new AddDatabaseSettingsToDefaultConfig(this);
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (migration != null) {
+                if (isLess) {
+                    migration.up();
+                    version++;
+                } else {
+                    migration.down();
+                    version--;
+                }
+            }
         }
 
     }
 
     private void runDatabaseMigrations(int configVersion) {
 
-        switch (configVersion) {
-            case 0:
-                Migration addInitialTables = new AddInitialDatabaseTables(this.h2db);
-                addInitialTables.migrate();
-                break;
+        int version = configVersion;
+        boolean isLess = (version < CURRENT_CONFIG_VERSION);
 
-            default:
-                break;
+        while (version != CURRENT_CONFIG_VERSION) {
+
+            Migration migration = null;
+
+            switch (configVersion) {
+                case 0:
+                    migration = new AddInitialDatabaseTables(this.h2db);
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (migration != null) {
+                if (isLess) {
+                    migration.up();
+                    version++;
+                } else {
+                    migration.down();
+                    version--;
+                }
+            }
         }
 
     }
