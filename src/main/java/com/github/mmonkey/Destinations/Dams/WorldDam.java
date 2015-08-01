@@ -2,10 +2,7 @@ package com.github.mmonkey.Destinations.Dams;
 
 import com.github.mmonkey.Destinations.Database.Database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.UUID;
 
 public class WorldDam {
@@ -16,21 +13,20 @@ public class WorldDam {
 
     public int getWorldId(UUID worldUniqueId) {
 
-        this.addWorld(worldUniqueId);
-
         int worldId = 0;
+
         Connection connection = null;
-        Statement statement = null;
-        ResultSet result;
-        String sql = "SELECT id FROM " + tblName +
-                " WHERE unique_id = " + worldUniqueId.toString() +
-                " LIMIT 1;";
+        PreparedStatement statement = null;
+        ResultSet result = null;
+
+        String sql = "SELECT id FROM " + tblName + " WHERE unique_id = ? LIMIT 1";
 
         try {
 
             connection = database.getConnection();
-            statement = connection.createStatement();
-            result = statement.executeQuery(sql);
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, worldUniqueId.toString());
+            result = statement.executeQuery();
 
             while (result.next()) {
                 worldId = result.getInt("id");
@@ -42,30 +38,41 @@ public class WorldDam {
 
         } finally {
 
+            try { if (result != null) result.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
 
+        }
+
+        if (worldId == 0) {
+            worldId = this.insertWorld(worldUniqueId);
         }
 
         return worldId;
 
     }
 
-    private void addWorld(UUID worldUniqueId) {
+    private int insertWorld(UUID worldUniqueId) {
+
+        int id = 0;
 
         Connection connection = null;
-        Statement statement = null;
-        String sql = "IF NOT EXISTS " +
-                "(SELECT id FROM " + tblName +
-                " WHERE unique_id = " + worldUniqueId.toString() + ")" +
-                " INSERT INTO " + tblName + " (unique_id)" +
-                " VALUES (" + worldUniqueId.toString() + ");";
+        PreparedStatement statement = null;
+        ResultSet result = null;
+
+        String sql = "INSERT INTO " + tblName + " (unique_id) VALUES (?)";
 
         try {
 
             connection = database.getConnection();
-            statement = connection.createStatement();
-            statement.execute(sql);
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, worldUniqueId.toString());
+            statement.executeUpdate();
+            result = statement.getGeneratedKeys();
+
+            if (result.next()) {
+                id = result.getInt(1);
+            }
 
         } catch (SQLException e) {
 
@@ -73,10 +80,13 @@ public class WorldDam {
 
         } finally {
 
+            try { if (result != null) result.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
 
         }
+
+        return id;
     }
 
     public WorldDam(Database database) {

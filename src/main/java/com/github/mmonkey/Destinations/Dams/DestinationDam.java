@@ -23,7 +23,7 @@ public class DestinationDam {
         int id = 0;
         String sql = "INSERT INTO " + tblName +
                 " (world_id, x, y, z, yaw, pitch, roll)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?);";
+                " VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try {
 

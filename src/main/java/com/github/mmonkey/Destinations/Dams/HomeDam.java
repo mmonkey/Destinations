@@ -17,26 +17,13 @@ public class HomeDam {
     private PlayerDam playerDam;
     private DestinationDam destinationDam;
 
-    String sql = "SELECT" +
-            " homes.name," +
-            " homes.owner_id," +
-            " destinations.x," +
-            " destinations.y," +
-            " destinations.z," +
-            " destinations.yaw," +
-            " destinations.pitch," +
-            " destinations.roll," +
-            " world.unique_id" +
-            " FROM " + tblName +
-            " JOIN destinations ON homes.destination_id = destinations.id" +
-            " JOIN worlds ON destinations.world_id = worlds.id" +
-            " JOIN players ON homes.owner_id = players.id;";
-
     public ArrayList<HomeModel> getPlayerHomes(Player player) {
+
+        int playerId = this.playerDam.getPlayerId(player.getUniqueId());
 
         ArrayList<HomeModel> homes = new ArrayList<HomeModel>();
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet result = null;
         String sql = "SELECT" +
                 " homes.name," +
@@ -47,23 +34,24 @@ public class HomeDam {
                 " destinations.yaw," +
                 " destinations.pitch," +
                 " destinations.roll," +
-                " world.unique_id" +
+                " worlds.unique_id" +
                 " FROM " + tblName +
                 " JOIN destinations ON homes.destination_id = destinations.id" +
                 " JOIN worlds ON destinations.world_id = worlds.id" +
                 " JOIN players ON homes.owner_id = players.id" +
-                " WHERE homes.owner_id = " + player.getUniqueId().toString() + ";";
+                " WHERE homes.owner_id = ?";
 
         try {
 
             connection = database.getConnection();
-            statement = connection.createStatement();
-            result = statement.executeQuery(sql);
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, playerId);
+            result = statement.executeQuery();
 
             while (result.next()) {
 
                 DestinationModel destination = new DestinationModel(
-                        UUID.fromString(result.getString("world.unique_id")),
+                        UUID.fromString(result.getString("worlds.unique_id")),
                         result.getDouble("destinations.x"),
                         result.getDouble("destinations.y"),
                         result.getDouble("destinations.z"),
@@ -98,9 +86,11 @@ public class HomeDam {
 
     public HomeModel getPlayerHomeByName(Player player, String name) {
 
+        int playerId = this.playerDam.getPlayerId(player.getUniqueId());
+
         HomeModel home = null;
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet result = null;
         String sql = "SELECT" +
                 " homes.name," +
@@ -111,25 +101,27 @@ public class HomeDam {
                 " destinations.yaw," +
                 " destinations.pitch," +
                 " destinations.roll," +
-                " world.unique_id" +
+                " worlds.unique_id" +
                 " FROM " + tblName +
                 " JOIN destinations ON homes.destination_id = destinations.id" +
                 " JOIN worlds ON destinations.world_id = worlds.id" +
                 " JOIN players ON homes.owner_id = players.id" +
-                " WHERE homes.owner_id = " + player.getUniqueId().toString() +
-                " AND UPPER(homes.name) = UPPER(" + name + ")" +
-                " LIMIT 1;";
+                " WHERE homes.owner_id = ?" +
+                " AND UPPER(homes.name) = UPPER(?)" +
+                " LIMIT 1";
 
         try {
 
             connection = database.getConnection();
-            statement = connection.createStatement();
-            result = statement.executeQuery(sql);
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, playerId);
+            statement.setString(2, name);
+            result = statement.executeQuery();
 
             while (result.next()) {
 
                 DestinationModel destination = new DestinationModel(
-                        UUID.fromString(result.getString("world.unique_id")),
+                        UUID.fromString(result.getString("worlds.unique_id")),
                         result.getDouble("destinations.x"),
                         result.getDouble("destinations.y"),
                         result.getDouble("destinations.z"),
@@ -159,7 +151,7 @@ public class HomeDam {
         return home;
     }
 
-    public int saveHome(Player player, String name) {
+    public int insertHome(Player player, String name) {
 
         int playerId = this.playerDam.getPlayerId(player.getUniqueId());
         int destinationId = this.destinationDam.saveDestination(player);
@@ -171,7 +163,7 @@ public class HomeDam {
         int id = 0;
         String sql = "INSERT INTO " + tblName +
                 " (destination_id, owner_id, name)" +
-                " VALUES (?, ?, ?);";
+                " VALUES (?, ?, ?)";
 
         try {
 

@@ -57,7 +57,7 @@ public class SetHomeCommand implements CommandExecutor {
 		}
 
 		name = name.equals("") ? getAvailableName(homes) : name;
-		homeDam.saveHome(player, name);
+		homeDam.insertHome(player, name);
 		
 		player.sendMessage(
 			Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!").builder()
