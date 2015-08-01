@@ -1,12 +1,11 @@
-package com.gmail.mmonkey.Destinations.Database;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
+package com.github.mmonkey.Destinations.Database;
 
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.sql.SqlService;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 abstract class Database {
 	

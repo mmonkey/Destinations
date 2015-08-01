@@ -1,15 +1,14 @@
-package com.gmail.mmonkey.Destinations.Database;
+package com.github.mmonkey.Destinations.Database;
+
+import org.h2.tools.Server;
+import org.spongepowered.api.Game;
 
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.h2.tools.Server;
-import org.spongepowered.api.Game;
+public class H2EmbeddedDatabase extends Database {
 
-public class H2EmbededDatabase extends Database {
-
-	private static final String jdbcH2EmbededUrl = "jdbc:h2:file:";
 	private static final String defaultPath = "." + File.separator + "data";
 	
 	private String dbName;
@@ -35,7 +34,7 @@ public class H2EmbededDatabase extends Database {
 		
 		this.setUsername(this.username);
 		this.setPassword(this.password);
-		this.setJdbcUrl(jdbcH2EmbededUrl + path + File.separator + this.dbName + ";user=" + this.username + ";password=" + this.password);
+		this.setJdbcUrl("jdbc:h2:file:" + path + File.separator + this.dbName + ";user=" + this.username + ";password=" + this.password);
 		return super.getConnection();
 		
 	}
@@ -62,7 +61,7 @@ public class H2EmbededDatabase extends Database {
 	
 	}
 	
-	public H2EmbededDatabase(Game game, String dbName, String username, String password) {
+	public H2EmbeddedDatabase(Game game, String dbName, String username, String password) {
 		super(game);
 		this.dbName = dbName;
 		this.username = username;
