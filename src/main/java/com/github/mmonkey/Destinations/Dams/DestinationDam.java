@@ -1,7 +1,9 @@
 package com.github.mmonkey.Destinations.Dams;
 
 import com.github.mmonkey.Destinations.Database.Database;
+import com.github.mmonkey.Destinations.Models.DestinationModel;
 import org.spongepowered.api.entity.player.Player;
+import sun.security.krb5.internal.crypto.Des;
 
 import java.sql.*;
 
@@ -12,15 +14,16 @@ public class DestinationDam {
     private Database database;
     private WorldDam worldDam;
 
-    public int saveDestination(Player player) {
+    public DestinationModel insertDestination(Player player) {
 
+        DestinationModel destination = null;
+        int id = 0;
         int worldId = this.worldDam.getWorldId(player.getWorld().getUniqueId());
 
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet result = null;
 
-        int id = 0;
         String sql = "INSERT INTO " + tblName +
                 " (world_id, x, y, z, yaw, pitch, roll)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -36,6 +39,47 @@ public class DestinationDam {
             statement.setDouble(5, player.getRotation().getX());
             statement.setDouble(6, player.getRotation().getY());
             statement.setDouble(7, player.getRotation().getZ());
+            statement.executeUpdate();
+            result = statement.getGeneratedKeys();
+
+            if (result.next()) {
+                id = result.getInt(1);
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try { if (result != null) result.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
+
+        }
+
+        if (id > 0) {
+            destination = new DestinationModel(id, player);
+        }
+
+        return destination;
+    }
+
+    public int deleteDestination(DestinationModel destination) {
+
+        int id = 0;
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+
+        String sql = "DELETE FROM " + tblName + " WHERE id = ? LIMIT 1";
+
+        try {
+
+            connection = database.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, destination.getId());
             statement.executeUpdate();
             result = statement.getGeneratedKeys();
 

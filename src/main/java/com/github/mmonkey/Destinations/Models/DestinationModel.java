@@ -12,6 +12,7 @@ import com.flowpowered.math.vector.Vector3d;
 
 public class DestinationModel {
 
+	private int id = 0;
 	private UUID worldUniqueId;
 	private Double x;
 	private Double y;
@@ -19,6 +20,10 @@ public class DestinationModel {
 	private Double yaw;
 	private Double pitch;
 	private Double roll;
+
+	public int getId() {
+		return this.id;
+	}
 	
 	public UUID getWorldUniqueId() {
 		return this.worldUniqueId;
@@ -49,7 +54,8 @@ public class DestinationModel {
 		return (world != null) ? new Location(world, this.x, this.y, this.z) : null;
 	}
 	
-	public DestinationModel(Player player) {
+	public DestinationModel(int id, Player player) {
+        this.id = id;
 		this.worldUniqueId = player.getWorld().getUniqueId();
 		this.x = player.getLocation().getX();
 		this.y = player.getLocation().getY();
@@ -59,7 +65,8 @@ public class DestinationModel {
 		this.roll = player.getRotation().getZ();
 	}
 	
-	public DestinationModel(UUID worldUniqueId, Double x, Double y, Double z, Double yaw, Double pitch, Double roll) {
+	public DestinationModel(int id, UUID worldUniqueId, Double x, Double y, Double z, Double yaw, Double pitch, Double roll) {
+        this.id = id;
 		this.worldUniqueId = worldUniqueId;
 		this.x = x;
 		this.y = y;

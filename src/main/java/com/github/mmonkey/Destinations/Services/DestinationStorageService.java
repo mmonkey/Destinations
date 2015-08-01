@@ -14,7 +14,6 @@ import com.github.mmonkey.Destinations.Destinations;
 public class DestinationStorageService extends StorageService {
 
     public static final String DESTINATION = "destination";
-    public static final String WORLD = "world";
     public static final String WORLD_UUID = "worldUUID";
     public static final String LOCATION_X = "locationX";
     public static final String LOCATION_Y = "locationY";

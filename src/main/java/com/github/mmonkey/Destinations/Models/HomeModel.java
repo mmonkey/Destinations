@@ -3,9 +3,14 @@ package com.github.mmonkey.Destinations.Models;
 import org.spongepowered.api.entity.player.Player;
 
 public class HomeModel {
-	
+
+	private int id;
 	private String name;
 	private DestinationModel destination;
+
+	public int getId() {
+		return this.id;
+	}
 	
 	public String getName() {
 		return name;
@@ -23,12 +28,13 @@ public class HomeModel {
 		this.destination = destination;
 	}
 	
-	public HomeModel(String name, Player player) {
+	public HomeModel(int id, String name, Player player) {
+		this.id = id;
 		this.name = name;
-		this.destination = new DestinationModel(player);
 	}
 	
-	public HomeModel(String name, DestinationModel destination) {
+	public HomeModel(int id, String name, DestinationModel destination) {
+		this.id = id;
 		this.name = name;
 		this.destination = destination;
 	}

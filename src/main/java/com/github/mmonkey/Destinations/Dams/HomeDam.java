@@ -26,8 +26,10 @@ public class HomeDam {
         PreparedStatement statement = null;
         ResultSet result = null;
         String sql = "SELECT" +
+                " homes.id, " +
                 " homes.name," +
                 " homes.owner_id," +
+                " destinations.id," +
                 " destinations.x," +
                 " destinations.y," +
                 " destinations.z," +
@@ -51,6 +53,7 @@ public class HomeDam {
             while (result.next()) {
 
                 DestinationModel destination = new DestinationModel(
+                        result.getInt("destinations.id"),
                         UUID.fromString(result.getString("worlds.unique_id")),
                         result.getDouble("destinations.x"),
                         result.getDouble("destinations.y"),
@@ -61,6 +64,7 @@ public class HomeDam {
                 );
 
                 HomeModel home = new HomeModel(
+                        result.getInt("homes.id"),
                         result.getString("homes.name"),
                         destination
                 );
@@ -93,8 +97,10 @@ public class HomeDam {
         PreparedStatement statement = null;
         ResultSet result = null;
         String sql = "SELECT" +
+                " homes.id," +
                 " homes.name," +
                 " homes.owner_id," +
+                " destinations.id," +
                 " destinations.x," +
                 " destinations.y," +
                 " destinations.z," +
@@ -121,6 +127,7 @@ public class HomeDam {
             while (result.next()) {
 
                 DestinationModel destination = new DestinationModel(
+                        result.getInt("destinations.id"),
                         UUID.fromString(result.getString("worlds.unique_id")),
                         result.getDouble("destinations.x"),
                         result.getDouble("destinations.y"),
@@ -131,6 +138,7 @@ public class HomeDam {
                 );
 
                 home = new HomeModel(
+                        result.getInt("homes.id"),
                         result.getString("homes.name"),
                         destination
                 );
@@ -151,16 +159,17 @@ public class HomeDam {
         return home;
     }
 
-    public int insertHome(Player player, String name) {
+    public HomeModel insertHome(Player player, String name) {
 
+        HomeModel home = null;
+        int id = 0;
         int playerId = this.playerDam.getPlayerId(player.getUniqueId());
-        int destinationId = this.destinationDam.saveDestination(player);
+        DestinationModel destination = this.destinationDam.insertDestination(player);
 
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet result = null;
 
-        int id = 0;
         String sql = "INSERT INTO " + tblName +
                 " (destination_id, owner_id, name)" +
                 " VALUES (?, ?, ?)";
@@ -169,9 +178,58 @@ public class HomeDam {
 
             connection = database.getConnection();
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, destinationId);
+            statement.setInt(1, destination.getId());
             statement.setInt(2, playerId);
             statement.setString(3, name);
+            statement.executeUpdate();
+            result = statement.getGeneratedKeys();
+
+            if (result.next()) {
+                id = result.getInt(1);
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try { if (result != null) result.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
+
+        }
+
+        if (id > 0) {
+            home = new HomeModel(id, name, destination);
+        }
+
+        return home;
+    }
+
+    public int deleteHome(Player player, HomeModel home) {
+
+        int id = 0;
+        int playerId = this.playerDam.getPlayerId(player.getUniqueId());
+        this.destinationDam.deleteDestination(home.getDestination());
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+
+        String sql = "DELETE FROM " + tblName +
+                " WHERE owner_id = ?" +
+                " AND destination_id = ?" +
+                " AND UPPER(homes.name) = UPPER(?)" +
+                " LIMIT 1";
+
+        try {
+
+            connection = database.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, playerId);
+            statement.setInt(2, home.getDestination().getId());
+            statement.setString(3, home.getName());
             statement.executeUpdate();
             result = statement.getGeneratedKeys();
 

@@ -1,7 +1,7 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.List;
-
+import com.github.mmonkey.Destinations.Dams.HomeDam;
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -20,6 +20,7 @@ import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 public class DelHomeCommand implements CommandExecutor {
 	
 	private Destinations plugin;
+	private HomeDam homeDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -30,13 +31,14 @@ public class DelHomeCommand implements CommandExecutor {
 		boolean force = (args.hasAny("f")) ? (Boolean) args.getOne("f").get() : false;
 		boolean cancel = (args.hasAny("c")) ? (Boolean) args.getOne("c").get() : false;
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
+
 		Player player = (Player) src;
-		List<String> list = plugin.getHomeStorageService().getHomeList(player);
+		HomeModel home = homeDam.getPlayerHomeByName(player, name);
 		
 		if (cancel) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.").builder()
+				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.").builder()
 				.build()
 			);
 			
@@ -44,14 +46,14 @@ public class DelHomeCommand implements CommandExecutor {
 			
 		}
 		
-		if (force && list.contains(name)) {
+		if (force && home != null) {
 			
-			deleteHome(player, name);
+			deleteHome(player, home);
 			return CommandResult.success();
 				
 		}
 		
-		if (list.contains(name)) {
+		if (home != null) {
 			
 			player.sendMessage(
 				Texts.of(CommandMessageFormatting.NEWLINE_TEXT).builder()
@@ -68,7 +70,7 @@ public class DelHomeCommand implements CommandExecutor {
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "HomeModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist.").builder()
+				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist.").builder()
 				.build()
 			);
 			
@@ -78,19 +80,19 @@ public class DelHomeCommand implements CommandExecutor {
 
 	}
 	
-	private void deleteHome(Player player, String name) {
+	private void deleteHome(Player player, HomeModel home) {
 		
-		if (plugin.getHomeStorageService().removeHome(player, name)) {
+		if (homeDam.deleteHome(player, home) > 0) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.SUCCESS, " was successfully deleted!").builder()
+				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.DELETED_OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully deleted!").builder()
 				.build()
 			);
 			
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "HomeModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, and could not be deleted.").builder()
+				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.DELETED_OBJECT, home.getName(), FormatUtil.ERROR, " doesn't exist, and could not be deleted.").builder()
 				.build()
 			);
 			
@@ -122,6 +124,7 @@ public class DelHomeCommand implements CommandExecutor {
 	
 	public DelHomeCommand(Destinations plugin) {
 		this.plugin = plugin;
+		this.homeDam = new HomeDam(plugin.getDatabase());
 	}
 
 }
