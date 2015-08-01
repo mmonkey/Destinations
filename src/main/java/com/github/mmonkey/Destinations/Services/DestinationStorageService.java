@@ -25,12 +25,10 @@ public class DestinationStorageService extends StorageService {
 
     public void saveDestination(CommentedConfigurationNode config, DestinationModel destination) {
 
-        String world = destination.getWorldName();
         UUID worldUniqueId = destination.getWorldUniqueId();
         Location location = destination.getLocation(getPlugin().getGame());
         Vector3d rotation = destination.getRotation();
 
-        config.getNode(DESTINATION, WORLD).setValue(world);
         config.getNode(DESTINATION, WORLD_UUID).setValue(worldUniqueId.toString());
         config.getNode(DESTINATION, LOCATION_X).setValue(location.getX());
         config.getNode(DESTINATION, LOCATION_Y).setValue(location.getY());
@@ -48,7 +46,6 @@ public class DestinationStorageService extends StorageService {
         UUID worldUniqueId = (destinationConfig.getNode(WORLD_UUID).getString() == null) ? null : UUID.fromString(destinationConfig.getNode(WORLD_UUID).getString());
 
         return new DestinationModel(
-                destinationConfig.getNode(WORLD).getString(),
                 worldUniqueId,
                 destinationConfig.getNode(LOCATION_X).getDouble(),
                 destinationConfig.getNode(LOCATION_Y).getDouble(),
