@@ -1,8 +1,8 @@
 package com.github.mmonkey.Destinations.Commands;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import com.github.mmonkey.Destinations.Dams.HomeDam;
 import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
@@ -16,8 +16,8 @@ import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class SetHomeCommand implements CommandExecutor {
-	
-	private Destinations plugin;
+
+	private HomeDam homeDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -29,37 +29,38 @@ public class SetHomeCommand implements CommandExecutor {
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		
 		Player player = (Player) src;
-		List<String> list = plugin.getHomeStorageService().getHomeList(player);
-		HomeModel home = createHome(player, name);
+		ArrayList<HomeModel> homes = homeDam.getPlayerHomes(player);
+		HomeModel home = homeDam.getPlayerHomeByName(player, name);
 		
-		if (force && list.contains(home.getName())) {
-			
-			plugin.getHomeStorageService().updateHome(player, home);
+//		if (force && list.contains(home.getName())) {
+//
+//			plugin.getHomeStorageService().updateHome(player, home);
+//
+//			player.sendMessage(
+//				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
+//				.build()
+//			);
+//
+//			return CommandResult.success();
+//
+//		}
+		
+		if (home != null) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
+				Texts.of(FormatUtil.ERROR, "HomeModel ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists!").builder()
 				.build()
 			);
 			
 			return CommandResult.success();
 			
 		}
-		
-		if (list.contains(home.getName())) {
-			
-			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.ERROR, " already exists!").builder()
-				.build()
-			);
-			
-			return CommandResult.success();
-			
-		}
-		
-		plugin.getHomeStorageService().addHome(player, home);
+
+		name = name.equals("") ? getAvailableName(homes) : name;
+		homeDam.saveHome(player, name);
 		
 		player.sendMessage(
-			Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully created!").builder()
+			Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!").builder()
 			.build()
 		);
 		
@@ -68,21 +69,8 @@ public class SetHomeCommand implements CommandExecutor {
 	}
 	
 	/**
-	 * Creates a new home of given name, if no name is passed, one will be generated
-	 * 
-	 * @param player Player
-	 * @param name String
-	 * @return HomeModel
-	 */
-	private HomeModel createHome(Player player, String name) {
-
-		ArrayList<HomeModel> playerHomes = plugin.getHomeStorageService().getHomes(player);
-		return (name.equals("")) ? new HomeModel(getAvailableName(playerHomes), player) : new HomeModel(name, player);
-
-	}
-	
-	/**
 	 * Returns available home name, example: home4
+	 *
 	 * @param homes ArrayList<HomeModel>
 	 * @return String
 	 */
@@ -112,7 +100,7 @@ public class SetHomeCommand implements CommandExecutor {
 	}
 	
 	public SetHomeCommand(Destinations plugin) {
-		this.plugin = plugin;
+		this.homeDam = new HomeDam(plugin.getDatabase());
 	}
 
 }

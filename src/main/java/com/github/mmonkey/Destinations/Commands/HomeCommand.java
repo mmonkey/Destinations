@@ -1,7 +1,9 @@
 package com.github.mmonkey.Destinations.Commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+import com.github.mmonkey.Destinations.Dams.HomeDam;
 import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
@@ -14,10 +16,12 @@ import org.spongepowered.api.world.Location;
 
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.world.World;
 
 public class HomeCommand implements CommandExecutor {
 	
 	private Destinations plugin;
+	private HomeDam homeDam;
 
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		
@@ -27,14 +31,14 @@ public class HomeCommand implements CommandExecutor {
 		
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		Player player = (Player) src;
-		ArrayList<HomeModel> homes = plugin.getHomeStorageService().getHomes(player);
+		ArrayList<HomeModel> homes = this.filterHomes(homeDam.getPlayerHomes(player));
 		
 		if (homes.isEmpty()) {	
 			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!").builder().build());
 			return CommandResult.success();
 		}
 			
-		HomeModel home = (name.equals("")) ? getClosestHome(player, homes) : getNamedHome(player, homes, name);
+		HomeModel home = (name.equals("")) ? getClosestHome(player, homes) : getNamedHome(homes, name);
 		Location location = (home != null) ? home.getDestination().getLocation(plugin.getGame()) : null;
 			
 		if (location != null) {
@@ -79,16 +83,31 @@ public class HomeCommand implements CommandExecutor {
 		return result;
 		
 	}
+
+	private ArrayList<HomeModel> filterHomes(ArrayList<HomeModel> homes) {
+
+		Collection<World> worlds = plugin.getGame().getServer().getWorlds();
+		ArrayList<HomeModel> list = new ArrayList<HomeModel>();
+		for (World world: worlds) {
+			for (HomeModel home: homes) {
+				if (home.getDestination().getWorldUniqueId().equals(world.getUniqueId())) {
+					list.add(home);
+				}
+			}
+		}
+
+		return list;
+
+	}
 	
 	/**
 	 * Get the HomeModel of the given name.
-	 * 
-	 * @param player Player
+	 *
 	 * @param homes ArrayList<HomeModel>
 	 * @param name String
 	 * @return HomeModel|null
 	 */
-	public HomeModel getNamedHome(Player player, ArrayList<HomeModel> homes, String name) {
+	public HomeModel getNamedHome(ArrayList<HomeModel> homes, String name) {
 
 		for (HomeModel home: homes) {
 			if (home.getName().equals(name)) {
@@ -102,6 +121,7 @@ public class HomeCommand implements CommandExecutor {
 	
 	public HomeCommand(Destinations plugin) {
 		this.plugin = plugin;
+		this.homeDam = new HomeDam(plugin.getDatabase());
 	}
 
 }
