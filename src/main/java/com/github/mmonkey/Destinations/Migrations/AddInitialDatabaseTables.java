@@ -18,11 +18,11 @@ public class AddInitialDatabaseTables implements Migration {
 
         // Create worlds table
         sql.append("CREATE TABLE IF NOT EXISTS worlds "
-                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, unique_id UUID NOT NULL);");
+                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, unique_id VARCHAR(255) NOT NULL);");
 
         // Create players table
         sql.append("CREATE TABLE IF NOT EXISTS players "
-                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, unique_id UUID NOT NULL);");
+                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, unique_id VARCHAR(255) NOT NULL);");
 
         // Create destinations table
         sql.append("CREATE TABLE IF NOT EXISTS destinations" +
