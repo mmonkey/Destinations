@@ -14,14 +14,14 @@ public class AddDatabaseSettingsToDefaultConfig implements Migration {
         config.getNode(DefaultConfigStorageService.DATABASE_SETTINGS, DefaultConfigStorageService.PASSWORD).setValue("");
         config.getNode(DefaultConfigStorageService.DATABASE_SETTINGS, DefaultConfigStorageService.USERNAME).setValue("admin");
         config.getNode(DefaultConfigStorageService.DATABASE_SETTINGS, DefaultConfigStorageService.WEBSERVER).setValue(false);
-        plugin.getDefaultConfigService().save();
+        plugin.getDefaultConfigService().saveConfig();
     }
 
     public void down() {
         CommentedConfigurationNode config = plugin.getDefaultConfigService().getConfig();
         config.getNode(DefaultConfigStorageService.VERSION).setValue(0);
         config.removeChild(DefaultConfigStorageService.DATABASE_SETTINGS);
-        plugin.getDefaultConfigService().save();
+        plugin.getDefaultConfigService().saveConfig();
     }
 
     public AddDatabaseSettingsToDefaultConfig(Destinations plugin) {
