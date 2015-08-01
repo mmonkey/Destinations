@@ -8,7 +8,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.world.Location;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.github.mmonkey.Destinations.Destination;
+import com.github.mmonkey.Destinations.Models.DestinationModel;
 import com.github.mmonkey.Destinations.Destinations;
 
 public class DestinationStorageService extends StorageService {
@@ -23,7 +23,7 @@ public class DestinationStorageService extends StorageService {
     public static final String ROTATION_Y = "rotationY";
     public static final String ROTATION_Z = "rotationZ";
 
-    public void saveDestination(CommentedConfigurationNode config, Destination destination) {
+    public void saveDestination(CommentedConfigurationNode config, DestinationModel destination) {
 
         String world = destination.getWorldName();
         UUID worldUniqueId = destination.getWorldUniqueId();
@@ -41,21 +41,21 @@ public class DestinationStorageService extends StorageService {
 
     }
 
-    public Destination getDestination(CommentedConfigurationNode config) {
+    public DestinationModel getDestination(CommentedConfigurationNode config) {
 
         CommentedConfigurationNode destinationConfig = config.getNode(DESTINATION);
 
         UUID worldUniqueId = (destinationConfig.getNode(WORLD_UUID).getString() == null) ? null : UUID.fromString(destinationConfig.getNode(WORLD_UUID).getString());
 
-        return new Destination(
-                (String) destinationConfig.getNode(WORLD).getString(),
+        return new DestinationModel(
+                destinationConfig.getNode(WORLD).getString(),
                 worldUniqueId,
-                (Double) destinationConfig.getNode(LOCATION_X).getDouble(),
-                (Double) destinationConfig.getNode(LOCATION_Y).getDouble(),
-                (Double) destinationConfig.getNode(LOCATION_Z).getDouble(),
-                (Double) destinationConfig.getNode(ROTATION_X).getDouble(),
-                (Double) destinationConfig.getNode(ROTATION_Y).getDouble(),
-                (Double) destinationConfig.getNode(ROTATION_Z).getDouble()
+                destinationConfig.getNode(LOCATION_X).getDouble(),
+                destinationConfig.getNode(LOCATION_Y).getDouble(),
+                destinationConfig.getNode(LOCATION_Z).getDouble(),
+                destinationConfig.getNode(ROTATION_X).getDouble(),
+                destinationConfig.getNode(ROTATION_Y).getDouble(),
+                destinationConfig.getNode(ROTATION_Z).getDouble()
         );
     }
 

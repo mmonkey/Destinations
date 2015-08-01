@@ -1,4 +1,4 @@
-package com.github.mmonkey.Destinations;
+package com.github.mmonkey.Destinations.Models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,11 +6,11 @@ import java.util.UUID;
 
 import org.spongepowered.api.entity.player.Player;
 
-public class Warp {
+public class WarpModel {
 
 	private String name;
 	private UUID ownerUniqueId;
-	private Destination destination;
+	private DestinationModel destination;
 	private boolean isPublic = true;
 	private Map<UUID, Boolean> whitelist = new HashMap<UUID, Boolean>();
 	
@@ -30,11 +30,11 @@ public class Warp {
 		this.ownerUniqueId = uniqueId;
 	}
 	
-	public Destination getDestination() {
+	public DestinationModel getDestination() {
 		return this.destination;
 	}
 	
-	public void setDestination(Destination destination) {
+	public void setDestination(DestinationModel destination) {
 		this.destination = destination;
 	}
 	
@@ -54,13 +54,13 @@ public class Warp {
 		this.whitelist = whitelist;
 	}
 	
-	public Warp() {
+	public WarpModel() {
 	}
 	
-	public Warp(String name, Player player) {
+	public WarpModel(String name, Player player) {
 		this.name = name;
 		this.ownerUniqueId = player.getUniqueId();
-		this.destination = new Destination(player);
+		this.destination = new DestinationModel(player);
 	}
 	
 }

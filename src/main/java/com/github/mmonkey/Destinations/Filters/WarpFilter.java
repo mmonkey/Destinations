@@ -3,13 +3,13 @@ package com.github.mmonkey.Destinations.Filters;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 import com.gmail.mmonkey.Commando.Match;
 import com.gmail.mmonkey.Commando.Filters.Filter;
@@ -29,7 +29,7 @@ public class WarpFilter extends Filter {
 		List<String> warpList = plugin.getWarpStorageService().getWarpList();
 		if (warpList.contains(match.getContent())) {
 		
-			Warp warp = plugin.getWarpStorageService().getWarp(match.getContent());
+			WarpModel warp = plugin.getWarpStorageService().getWarp(match.getContent());
 			return getWarpAction(match.getTitle(), warp.getName());
 		
 		} else {

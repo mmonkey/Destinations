@@ -15,7 +15,7 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
@@ -32,7 +32,7 @@ public class ListWarpsCommand implements CommandExecutor {
 		Player player = (Player) src;
 		int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
 		
-		Collection<Warp> warps = plugin.getWarpStorageService().getPlayerWarps(player);
+		Collection<WarpModel> warps = plugin.getWarpStorageService().getPlayerWarps(player);
 		
 		if (warps.size() == 0) {
 			
@@ -46,7 +46,7 @@ public class ListWarpsCommand implements CommandExecutor {
 		
 		PaginatedList paginatedList = new PaginatedList("/listwarps");
 		
-		for (Warp warp: warps) {
+		for (WarpModel warp: warps) {
 			
 			TextBuilder row = Texts.builder();
 			row.append(getWarpAction(warp));
@@ -74,7 +74,7 @@ public class ListWarpsCommand implements CommandExecutor {
 	
 	}
 	
-	private Text getWarpAction(Warp warp) {
+	private Text getWarpAction(WarpModel warp) {
 		
 		if (warp.isPublic()) {
 			
@@ -98,7 +98,7 @@ public class ListWarpsCommand implements CommandExecutor {
 		
 	}
 	
-	private Text getDeleteWarpAction(Warp warp, Player player) {
+	private Text getDeleteWarpAction(WarpModel warp, Player player) {
 		
 		if (warp.getWhitelist().containsKey(player.getUniqueId()) || warp.getOwnerUniqueId().equals(player.getUniqueId())) {
 			

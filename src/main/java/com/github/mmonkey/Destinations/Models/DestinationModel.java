@@ -1,6 +1,6 @@
-package com.github.mmonkey.Destinations;
+package com.github.mmonkey.Destinations.Models;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.spongepowered.api.Game;
@@ -10,7 +10,7 @@ import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3d;
 
-public class Destination {
+public class DestinationModel {
 
 	private String world;
 	private UUID worldUniqueId;
@@ -31,11 +31,10 @@ public class Destination {
 	
 	public World getWorld(Game game) {
 		try {
-			Iterator<World> worlds = game.getServer().getWorlds().iterator();
-			while (worlds.hasNext()) {
-				World w = worlds.next();
-				if(w.getUniqueId().equals(this.getWorldUniqueId()) && w.getName().equals(this.getWorldName())) {
-					return w;
+			Collection<World> worlds = game.getServer().getWorlds();
+			for (World world: worlds) {
+				if(world.getUniqueId().equals(this.getWorldUniqueId()) && world.getName().equals(this.getWorldName())) {
+					return world;
 				}
 			}
 		} catch (Error e) {
@@ -53,7 +52,7 @@ public class Destination {
 		return (world != null) ? new Location(world, this.x, this.y, this.z) : null;
 	}
 	
-	public Destination(Player player) {
+	public DestinationModel(Player player) {
 		this.world = player.getWorld().getName();
 		this.worldUniqueId = player.getWorld().getUniqueId();
 		this.x = player.getLocation().getX();
@@ -64,7 +63,7 @@ public class Destination {
 		this.roll = player.getRotation().getZ();
 	}
 	
-	public Destination(String world, UUID worldUniqueId, Double x, Double y, Double z, Double yaw, Double pitch, Double roll) {
+	public DestinationModel(String world, UUID worldUniqueId, Double x, Double y, Double z, Double yaw, Double pitch, Double roll) {
 		this.world = world;
 		this.worldUniqueId = worldUniqueId;
 		this.x = x;

@@ -36,7 +36,7 @@ public class DelHomeCommand implements CommandExecutor {
 		if (cancel) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.").builder()
+				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.").builder()
 				.build()
 			);
 			
@@ -68,7 +68,7 @@ public class DelHomeCommand implements CommandExecutor {
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist.").builder()
+				Texts.of(FormatUtil.ERROR, "HomeModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist.").builder()
 				.build()
 			);
 			
@@ -83,14 +83,14 @@ public class DelHomeCommand implements CommandExecutor {
 		if (plugin.getHomeStorageService().removeHome(player, name)) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.DELETED_OBJECT, name, FormatUtil.SUCCESS, " was successfully deleted!").builder()
+				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.SUCCESS, " was successfully deleted!").builder()
 				.build()
 			);
 			
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, and could not be deleted.").builder()
+				Texts.of(FormatUtil.ERROR, "HomeModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, and could not be deleted.").builder()
 				.build()
 			);
 			

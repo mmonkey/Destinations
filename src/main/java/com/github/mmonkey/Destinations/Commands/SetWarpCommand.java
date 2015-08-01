@@ -2,6 +2,7 @@ package com.github.mmonkey.Destinations.Commands;
 
 import java.util.UUID;
 
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -10,9 +11,8 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
-import com.github.mmonkey.Destinations.Destination;
+import com.github.mmonkey.Destinations.Models.DestinationModel;
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class SetWarpCommand implements CommandExecutor {
@@ -27,20 +27,20 @@ public class SetWarpCommand implements CommandExecutor {
 		
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		Player player = (Player) src;
-		Warp existing = plugin.getWarpStorageService().getWarp(name);
+		WarpModel existing = plugin.getWarpStorageService().getWarp(name);
 		
 		if (existing != null) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.").builder().build()
+				Texts.of(FormatUtil.ERROR, "WarpModel ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.").builder().build()
 			);
 			
 		}
 		
-		Destination destination = new Destination(player);
+		DestinationModel destination = new DestinationModel(player);
 		UUID uniqueId = player.getUniqueId();
 		
-		Warp warp = new Warp();
+		WarpModel warp = new WarpModel();
 		warp.setName(name);
 		warp.setOwnerUniqueId(uniqueId);
 		warp.getWhitelist().put(uniqueId, true);
@@ -49,7 +49,7 @@ public class SetWarpCommand implements CommandExecutor {
 		plugin.getWarpStorageService().addWarp(warp);
 		
 		player.sendMessage(
-			Texts.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!").builder().build()
+			Texts.of(FormatUtil.SUCCESS, "WarpModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!").builder().build()
 		);
 		
 		return CommandResult.success();

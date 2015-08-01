@@ -4,17 +4,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
-import com.github.mmonkey.Destinations.Destination;
+import com.github.mmonkey.Destinations.Models.DestinationModel;
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Home;
 
 public class HomeStorageService extends DestinationStorageService {
 
-	public void saveHome(CommentedConfigurationNode config, Home home) {
+	public void saveHome(CommentedConfigurationNode config, HomeModel home) {
 		
 		List<String> list = getList(config);
 		
@@ -35,16 +35,16 @@ public class HomeStorageService extends DestinationStorageService {
 		
 	}
 	
-	public ArrayList<Home> getHomes(Player player) {
+	public ArrayList<HomeModel> getHomes(Player player) {
 		
 		CommentedConfigurationNode config = getConfig().getNode(player.getUniqueId().toString());
 		List<String> list = getList(config);
-		ArrayList<Home> homes = new ArrayList<Home>();
+		ArrayList<HomeModel> homes = new ArrayList<HomeModel>();
 		
 		for (String name: list) {
 			
-			Destination destination = getDestination(config.getNode(name));
-			Home home = new Home(name, destination);
+			DestinationModel destination = getDestination(config.getNode(name));
+			HomeModel home = new HomeModel(name, destination);
 			homes.add(home);
 			
 		}
@@ -53,7 +53,7 @@ public class HomeStorageService extends DestinationStorageService {
 		
 	}
 	
-	public void addHome(Player player, Home home) {
+	public void addHome(Player player, HomeModel home) {
 		
 		saveHome(getConfig().getNode(player.getUniqueId().toString()), home);
 		saveConfig();
@@ -82,13 +82,13 @@ public class HomeStorageService extends DestinationStorageService {
 		
 	}
 	
-	public void updateHome(Player player, Home home) {
+	public void updateHome(Player player, HomeModel home) {
 		
 		List<String> list = getHomeList(player);
 		
 		if (list.contains(home.getName())) {
 			
-			Destination destination = home.getDestination();
+			DestinationModel destination = home.getDestination();
 			saveDestination(getConfig().getNode(player.getUniqueId().toString(), home.getName()), destination);
 			saveConfig();
 			

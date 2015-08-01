@@ -1,5 +1,6 @@
 package com.github.mmonkey.Destinations.Commands;
 
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -9,7 +10,6 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class WarpCommand implements CommandExecutor {
@@ -24,12 +24,12 @@ public class WarpCommand implements CommandExecutor {
 		
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		Player player = (Player) src;
-		Warp warp = plugin.getWarpStorageService().getWarp(name);
+		WarpModel warp = plugin.getWarpStorageService().getWarp(name);
 		
 		if (warp == null) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " does not exist.").builder().build()
+				Texts.of(FormatUtil.ERROR, "WarpModel ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " does not exist.").builder().build()
 			);
 			
 			return CommandResult.success();

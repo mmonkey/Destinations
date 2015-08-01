@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.entity.player.Player;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
 
 public class WarpStorageService extends DestinationStorageService {
 	
@@ -22,14 +22,14 @@ public class WarpStorageService extends DestinationStorageService {
 	public static final String WHITELIST = "whitelist";
 	public static final String EDITORS = "editors";
 	
-	private void saveWhitelist(Warp warp) {
+	private void saveWhitelist(WarpModel warp) {
 		CommentedConfigurationNode config = getConfig().getNode(warp.getName(), WHITELIST);
 		for (Map.Entry<UUID, Boolean> item: warp.getWhitelist().entrySet()) {
 			config.getNode(item.getKey().toString()).setValue(item.getValue());
 		}
 	}
 	
-	public boolean addWarp(Warp warp) {
+	public boolean addWarp(WarpModel warp) {
 
 		List<String> list = getList(getConfig());
 		
@@ -52,7 +52,7 @@ public class WarpStorageService extends DestinationStorageService {
 		
 	}
 	
-	public boolean removeWarp(Warp warp) {
+	public boolean removeWarp(WarpModel warp) {
 		
 		List<String> list = getList(getConfig());
 		
@@ -81,7 +81,7 @@ public class WarpStorageService extends DestinationStorageService {
 		
 		for (Map.Entry<Object, ? extends CommentedConfigurationNode> item: mappings.entrySet()) {
 			if (item.getKey() instanceof String) {
-				whitelist.put((UUID) UUID.fromString((String) item.getKey()), item.getValue().getBoolean());
+				whitelist.put(UUID.fromString((String) item.getKey()), item.getValue().getBoolean());
 			}
 		}
 		
@@ -89,11 +89,11 @@ public class WarpStorageService extends DestinationStorageService {
 		
 	}
 	
-	public Collection<Warp> getPlayerWarps(Player player) {
+	public Collection<WarpModel> getPlayerWarps(Player player) {
 		
-		Collection<Warp> warps = getWarps();
+		Collection<WarpModel> warps = getWarps();
 		
-		for (Warp warp: warps) {
+		for (WarpModel warp: warps) {
 			
 			if (!warp.isPublic()
 				&& !warp.getWhitelist().containsKey(player.getUniqueId())
@@ -109,11 +109,11 @@ public class WarpStorageService extends DestinationStorageService {
 		
 	}
 	
-	public Warp getWarp(String name) {
+	public WarpModel getWarp(String name) {
 		
-		Collection<Warp> warps = getWarps();
+		Collection<WarpModel> warps = getWarps();
 		
-		for (Warp warp: warps) {
+		for (WarpModel warp: warps) {
 			if (warp.getName().equalsIgnoreCase(name)) {
 				return warp;
 			}
@@ -122,16 +122,16 @@ public class WarpStorageService extends DestinationStorageService {
 		return null;
 	}
 	
-	public Collection<Warp> getWarps() {
+	public Collection<WarpModel> getWarps() {
 		
 		List<String> list = getList(getConfig());
-		Collection<Warp> warps = new ArrayList<Warp>();
+		Collection<WarpModel> warps = new ArrayList<WarpModel>();
 		
 		for (String item: list) {
 			
 			CommentedConfigurationNode config = getConfig().getNode(item);
 			
-			Warp warp = new Warp();
+			WarpModel warp = new WarpModel();
 			warp.setName(item);
 			warp.setOwnerUniqueId(UUID.fromString(config.getNode(OWNER).getString()));
 			warp.setDestination(getDestination(config));
@@ -154,10 +154,10 @@ public class WarpStorageService extends DestinationStorageService {
 	
 	public List<String> getPlayerWarpList(Player player) {
 		
-		Collection<Warp> warps = getPlayerWarps(player);
+		Collection<WarpModel> warps = getPlayerWarps(player);
 		List<String> list = new ArrayList<String>();
 		
-		for (Warp warp: warps) {
+		for (WarpModel warp: warps) {
 			 list.add(warp.getName());
 		}
 		

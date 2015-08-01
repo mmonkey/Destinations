@@ -2,6 +2,7 @@ package com.github.mmonkey.Destinations.Commands;
 
 import java.util.List;
 
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -15,7 +16,6 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class DelWarpCommand implements CommandExecutor {
@@ -37,7 +37,7 @@ public class DelWarpCommand implements CommandExecutor {
 		if (cancel) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.").builder()
+				Texts.of(FormatUtil.SUCCESS, "WarpModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.").builder()
 				.build()
 			);
 			
@@ -69,7 +69,7 @@ public class DelWarpCommand implements CommandExecutor {
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
+				Texts.of(FormatUtil.ERROR, "WarpModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
 				.build()
 			);
 			
@@ -81,19 +81,19 @@ public class DelWarpCommand implements CommandExecutor {
 	
 	private void deleteWarp(Player player, String name) {
 		
-		Warp warp = plugin.getWarpStorageService().getWarp(name);
+		WarpModel warp = plugin.getWarpStorageService().getWarp(name);
 		
 		if (warp != null && plugin.getWarpStorageService().removeWarp(warp)) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.SUCCESS, " was successfully deleted!").builder()
+				Texts.of(FormatUtil.SUCCESS, "WarpModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.SUCCESS, " was successfully deleted!").builder()
 				.build()
 			);
 			
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
+				Texts.of(FormatUtil.ERROR, "WarpModel ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
 				.build()
 			);
 			

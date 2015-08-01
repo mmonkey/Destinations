@@ -2,6 +2,7 @@ package com.github.mmonkey.Destinations.Commands;
 
 import java.util.ArrayList;
 
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -11,7 +12,6 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.world.Location;
 
-import com.github.mmonkey.Destinations.Home;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
@@ -27,14 +27,14 @@ public class HomeCommand implements CommandExecutor {
 		
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		Player player = (Player) src;
-		ArrayList<Home> homes = plugin.getHomeStorageService().getHomes(player);
+		ArrayList<HomeModel> homes = plugin.getHomeStorageService().getHomes(player);
 		
 		if (homes.isEmpty()) {	
 			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!").builder().build());
 			return CommandResult.success();
 		}
 			
-		Home home = (name.equals("")) ? getClosestHome(player, homes) : getNamedHome(player, homes, name);
+		HomeModel home = (name.equals("")) ? getClosestHome(player, homes) : getNamedHome(player, homes, name);
 		Location location = (home != null) ? home.getDestination().getLocation(plugin.getGame()) : null;
 			
 		if (location != null) {
@@ -51,18 +51,18 @@ public class HomeCommand implements CommandExecutor {
 	 * Calculate the closest home to the player's current location
 	 * 
 	 * @param player Player
-	 * @param homes ArrayList<Home>
-	 * @return Home|null
+	 * @param homes ArrayList<HomeModel>
+	 * @return HomeModel|null
 	 */
-	private Home getClosestHome(Player player, ArrayList<Home> homes) {
+	private HomeModel getClosestHome(Player player, ArrayList<HomeModel> homes) {
 		
 		Location playerLocation = player.getLocation();
 		
 		double min = -1;
-		double tmp = 0;
-		Home result = null;
+		double tmp;
+		HomeModel result = null;
 		
-		for (Home home: homes) {
+		for (HomeModel home: homes) {
 			
 			Location location = home.getDestination().getLocation(plugin.getGame());
 			double x = Math.pow((playerLocation.getX() - location.getX()), 2);
@@ -81,21 +81,19 @@ public class HomeCommand implements CommandExecutor {
 	}
 	
 	/**
-	 * Get the Home of the given name.
+	 * Get the HomeModel of the given name.
 	 * 
 	 * @param player Player
-	 * @param homes ArrayList<Home>
+	 * @param homes ArrayList<HomeModel>
 	 * @param name String
-	 * @return Home|null
+	 * @return HomeModel|null
 	 */
-	public Home getNamedHome(Player player, ArrayList<Home> homes, String name) {
-		
-		for(int i = 0; i < homes.size(); i++) {
-			
-			if (homes.get(i).getName().equals(name)) {
-				return homes.get(i);
-			}
+	public HomeModel getNamedHome(Player player, ArrayList<HomeModel> homes, String name) {
 
+		for (HomeModel home: homes) {
+			if (home.getName().equals(name)) {
+				return home;
+			}
 		}
 		
 		return null;

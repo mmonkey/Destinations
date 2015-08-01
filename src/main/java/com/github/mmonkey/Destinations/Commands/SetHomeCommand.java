@@ -3,6 +3,7 @@ package com.github.mmonkey.Destinations.Commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -11,7 +12,6 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
-import com.github.mmonkey.Destinations.Home;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
@@ -30,14 +30,14 @@ public class SetHomeCommand implements CommandExecutor {
 		
 		Player player = (Player) src;
 		List<String> list = plugin.getHomeStorageService().getHomeList(player);
-		Home home = createHome(player, name);
+		HomeModel home = createHome(player, name);
 		
 		if (force && list.contains(home.getName())) {
 			
 			plugin.getHomeStorageService().updateHome(player, home);
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
+				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
 				.build()
 			);
 			
@@ -48,7 +48,7 @@ public class SetHomeCommand implements CommandExecutor {
 		if (list.contains(home.getName())) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.ERROR, " already exists!").builder()
+				Texts.of(FormatUtil.ERROR, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.ERROR, " already exists!").builder()
 				.build()
 			);
 			
@@ -59,7 +59,7 @@ public class SetHomeCommand implements CommandExecutor {
 		plugin.getHomeStorageService().addHome(player, home);
 		
 		player.sendMessage(
-			Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully created!").builder()
+			Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully created!").builder()
 			.build()
 		);
 		
@@ -72,28 +72,26 @@ public class SetHomeCommand implements CommandExecutor {
 	 * 
 	 * @param player Player
 	 * @param name String
-	 * @return Home
+	 * @return HomeModel
 	 */
-	private Home createHome(Player player, String name) {
+	private HomeModel createHome(Player player, String name) {
 
-		ArrayList<Home> playerHomes = plugin.getHomeStorageService().getHomes(player);
-		Home home = (name.equals("")) ? new Home(getAvailableName(playerHomes), player) : new Home(name, player);
-		
-		return home;
+		ArrayList<HomeModel> playerHomes = plugin.getHomeStorageService().getHomes(player);
+		return (name.equals("")) ? new HomeModel(getAvailableName(playerHomes), player) : new HomeModel(name, player);
 
 	}
 	
 	/**
 	 * Returns available home name, example: home4
-	 * @param homes ArrayList<Home>
+	 * @param homes ArrayList<HomeModel>
 	 * @return String
 	 */
-	private String getAvailableName(ArrayList<Home> homes) {
+	private String getAvailableName(ArrayList<HomeModel> homes) {
 		
 		int max = 0;
 		int temp = 0;
 		
-		for (Home home: homes) {
+		for (HomeModel home: homes) {
 			
 			if (home.getName().startsWith("home") && home.getName().matches(".*\\d.*")) {
 				temp = Integer.parseInt(home.getName().replaceAll("[\\D]", ""));

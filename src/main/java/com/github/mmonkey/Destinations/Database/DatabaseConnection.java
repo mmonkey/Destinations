@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-abstract class Database {
+public abstract class DatabaseConnection {
 	
 	private Game game;
 	private SqlService service;
@@ -39,7 +39,7 @@ abstract class Database {
 		this.jdbcUrl = jdbcUrl;
 	}
 	
-	protected DataSource getDataSource(String jdbcUrl) {
+	public DataSource getDataSource(String jdbcUrl) {
 		
 		DataSource source = null;
 		
@@ -56,7 +56,7 @@ abstract class Database {
 		return source;
 	}
 	
-	protected Connection getConnection() {
+	public Connection getConnection() {
 		
 		try {
 			return this.getDataSource(this.getJdbcUrl()).getConnection(this.getUsername(), this.getPassword());
@@ -67,7 +67,7 @@ abstract class Database {
 		return null;
 	}
 	
-	protected Database(Game game) {
+	protected DatabaseConnection(Game game) {
 		this.game = game;
 	}
 

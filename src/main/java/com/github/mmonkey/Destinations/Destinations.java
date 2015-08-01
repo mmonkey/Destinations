@@ -2,6 +2,7 @@ package com.github.mmonkey.Destinations;
 
 import java.io.File;
 
+import com.github.mmonkey.Destinations.Services.TestConnectionService;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
 import org.slf4j.Logger;
@@ -29,8 +30,8 @@ import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Services.WarpStorageService;
-import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabase;
-import com.github.mmonkey.Destinations.Database.TestConnectionService;
+import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabaseConnection;
+import com.github.mmonkey.Destinations.Dams.TestConnectionDam;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
@@ -49,7 +50,7 @@ public class Destinations {
 	private HomeStorageService homeStorageService;
 	private WarpStorageService warpStorageService;
 	
-	private H2EmbeddedDatabase h2db;
+	private H2EmbeddedDatabaseConnection h2db;
 	private boolean isWebServerRunning = false;
 	
 	@Inject
@@ -105,7 +106,7 @@ public class Destinations {
 		CommentedConfigurationNode dbConfig = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.DATABASE_SETTINGS);
 		String username = dbConfig.getNode(DefaultConfigStorageService.USERNAME).getString();
 		String password = dbConfig.getNode(DefaultConfigStorageService.PASSWORD).getString();
-		this.h2db = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
+		this.h2db = new H2EmbeddedDatabaseConnection(this.getGame(), "destinations", username, password);
 
 		if (dbConfig.getNode(DefaultConfigStorageService.WEBSERVER).getBoolean()) {
 			if (this.h2db.startWebServer()) {
@@ -115,8 +116,8 @@ public class Destinations {
 			}
 		}
 
-		TestConnectionService testService = new TestConnectionService(this.h2db);
-		if (testService.testConnection()) {
+		TestConnectionService service = new TestConnectionService(this.h2db);
+		if (service.execute()) {
 			getLogger().info("Database connected successfully.");
 		} else {
 			getLogger().info("Unable to connect to database.");
@@ -130,7 +131,7 @@ public class Destinations {
 		 * /home [name]
 		 */
 		CommandSpec homeCommand = CommandSpec.builder()
-			.description(Texts.of("Teleport Home"))
+			.description(Texts.of("Teleport HomeModel"))
 			.extendedDescription(Texts.of("Teleport to the nearest home or to the named home. Optional: /home [name]"))
 			.executor(new HomeCommand(this))
 			.arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("name"))))
@@ -180,7 +181,7 @@ public class Destinations {
 		 * /warp <warp>
 		 */
 		CommandSpec warpCommand = CommandSpec.builder()
-			.description(Texts.of("Teleport to Warp"))
+			.description(Texts.of("Teleport to WarpModel"))
 			.extendedDescription(Texts.of("Teleport to the warp of the provided name."))
 			.executor(new WarpCommand(this))
 			.arguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
@@ -236,6 +237,7 @@ public class Destinations {
 	public void onServerStop(ServerStoppingEvent event) {
 		if (this.isWebServerRunning) {
 			this.h2db.stopWebServer();
+			this.isWebServerRunning = false;
 		}
 	}
 	
