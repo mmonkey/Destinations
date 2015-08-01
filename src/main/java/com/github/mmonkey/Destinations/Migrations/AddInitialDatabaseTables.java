@@ -18,16 +18,16 @@ public class AddInitialDatabaseTables implements Migration {
 
         // Create worlds table
         sql.append("CREATE TABLE IF NOT EXISTS worlds "
-                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, uniqueId UUID NOT NULL);");
+                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, unique_id UUID NOT NULL);");
 
         // Create players table
         sql.append("CREATE TABLE IF NOT EXISTS players "
-                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, uniqueId UUID NOT NULL);");
+                + "(id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, unique_id UUID NOT NULL);");
 
         // Create destinations table
         sql.append("CREATE TABLE IF NOT EXISTS destinations" +
                 " (id INT PRIMARY KEY AUTO_INCREMENT NOT NULL," +
-                " worldId INT REFERENCES worlds(id)," +
+                " world_id INT REFERENCES worlds(id)," +
                 " x DOUBLE NOT NULL," +
                 " y DOUBLE NOT NULL," +
                 " z DOUBLE NOT NULL," +
@@ -38,22 +38,22 @@ public class AddInitialDatabaseTables implements Migration {
         // Create homes table
         sql.append("CREATE TABLE IF NOT EXISTS homes" +
                 " (id INT PRIMARY KEY AUTO_INCREMENT NOT NULL," +
-                " destinationId INT REFERENCES destinations(id)," +
-                " ownerId INT REFERENCES players(id)," +
+                " destination_id INT REFERENCES destinations(id)," +
+                " owner_id INT REFERENCES players(id)," +
                 " name VARCHAR(255));");
 
         // Create warps table
         sql.append("CREATE TABLE IF NOT EXISTS warps" +
                 " (id INT PRIMARY KEY AUTO_INCREMENT NOT NULL," +
-                " destinationId INT REFERENCES destinations(id)," +
-                " ownerId INT REFERENCES players(id)," +
+                " destination_id INT REFERENCES destinations(id)," +
+                " owner_id INT REFERENCES players(id)," +
                 " name VARCHAR(255)," +
-                " isPublic BOOLEAN DEFAULT true);");
+                " is_public BOOLEAN DEFAULT true);");
 
         // Create warp_player table
         sql.append("CREATE TABLE IF NOT EXISTS warp_player" +
-                " (warpId INT REFERENCES warps(id)," +
-                " playerId INT REFERENCES players(id));");
+                " (warp_id INT REFERENCES warps(id)," +
+                " player_id INT REFERENCES players(id));");
 
         try {
 
