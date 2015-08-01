@@ -2,6 +2,9 @@ package com.github.mmonkey.Destinations;
 
 import java.io.File;
 
+import com.github.mmonkey.Destinations.Migrations.AddDatabaseSettingsToDefaultConfig;
+import com.github.mmonkey.Destinations.Migrations.AddInitialDatabaseTables;
+import com.github.mmonkey.Destinations.Migrations.Migration;
 import com.github.mmonkey.Destinations.Services.TestConnectionService;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -30,8 +33,7 @@ import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
 import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Services.WarpStorageService;
-import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabaseConnection;
-import com.github.mmonkey.Destinations.Dams.TestConnectionDam;
+import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabase;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
@@ -50,7 +52,7 @@ public class Destinations {
 	private HomeStorageService homeStorageService;
 	private WarpStorageService warpStorageService;
 	
-	private H2EmbeddedDatabaseConnection h2db;
+	private H2EmbeddedDatabase h2db;
 	private boolean isWebServerRunning = false;
 	
 	@Inject
@@ -101,27 +103,12 @@ public class Destinations {
 		this.defaultConfigService.load();
 		this.homeStorageService.load();
 		this.warpStorageService.load();
-		
-		// Load H2 database
-		CommentedConfigurationNode dbConfig = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.DATABASE_SETTINGS);
-		String username = dbConfig.getNode(DefaultConfigStorageService.USERNAME).getString();
-		String password = dbConfig.getNode(DefaultConfigStorageService.PASSWORD).getString();
-		this.h2db = new H2EmbeddedDatabaseConnection(this.getGame(), "destinations", username, password);
 
-		if (dbConfig.getNode(DefaultConfigStorageService.WEBSERVER).getBoolean()) {
-			if (this.h2db.startWebServer()) {
-				String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
-				getLogger().info("H2 console started at " + address + ":8082");
-				this.isWebServerRunning = true;
-			}
-		}
+        int configVersion = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.VERSION).getInt(0);
 
-		TestConnectionService service = new TestConnectionService(this.h2db);
-		if (service.execute()) {
-			getLogger().info("Database connected successfully.");
-		} else {
-			getLogger().info("Unable to connect to database.");
-		}
+        this.runConfigMigrations(configVersion);
+        this.setupDatabase();
+        this.runDatabaseMigrations(configVersion);
 	}
 	
 	@Subscribe
@@ -240,6 +227,58 @@ public class Destinations {
 			this.isWebServerRunning = false;
 		}
 	}
+
+    private void setupDatabase() {
+
+        CommentedConfigurationNode dbConfig = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.DATABASE_SETTINGS);
+        String username = dbConfig.getNode(DefaultConfigStorageService.USERNAME).getString();
+        String password = dbConfig.getNode(DefaultConfigStorageService.PASSWORD).getString();
+        this.h2db = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
+
+        if (dbConfig.getNode(DefaultConfigStorageService.WEBSERVER).getBoolean()) {
+            if (this.h2db.startWebServer()) {
+                String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
+                getLogger().info("H2 console started at " + address + ":8082");
+                this.isWebServerRunning = true;
+            }
+        }
+
+        TestConnectionService service = new TestConnectionService(this.h2db);
+        if (service.execute()) {
+            getLogger().info("Database connected successfully.");
+        } else {
+            getLogger().info("Unable to connect to database.");
+        }
+
+    }
+
+    private void runConfigMigrations(int configVersion) {
+
+        switch (configVersion) {
+            case 0:
+                Migration defaultConfigMigration = new AddDatabaseSettingsToDefaultConfig(this);
+                defaultConfigMigration.migrate();
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    private void runDatabaseMigrations(int configVersion) {
+
+        switch (configVersion) {
+            case 0:
+                Migration addInitialTables = new AddInitialDatabaseTables(this.h2db);
+                addInitialTables.migrate();
+                break;
+
+            default:
+                break;
+        }
+
+    }
 	
 	public Destinations() {
 	}
