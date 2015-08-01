@@ -5,6 +5,8 @@ import com.github.mmonkey.Destinations.Models.DestinationModel;
 import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 
+import javax.print.attribute.standard.Destination;
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -207,6 +209,79 @@ public class HomeDam {
         return home;
     }
 
+    public HomeModel updateHome(Player player, HomeModel home) {
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        int updatedRows = 0;
+
+        destinationDam.deleteDestination(home.getDestination());
+        DestinationModel destination = destinationDam.insertDestination(player);
+
+        String sql = "UPDATE " + tblName + " SET name = ? WHERE id = ?";
+
+        try {
+
+            connection = database.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, destination.getId());
+            statement.setInt(2, home.getId());
+            updatedRows = statement.executeUpdate();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
+
+        }
+
+        if (updatedRows > 0) {
+            home.setDestination(destination);
+        }
+
+        return home;
+    }
+
+    public HomeModel updateHome(HomeModel home, String newName) {
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        int updatedRows = 0;
+
+        String sql = "UPDATE " + tblName + " SET name = ? WHERE id = ?";
+
+        try {
+
+            connection = database.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, newName);
+            statement.setInt(2, home.getId());
+            updatedRows = statement.executeUpdate();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
+
+        }
+
+        if (updatedRows > 0) {
+            home.setName(newName);
+        }
+
+        return home;
+    }
+
     public int deleteHome(Player player, HomeModel home) {
 
         int id = 0;
@@ -226,7 +301,7 @@ public class HomeDam {
         try {
 
             connection = database.getConnection();
-            statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, playerId);
             statement.setInt(2, home.getDestination().getId());
             statement.setString(3, home.getName());

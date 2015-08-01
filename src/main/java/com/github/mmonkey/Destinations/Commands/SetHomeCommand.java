@@ -1,6 +1,7 @@
 package com.github.mmonkey.Destinations.Commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import com.github.mmonkey.Destinations.Dams.HomeDam;
 import com.github.mmonkey.Destinations.Models.HomeModel;
@@ -14,9 +15,11 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.world.World;
 
 public class SetHomeCommand implements CommandExecutor {
 
+    private Destinations plugin;
 	private HomeDam homeDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
@@ -31,19 +34,20 @@ public class SetHomeCommand implements CommandExecutor {
 		Player player = (Player) src;
 		ArrayList<HomeModel> homes = homeDam.getPlayerHomes(player);
 		HomeModel home = homeDam.getPlayerHomeByName(player, name);
+        ArrayList<String> list = this.filterHomes(homes);
 		
-//		if (force && list.contains(home.getName())) {
-//
-//			plugin.getHomeStorageService().updateHome(player, home);
-//
-//			player.sendMessage(
-//				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
-//				.build()
-//			);
-//
-//			return CommandResult.success();
-//
-//		}
+		if (force && list.contains(home.getName())) {
+
+            home = homeDam.updateHome(player, home);
+
+			player.sendMessage(
+				Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
+				.build()
+			);
+
+			return CommandResult.success();
+
+		}
 		
 		if (home != null) {
 			
@@ -57,16 +61,32 @@ public class SetHomeCommand implements CommandExecutor {
 		}
 
 		name = name.equals("") ? getAvailableName(homes) : name;
-		homeDam.insertHome(player, name);
+		home = homeDam.insertHome(player, name);
 		
 		player.sendMessage(
-			Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!").builder()
+			Texts.of(FormatUtil.SUCCESS, "HomeModel ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully created!").builder()
 			.build()
 		);
 		
 		return CommandResult.success();
 
 	}
+
+    private ArrayList<String> filterHomes(ArrayList<HomeModel> homes) {
+
+        Collection<World> worlds = plugin.getGame().getServer().getWorlds();
+        ArrayList<String> list = new ArrayList<String>();
+        for (World world: worlds) {
+            for (HomeModel home: homes) {
+                if (home.getDestination().getWorldUniqueId().equals(world.getUniqueId())) {
+                    list.add(home.getName());
+                }
+            }
+        }
+
+        return list;
+
+    }
 	
 	/**
 	 * Returns available home name, example: home4
@@ -100,6 +120,7 @@ public class SetHomeCommand implements CommandExecutor {
 	}
 	
 	public SetHomeCommand(Destinations plugin) {
+        this.plugin = plugin;
 		this.homeDam = new HomeDam(plugin.getDatabase());
 	}
 

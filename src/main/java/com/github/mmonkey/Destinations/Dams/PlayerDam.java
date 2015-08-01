@@ -65,7 +65,7 @@ public class PlayerDam {
         try {
 
             connection = database.getConnection();
-            statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, playerUniqueId.toString());
             statement.executeUpdate();
             result = statement.getGeneratedKeys();

@@ -78,7 +78,7 @@ public class DestinationDam {
         try {
 
             connection = database.getConnection();
-            statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, destination.getId());
             statement.executeUpdate();
             result = statement.getGeneratedKeys();
