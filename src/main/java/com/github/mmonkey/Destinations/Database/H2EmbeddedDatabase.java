@@ -7,7 +7,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class H2EmbeddedDatabaseConnection extends DatabaseConnection {
+public class H2EmbeddedDatabase extends Database {
 
 	private static final String defaultPath = "." + File.separator + "data";
 	
@@ -61,7 +61,7 @@ public class H2EmbeddedDatabaseConnection extends DatabaseConnection {
 	
 	}
 	
-	public H2EmbeddedDatabaseConnection(Game game, String dbName, String username, String password) {
+	public H2EmbeddedDatabase(Game game, String dbName, String username, String password) {
 		super(game);
 		this.dbName = dbName;
 		this.username = username;

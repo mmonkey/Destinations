@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public abstract class DatabaseConnection {
+public abstract class Database {
 	
 	private Game game;
 	private SqlService service;
@@ -67,7 +67,7 @@ public abstract class DatabaseConnection {
 		return null;
 	}
 	
-	protected DatabaseConnection(Game game) {
+	protected Database(Game game) {
 		this.game = game;
 	}
 
