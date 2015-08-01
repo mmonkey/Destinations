@@ -32,7 +32,6 @@ import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
 import com.github.mmonkey.Destinations.Commands.WarpCommand;
 import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
-import com.github.mmonkey.Destinations.Services.HomeStorageService;
 import com.github.mmonkey.Destinations.Services.WarpStorageService;
 import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabase;
 import com.google.common.base.Optional;
@@ -51,7 +50,6 @@ public class Destinations {
 	private static Logger logger;
 	
 	private DefaultConfigStorageService defaultConfigService;
-	private HomeStorageService homeStorageService;
 	private WarpStorageService warpStorageService;
 	
 	private Database database;
@@ -76,10 +74,6 @@ public class Destinations {
 		return this.defaultConfigService;
 	}
 	
-	public HomeStorageService getHomeStorageService() {
-		return this.homeStorageService;
-	}
-	
 	public WarpStorageService getWarpStorageService() {
 		return this.warpStorageService;
 	}
@@ -102,11 +96,9 @@ public class Destinations {
 		}
 		
 		this.defaultConfigService = new DefaultConfigStorageService(this, this.configDir);
-		this.homeStorageService = new HomeStorageService(this, this.configDir);
 		this.warpStorageService = new WarpStorageService(this, this.configDir);
 		
 		this.defaultConfigService.load();
-		this.homeStorageService.load();
 		this.warpStorageService.load();
 
         int configVersion = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.VERSION).getInt(0);
