@@ -31,7 +31,7 @@ import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
 import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
 import com.github.mmonkey.Destinations.Commands.WarpCommand;
 import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
-import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
+import com.github.mmonkey.Destinations.Configs.DefaultConfig;
 import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabase;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
@@ -47,8 +47,9 @@ public class Destinations {
 	private Game game;
 	private Optional<PluginContainer> pluginContainer;
 	private static Logger logger;
-	private DefaultConfigStorageService defaultConfigService;
+	private DefaultConfig defaultConfig;
 	private Database database;
+    private boolean webServerRunning = false;
 	
 	@Inject
 	@ConfigDir(sharedRoot = false)
@@ -66,8 +67,8 @@ public class Destinations {
 		return logger;
 	}
 	
-	public DefaultConfigStorageService getDefaultConfigService() {
-		return this.defaultConfigService;
+	public DefaultConfig getDefaultConfig() {
+		return this.defaultConfig;
 	}
 
 	public Database getDatabase() {
@@ -82,14 +83,16 @@ public class Destinations {
 		Destinations.logger = game.getPluginManager().getLogger(pluginContainer.get());
 		
 		getLogger().info(String.format("Starting up %s v%s.", Destinations.NAME, Destinations.VERSION));
-			
+
 		if (!this.configDir.isDirectory()) {
-			this.configDir.mkdirs();
+			if (this.configDir.mkdirs()) {
+                getLogger().info("Destinations config directory successfully created!");
+            }
 		}
 		
-		this.defaultConfigService = new DefaultConfigStorageService(this, this.configDir);
-		this.defaultConfigService.load();
-        int configVersion = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.VERSION).getInt(0);
+		this.defaultConfig = new DefaultConfig(this, this.configDir);
+		this.defaultConfig.load();
+        int configVersion = this.defaultConfig.getConfig().getNode(DefaultConfig.VERSION).getInt(0);
 
         this.runConfigMigrations(configVersion);
         this.setupDatabase();
@@ -140,7 +143,7 @@ public class Destinations {
 			.build();
 		
 		// Register home commands if enabled
-		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.HOME_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
+		if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.HOME_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
 			
 			game.getCommandDispatcher().register(this, homeCommand, "home", "h");
 			game.getCommandDispatcher().register(this, setHomeCommand, "sethome");
@@ -190,7 +193,7 @@ public class Destinations {
 			.build();
 		
 		// Register warp commands if enabled
-		if (this.getDefaultConfigService().getConfig().getNode(DefaultConfigStorageService.WARP_SETTINGS, DefaultConfigStorageService.ENABLED).getBoolean()) {
+		if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.WARP_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
 		
 			game.getCommandDispatcher().register(this, warpCommand, "warp", "w");
 			game.getCommandDispatcher().register(this, setWarpCommand, "setwarp");
@@ -207,23 +210,25 @@ public class Destinations {
 	
 	@Subscribe
 	public void onServerStop(ServerStoppingEvent event) {
-        if (this.database instanceof H2EmbeddedDatabase) {
+        if (this.database instanceof H2EmbeddedDatabase && this.webServerRunning) {
             ((H2EmbeddedDatabase) this.database).stopWebServer();
+            this.webServerRunning = false;
         }
 	}
 
     private void setupDatabase() {
 
-        CommentedConfigurationNode dbConfig = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.DATABASE_SETTINGS);
-        String username = dbConfig.getNode(DefaultConfigStorageService.USERNAME).getString();
-        String password = dbConfig.getNode(DefaultConfigStorageService.PASSWORD).getString();
+        CommentedConfigurationNode dbConfig = this.defaultConfig.getConfig().getNode(DefaultConfig.DATABASE_SETTINGS);
+        String username = dbConfig.getNode(DefaultConfig.USERNAME).getString();
+        String password = dbConfig.getNode(DefaultConfig.PASSWORD).getString();
         this.database = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
 
-        if (dbConfig.getNode(DefaultConfigStorageService.WEBSERVER).getBoolean()) {
-            if (this.database instanceof H2EmbeddedDatabase) {
+        if (dbConfig.getNode(DefaultConfig.WEBSERVER).getBoolean()) {
+            if (this.database instanceof H2EmbeddedDatabase && !this.webServerRunning) {
                 if (((H2EmbeddedDatabase) this.database).startWebServer()) {
                     String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
                     getLogger().info("H2 console started at " + address + ":8082");
+                    this.webServerRunning = true;
                 }
             }
         }
