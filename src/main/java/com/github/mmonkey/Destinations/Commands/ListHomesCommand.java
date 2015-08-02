@@ -1,9 +1,6 @@
 package com.github.mmonkey.Destinations.Commands;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import com.github.mmonkey.Destinations.Dams.HomeDam;
 import com.github.mmonkey.Destinations.Models.HomeModel;
@@ -18,7 +15,6 @@ import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.world.World;
 
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
@@ -42,9 +38,7 @@ public class ListHomesCommand implements CommandExecutor {
 		
 		// Get this players list of homes
 		ArrayList<HomeModel> homes = homeDam.getPlayerHomes(player);
-
-		// Filter homes for this game's worlds
-		ArrayList<String> list = this.filterHomes(homes);
+		ArrayList<String> list = this.getHomeNames(homes);
 		
 		// If this player doesn't have any homes, return with message
 		if (list.isEmpty()) {
@@ -84,26 +78,15 @@ public class ListHomesCommand implements CommandExecutor {
 		// Send message to this player
 		player.sendMessage(message.build());
 		
-//		Iterator<World> worlds = plugin.getGame().getServer().getWorlds().iterator();
-//		while (worlds.hasNext()) {
-//			World w = worlds.next();
-//			player.sendMessage(Texts.of(w.getName() + ": " + w.getUniqueId().toString()));
-//		}
-		
 		return CommandResult.success();
 
 	}
 
-	private ArrayList<String> filterHomes(ArrayList<HomeModel> homes) {
+	private ArrayList<String> getHomeNames(ArrayList<HomeModel> homes) {
 
-		Collection<World> worlds = plugin.getGame().getServer().getWorlds();
 		ArrayList<String> list = new ArrayList<String>();
-		for (World world: worlds) {
-			for (HomeModel home: homes) {
-				if (home.getDestination().getWorldUniqueId().equals(world.getUniqueId())) {
-					list.add(home.getName());
-				}
-			}
+		for (HomeModel home: homes) {
+			list.add(home.getName());
 		}
 
 		return list;
@@ -134,7 +117,7 @@ public class ListHomesCommand implements CommandExecutor {
 	
 	public ListHomesCommand(Destinations plugin) {
 		this.plugin = plugin;
-		this.homeDam = new HomeDam(plugin.getDatabase());
+		this.homeDam = new HomeDam(plugin);
 	}
 
 }

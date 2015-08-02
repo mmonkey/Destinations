@@ -1,20 +1,24 @@
 package com.github.mmonkey.Destinations.Dams;
 
 import com.github.mmonkey.Destinations.Database.Database;
+import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Models.DestinationModel;
 import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.world.World;
 
 import javax.print.attribute.standard.Destination;
 import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 public class HomeDam {
 
     public static final String tblName = "homes";
 
+    private Destinations plugin;
     private Database database;
     private PlayerDam playerDam;
     private DestinationDam destinationDam;
@@ -86,7 +90,7 @@ public class HomeDam {
 
         }
 
-        return homes;
+        return getFilteredHomes(homes);
 
     }
 
@@ -158,7 +162,7 @@ public class HomeDam {
 
         }
 
-        return home;
+        return this.isHomeInGameWorlds(home) ? home : null;
     }
 
     public HomeModel insertHome(Player player, String name) {
@@ -218,8 +222,7 @@ public class HomeDam {
 
         destinationDam.deleteDestination(home.getDestination());
         DestinationModel destination = destinationDam.insertDestination(player);
-
-        String sql = "UPDATE " + tblName + " SET name = ? WHERE id = ?";
+        String sql = "UPDATE " + tblName + " SET destination_id = ? WHERE id = ?";
 
         try {
 
@@ -282,9 +285,8 @@ public class HomeDam {
         return home;
     }
 
-    public int deleteHome(Player player, HomeModel home) {
+    public boolean deleteHome(Player player, HomeModel home) {
 
-        int id = 0;
         int playerId = this.playerDam.getPlayerId(player.getUniqueId());
         this.destinationDam.deleteDestination(home.getDestination());
 
@@ -307,14 +309,12 @@ public class HomeDam {
             statement.setString(3, home.getName());
             statement.executeUpdate();
             result = statement.getGeneratedKeys();
-
-            if (result.next()) {
-                id = result.getInt(1);
-            }
+            return true;
 
         } catch (SQLException e) {
 
             e.printStackTrace();
+            return false;
 
         } finally {
 
@@ -324,13 +324,46 @@ public class HomeDam {
 
         }
 
-        return id;
     }
 
-    public HomeDam(Database database) {
-        this.database = database;
-        this.playerDam = new PlayerDam(database);
-        this.destinationDam = new DestinationDam(database);
+    private ArrayList<HomeModel> getFilteredHomes(ArrayList<HomeModel> homes) {
+
+        ArrayList<HomeModel> filteredHomes = new ArrayList<HomeModel>();
+        Collection<World> worlds = plugin.getGame().getServer().getWorlds();
+
+        for (World world : worlds) {
+            for (HomeModel home : homes) {
+                if (home.getDestination().getWorldUniqueId().equals(world.getUniqueId())) {
+                    filteredHomes.add(home);
+                }
+            }
+        }
+
+        return filteredHomes;
+    }
+
+    private boolean isHomeInGameWorlds(HomeModel home) {
+
+        if (home == null) {
+            return false;
+        }
+
+        Collection<World> worlds = plugin.getGame().getServer().getWorlds();
+
+        for (World world : worlds) {
+            if (home.getDestination().getWorldUniqueId().equals(world.getUniqueId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public HomeDam(Destinations plugin) {
+        this.plugin = plugin;
+        this.database = plugin.getDatabase();
+        this.playerDam = new PlayerDam(plugin.getDatabase());
+        this.destinationDam = new DestinationDam(plugin.getDatabase());
     }
 
 

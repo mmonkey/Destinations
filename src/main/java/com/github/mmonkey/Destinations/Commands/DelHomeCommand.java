@@ -82,10 +82,10 @@ public class DelHomeCommand implements CommandExecutor {
 	
 	private void deleteHome(Player player, HomeModel home) {
 		
-		if (homeDam.deleteHome(player, home) > 0) {
-			
-			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.DELETED_OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully deleted!").builder()
+		if (homeDam.deleteHome(player, home)) {
+
+            player.sendMessage(
+				Texts.of(FormatUtil.empty(), FormatUtil.SUCCESS, "Home ", FormatUtil.DELETED_OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully deleted!").builder()
 				.build()
 			);
 			
@@ -124,7 +124,7 @@ public class DelHomeCommand implements CommandExecutor {
 	
 	public DelHomeCommand(Destinations plugin) {
 		this.plugin = plugin;
-		this.homeDam = new HomeDam(plugin.getDatabase());
+		this.homeDam = new HomeDam(plugin);
 	}
 
 }

@@ -3,7 +3,6 @@ package com.github.mmonkey.Destinations.Dams;
 import com.github.mmonkey.Destinations.Database.Database;
 import com.github.mmonkey.Destinations.Models.DestinationModel;
 import org.spongepowered.api.entity.player.Player;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.sql.*;
 
@@ -65,9 +64,7 @@ public class DestinationDam {
         return destination;
     }
 
-    public int deleteDestination(DestinationModel destination) {
-
-        int id = 0;
+    public boolean deleteDestination(DestinationModel destination) {
 
         Connection connection = null;
         PreparedStatement statement = null;
@@ -82,14 +79,12 @@ public class DestinationDam {
             statement.setInt(1, destination.getId());
             statement.executeUpdate();
             result = statement.getGeneratedKeys();
-
-            if (result.next()) {
-                id = result.getInt(1);
-            }
+            return true;
 
         } catch (SQLException e) {
 
             e.printStackTrace();
+            return false;
 
         } finally {
 
@@ -99,7 +94,6 @@ public class DestinationDam {
 
         }
 
-        return id;
     }
 
     public DestinationDam(Database database) {
