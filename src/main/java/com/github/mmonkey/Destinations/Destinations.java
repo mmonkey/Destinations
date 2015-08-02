@@ -14,6 +14,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.state.InitializationEvent;
 import org.spongepowered.api.event.state.PreInitializationEvent;
+import org.spongepowered.api.event.state.ServerAboutToStartEvent;
 import org.spongepowered.api.event.state.ServerStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -207,6 +208,11 @@ public class Destinations {
 			game.getEventManager().register(this, new ConvertTextListener(this));
 		}
 	}
+
+    @Subscribe
+    public void onServerStart(ServerAboutToStartEvent event) {
+        this.startWebServer();
+    }
 	
 	@Subscribe
 	public void onServerStop(ServerStoppingEvent event) {
@@ -223,15 +229,7 @@ public class Destinations {
         String password = dbConfig.getNode(DefaultConfig.PASSWORD).getString();
         this.database = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
 
-        if (dbConfig.getNode(DefaultConfig.WEBSERVER).getBoolean()) {
-            if (this.database instanceof H2EmbeddedDatabase && !this.webServerRunning) {
-                if (((H2EmbeddedDatabase) this.database).startWebServer()) {
-                    String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
-                    getLogger().info("H2 console started at " + address + ":8082");
-                    this.webServerRunning = true;
-                }
-            }
-        }
+        this.startWebServer();
 
         TestConnectionDam testConnectionDam = new TestConnectionDam(this.database);
         if (testConnectionDam.testConnection()) {
@@ -240,6 +238,22 @@ public class Destinations {
             getLogger().info("Unable to connect to database.");
         }
 
+    }
+
+    private void startWebServer() {
+        CommentedConfigurationNode dbConfig = this.defaultConfig.getConfig().getNode(DefaultConfig.DATABASE_SETTINGS);
+        if (dbConfig.getNode(DefaultConfig.WEBSERVER).getBoolean()) {
+            if (this.database instanceof H2EmbeddedDatabase && !this.webServerRunning) {
+                if (((H2EmbeddedDatabase) this.database).startWebServer()) {
+                    this.webServerRunning = true;
+                }
+            }
+        }
+
+        if (this.webServerRunning) {
+            String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
+            getLogger().info("H2 console started at " + address + ":8082");
+        }
     }
 
     private void runConfigMigrations(int configVersion) {
