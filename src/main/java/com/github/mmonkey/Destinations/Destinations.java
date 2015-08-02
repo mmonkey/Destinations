@@ -2,11 +2,11 @@ package com.github.mmonkey.Destinations;
 
 import java.io.File;
 
+import com.github.mmonkey.Destinations.Dams.TestConnectionDam;
 import com.github.mmonkey.Destinations.Database.Database;
 import com.github.mmonkey.Destinations.Migrations.AddDatabaseSettingsToDefaultConfig;
 import com.github.mmonkey.Destinations.Migrations.AddInitialDatabaseTables;
 import com.github.mmonkey.Destinations.Migrations.Migration;
-import com.github.mmonkey.Destinations.Services.TestConnectionService;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
 import org.slf4j.Logger;
@@ -240,8 +240,8 @@ public class Destinations {
             }
         }
 
-        TestConnectionService service = new TestConnectionService(this.database);
-        if (service.execute()) {
+        TestConnectionDam testConnectionDam = new TestConnectionDam(this.database);
+        if (testConnectionDam.testConnection()) {
             getLogger().info("Database connected successfully.");
         } else {
             getLogger().info("Unable to connect to database.");
