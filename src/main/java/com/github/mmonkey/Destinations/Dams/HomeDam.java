@@ -189,44 +189,35 @@ public class HomeDam {
         return home;
     }
 
-    public boolean deleteHome(Player player, HomeModel home) {
+    public boolean deleteHome(HomeModel home) {
 
-        int playerId = this.playerDam.getPlayerId(player.getUniqueId());
+        int deleted = 0;
         this.destinationDam.deleteDestination(home.getDestination());
 
         Connection connection = null;
         PreparedStatement statement = null;
-        ResultSet result = null;
 
-        String sql = "DELETE FROM " + tblName +
-                " WHERE owner_id = ?" +
-                " AND destination_id = ?" +
-                " AND UPPER(homes.name) = UPPER(?)" +
-                " LIMIT 1";
+        String sql = "DELETE FROM " + tblName + " WHERE id = ?";
 
         try {
 
             connection = database.getConnection();
-            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, playerId);
-            statement.setInt(2, home.getDestination().getId());
-            statement.setString(3, home.getName());
-            statement.executeUpdate();
-            result = statement.getGeneratedKeys();
-            return true;
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, home.getId());
+            deleted = statement.executeUpdate();
 
         } catch (SQLException e) {
 
             e.printStackTrace();
-            return false;
 
         } finally {
 
-            try { if (result != null) result.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
 
         }
+
+        return  (deleted > 0);
 
     }
 
@@ -252,6 +243,5 @@ public class HomeDam {
         this.playerDam = new PlayerDam(plugin.getDatabase());
         this.destinationDam = new DestinationDam(plugin.getDatabase());
     }
-
 
 }

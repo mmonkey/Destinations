@@ -66,33 +66,32 @@ public class DestinationDam {
 
     public boolean deleteDestination(DestinationModel destination) {
 
+        int deleted = 0;
+
         Connection connection = null;
         PreparedStatement statement = null;
-        ResultSet result = null;
 
         String sql = "DELETE FROM " + tblName + " WHERE id = ? LIMIT 1";
 
         try {
 
             connection = database.getConnection();
-            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement = connection.prepareStatement(sql);
             statement.setInt(1, destination.getId());
-            statement.executeUpdate();
-            result = statement.getGeneratedKeys();
-            return true;
+            deleted = statement.executeUpdate();
 
         } catch (SQLException e) {
 
             e.printStackTrace();
-            return false;
 
         } finally {
 
-            try { if (result != null) result.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (statement != null) statement.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (connection != null) connection.close(); } catch (SQLException e) { e.printStackTrace(); }
 
         }
+
+        return (deleted > 0);
 
     }
 
