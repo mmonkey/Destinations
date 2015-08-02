@@ -8,11 +8,16 @@ import org.spongepowered.api.entity.player.Player;
 
 public class WarpModel {
 
+    private int id;
 	private String name;
 	private UUID ownerUniqueId;
 	private DestinationModel destination;
 	private boolean isPublic = true;
 	private Map<UUID, Boolean> whitelist = new HashMap<UUID, Boolean>();
+
+    public int getId() {
+        return this.id;
+    }
 	
 	public String getName() {
 		return this.name;
@@ -57,7 +62,8 @@ public class WarpModel {
 	public WarpModel() {
 	}
 	
-	public WarpModel(String name, Player player) {
+	public WarpModel(int id, String name, Player player) {
+        this.id = id;
 		this.name = name;
 		this.ownerUniqueId = player.getUniqueId();
 		this.destination = new DestinationModel(0, player);

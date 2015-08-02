@@ -53,7 +53,8 @@ public class AddInitialDatabaseTables implements Migration {
         // Create warp_player table
         sql.append("CREATE TABLE IF NOT EXISTS warp_player" +
                 " (warp_id INT NOT NULL," +
-                " player_id INT NOT NULL);");
+                " player_id INT NOT NULL," +
+                " can_edit BOOLEAN DEFAULT false);");
 
         try {
 
