@@ -37,7 +37,7 @@ public class SetWarpCommand implements CommandExecutor {
 			
 		}
 		
-		DestinationModel destination = new DestinationModel(player);
+		DestinationModel destination = new DestinationModel(0, player);
 		UUID uniqueId = player.getUniqueId();
 		
 		WarpModel warp = new WarpModel();

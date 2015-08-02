@@ -60,7 +60,7 @@ public class WarpModel {
 	public WarpModel(String name, Player player) {
 		this.name = name;
 		this.ownerUniqueId = player.getUniqueId();
-		this.destination = new DestinationModel(player);
+		this.destination = new DestinationModel(0, player);
 	}
 	
 }

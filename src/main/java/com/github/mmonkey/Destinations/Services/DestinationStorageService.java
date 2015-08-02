@@ -45,6 +45,7 @@ public class DestinationStorageService extends StorageService {
         UUID worldUniqueId = (destinationConfig.getNode(WORLD_UUID).getString() == null) ? null : UUID.fromString(destinationConfig.getNode(WORLD_UUID).getString());
 
         return new DestinationModel(
+                0,
                 worldUniqueId,
                 destinationConfig.getNode(LOCATION_X).getDouble(),
                 destinationConfig.getNode(LOCATION_Y).getDouble(),
