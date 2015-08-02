@@ -27,7 +27,7 @@ public class WarpDam {
         PreparedStatement statement = null;
         ResultSet result = null;
         String sql = "SELECT" +
-                " warps.id, " +
+                " warps.id," +
                 " warps.name," +
                 " players.unique_id," +
                 " warps.is_public," +
@@ -38,7 +38,7 @@ public class WarpDam {
                 " destinations.yaw," +
                 " destinations.pitch," +
                 " destinations.roll," +
-                " worlds.unique_id," +
+                " worlds.unique_id" +
                 " FROM " + tblName +
                 " JOIN players ON warps.owner_id = players.id" +
                 " JOIN destinations ON warps.destination_id = destinations.id" +
@@ -95,7 +95,7 @@ public class WarpDam {
         ArrayList<WarpModel> playerWarps = new ArrayList<WarpModel>();
         ArrayList<WarpModel> warps = this.getAllWarps();
         for (WarpModel warp : warps) {
-            if (warp.isPublic() || warp.getWhitelist().containsKey(player.getUniqueId())) {
+            if (warp.isPublic() || warp.getWhitelist().containsKey(player.getUniqueId()) || warp.getOwnerUniqueId().equals(player.getUniqueId())) {
                 playerWarps.add(warp);
             }
         }
@@ -231,8 +231,8 @@ public class WarpDam {
         PreparedStatement statement = null;
         ResultSet result = null;
 
-        String sql = "SELECT " +
-                " warp_players.can_edit" +
+        String sql = "SELECT" +
+                " warp_players.can_edit," +
                 " players.unique_id" +
                 " FROM warp_players" +
                 " JOIN players ON players.id = warp_players.player_id" +

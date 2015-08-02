@@ -82,7 +82,7 @@ public class DelHomeCommand implements CommandExecutor {
 	
 	private void deleteHome(Player player, HomeModel home) {
 		
-		if (homeDam.deleteHome(player, home)) {
+		if (homeDam.deleteHome(home)) {
 
             player.sendMessage(
 				Texts.of(FormatUtil.empty(), FormatUtil.SUCCESS, "Home ", FormatUtil.DELETED_OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully deleted!").builder()

@@ -26,11 +26,11 @@ public class WarpModel {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public UUID getOwnerUniqueId() {
 		return this.ownerUniqueId;
 	}
-	
+
 	public void setOwnerUniqueId(UUID uniqueId) {
 		this.ownerUniqueId = uniqueId;
 	}
@@ -59,14 +59,15 @@ public class WarpModel {
 		this.whitelist = whitelist;
 	}
 	
-	public WarpModel() {
-	}
+//	public WarpModel() {
+//	}
 	
-	public WarpModel(int id, String name, Player player) {
+	public WarpModel(int id, String name, UUID playerUniqueId, DestinationModel destination, boolean isPublic) {
         this.id = id;
 		this.name = name;
-		this.ownerUniqueId = player.getUniqueId();
-		this.destination = new DestinationModel(0, player);
+		this.ownerUniqueId = playerUniqueId;
+		this.destination = destination;
+		this.isPublic = isPublic;
 	}
 	
 }

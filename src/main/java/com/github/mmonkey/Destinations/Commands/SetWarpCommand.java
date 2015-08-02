@@ -1,7 +1,9 @@
 package com.github.mmonkey.Destinations.Commands;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
+import com.github.mmonkey.Destinations.Dams.WarpDam;
 import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
@@ -18,6 +20,7 @@ import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 public class SetWarpCommand implements CommandExecutor {
 
 	private Destinations plugin;
+	private WarpDam warpDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		
@@ -27,37 +30,44 @@ public class SetWarpCommand implements CommandExecutor {
 		
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		Player player = (Player) src;
-		WarpModel existing = plugin.getWarpStorageService().getWarp(name);
 		
-		if (existing != null) {
+		if (warpExists(name)) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "WarpModel ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.").builder().build()
+				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.").builder().build()
 			);
+
+			return CommandResult.success();
 			
 		}
-		
-		DestinationModel destination = new DestinationModel(0, player);
-		UUID uniqueId = player.getUniqueId();
-		
-		WarpModel warp = new WarpModel();
-		warp.setName(name);
-		warp.setOwnerUniqueId(uniqueId);
-		warp.getWhitelist().put(uniqueId, true);
-		warp.setDestination(destination);
-		
-		plugin.getWarpStorageService().addWarp(warp);
+
+		WarpModel warp = warpDam.insertWarp(player, name, true);
 		
 		player.sendMessage(
-			Texts.of(FormatUtil.SUCCESS, "WarpModel ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!").builder().build()
+			Texts.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully created!").builder().build()
 		);
+
+		// TODO: add private flag
 		
 		return CommandResult.success();
 		
 	}
+
+	public boolean warpExists(String name) {
+
+		ArrayList<WarpModel> allWarps = this.warpDam.getAllWarps();
+		for (WarpModel warp : allWarps) {
+			if (warp.getName().equalsIgnoreCase(name)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 	
 	public SetWarpCommand(Destinations plugin) {
 		this.plugin = plugin;
+		this.warpDam = new WarpDam(plugin);
 	}
 	
 }

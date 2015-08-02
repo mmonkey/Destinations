@@ -1,7 +1,8 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.Collection;
+import java.util.ArrayList;
 
+import com.github.mmonkey.Destinations.Dams.WarpDam;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
@@ -21,7 +22,7 @@ import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class ListWarpsCommand implements CommandExecutor {
 
-	private Destinations plugin;
+	private WarpDam warpDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		
@@ -32,7 +33,7 @@ public class ListWarpsCommand implements CommandExecutor {
 		Player player = (Player) src;
 		int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
 		
-		Collection<WarpModel> warps = plugin.getWarpStorageService().getPlayerWarps(player);
+		ArrayList<WarpModel> warps = this.getWarps(player);
 		
 		if (warps.size() == 0) {
 			
@@ -72,6 +73,12 @@ public class ListWarpsCommand implements CommandExecutor {
 		
 		return CommandResult.success();
 	
+	}
+
+	private ArrayList<WarpModel> getWarps(Player player) {
+		// this is broken in sponge
+		// return (player.hasPermission("warp.admin")) ? warpDam.getAllWarps() : warpDam.getPlayerWarps(player);
+		return warpDam.getPlayerWarps(player);
 	}
 	
 	private Text getWarpAction(WarpModel warp) {
@@ -120,7 +127,7 @@ public class ListWarpsCommand implements CommandExecutor {
 	}
 	
 	public ListWarpsCommand(Destinations plugin) {
-		this.plugin = plugin;
+		this.warpDam = new WarpDam(plugin);
 	}
 
 }
