@@ -37,14 +37,15 @@ public class HomeCommand implements CommandExecutor {
 		}
 			
 		HomeModel home = (name.equals("")) ? getClosestHome(player, homes) : getNamedHome(homes, name);
-		Location location = (home != null) ? home.getDestination().getLocation(plugin.getGame()) : null;
-			
-		if (location != null) {
-			player.setRotation(home.getDestination().getRotation());
-			player.setLocation(location);
+
+		if (home == null) {
+			player.sendMessage(Texts.of(FormatUtil.ERROR, "You have no home named ", FormatUtil.OBJECT, name, FormatUtil.ERROR, "."));
+			return CommandResult.success();
 		}
-		
-		// TODO add no home found if location == null
+
+		Location location = home.getDestination().getLocation(plugin.getGame());
+		player.setRotation(home.getDestination().getRotation());
+		player.setLocation(location);
 			
 		return CommandResult.success();
 	}
