@@ -1,4 +1,4 @@
-package com.github.mmonkey.Destinations.Services;
+package com.github.mmonkey.Destinations.Configs;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 
 import com.github.mmonkey.Destinations.Destinations;
 
-public class DefaultConfigStorageService extends StorageService {
+public class DefaultConfig extends Config {
 	
 	public static final String VERSION = "version";
 	public static final String HOME_SETTINGS = "HomeSettings";
@@ -69,7 +69,7 @@ public class DefaultConfigStorageService extends StorageService {
 		
 	}
 	
-	public DefaultConfigStorageService(Destinations plugin, File configDir) {
+	public DefaultConfig(Destinations plugin, File configDir) {
 		super(plugin, configDir);
 		
 		setConfigFile(new File(configDir, Destinations.NAME + ".conf"));
