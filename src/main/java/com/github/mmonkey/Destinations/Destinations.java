@@ -32,7 +32,6 @@ import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
 import com.github.mmonkey.Destinations.Commands.WarpCommand;
 import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
 import com.github.mmonkey.Destinations.Services.DefaultConfigStorageService;
-import com.github.mmonkey.Destinations.Services.WarpStorageService;
 import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabase;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
@@ -48,10 +47,7 @@ public class Destinations {
 	private Game game;
 	private Optional<PluginContainer> pluginContainer;
 	private static Logger logger;
-	
 	private DefaultConfigStorageService defaultConfigService;
-	private WarpStorageService warpStorageService;
-	
 	private Database database;
 	
 	@Inject
@@ -73,10 +69,6 @@ public class Destinations {
 	public DefaultConfigStorageService getDefaultConfigService() {
 		return this.defaultConfigService;
 	}
-	
-	public WarpStorageService getWarpStorageService() {
-		return this.warpStorageService;
-	}
 
 	public Database getDatabase() {
 		return this.database;
@@ -96,11 +88,7 @@ public class Destinations {
 		}
 		
 		this.defaultConfigService = new DefaultConfigStorageService(this, this.configDir);
-		this.warpStorageService = new WarpStorageService(this, this.configDir);
-		
 		this.defaultConfigService.load();
-		this.warpStorageService.load();
-
         int configVersion = this.defaultConfigService.getConfig().getNode(DefaultConfigStorageService.VERSION).getInt(0);
 
         this.runConfigMigrations(configVersion);
