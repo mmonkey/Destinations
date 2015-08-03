@@ -2,8 +2,11 @@ package com.github.mmonkey.Destinations;
 
 import java.io.File;
 
+import com.github.mmonkey.Destinations.Commands.*;
 import com.github.mmonkey.Destinations.Dams.TestConnectionDam;
 import com.github.mmonkey.Destinations.Database.Database;
+import com.github.mmonkey.Destinations.Listeners.BackListener;
+import com.github.mmonkey.Destinations.Listeners.DeathListener;
 import com.github.mmonkey.Destinations.Migrations.AddDatabaseSettingsToDefaultConfig;
 import com.github.mmonkey.Destinations.Migrations.AddInitialDatabaseTables;
 import com.github.mmonkey.Destinations.Migrations.Migration;
@@ -23,14 +26,6 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
-import com.github.mmonkey.Destinations.Commands.DelHomeCommand;
-import com.github.mmonkey.Destinations.Commands.DelWarpCommand;
-import com.github.mmonkey.Destinations.Commands.HomeCommand;
-import com.github.mmonkey.Destinations.Commands.ListHomesCommand;
-import com.github.mmonkey.Destinations.Commands.ListWarpsCommand;
-import com.github.mmonkey.Destinations.Commands.SetHomeCommand;
-import com.github.mmonkey.Destinations.Commands.SetWarpCommand;
-import com.github.mmonkey.Destinations.Commands.WarpCommand;
 import com.github.mmonkey.Destinations.Listeners.ConvertTextListener;
 import com.github.mmonkey.Destinations.Configs.DefaultConfig;
 import com.github.mmonkey.Destinations.Database.H2EmbeddedDatabase;
@@ -102,6 +97,15 @@ public class Destinations {
 	
 	@Subscribe
 	public void onInit(InitializationEvent event) {
+
+        // RegisterEvents
+        game.getEventManager().register(this, new BackListener(this));
+
+        // Register back on death if enabled
+        if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.BACK_SETTINGS, DefaultConfig.SAVE_ON_DEATH).getBoolean()) {
+            game.getEventManager().register(this, new DeathListener(this));
+        }
+
 		
 		/**
 		 * /home [name]
@@ -207,6 +211,23 @@ public class Destinations {
 		if (game.getPluginManager().getPlugin("Commando").isPresent()) {
 			game.getEventManager().register(this, new ConvertTextListener(this));
 		}
+
+		/**
+		 * /back
+		 */
+		CommandSpec backCommand = CommandSpec.builder()
+				.description(Texts.of("Teleport back"))
+				.extendedDescription(Texts.of("Teleport to your previous location."))
+				.executor(new BackCommand(this))
+                .build();
+
+        // Register back commands if enabled
+        if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.BACK_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
+
+            game.getCommandDispatcher().register(this, backCommand, "back", "b");
+
+        }
+
 	}
 
     @Subscribe

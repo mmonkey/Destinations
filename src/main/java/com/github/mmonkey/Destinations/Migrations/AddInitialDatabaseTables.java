@@ -56,6 +56,12 @@ public class AddInitialDatabaseTables implements Migration {
                 " player_id INT NOT NULL," +
                 " can_edit BOOLEAN DEFAULT false);");
 
+        // Create backs table
+        sql.append("CREATE TABLE IF NOT EXISTS backs" +
+                " (player_id INT NOT NULL," +
+                " destination_id INT NOT NULL," +
+                " created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+
         try {
 
             connection = database.getConnection();

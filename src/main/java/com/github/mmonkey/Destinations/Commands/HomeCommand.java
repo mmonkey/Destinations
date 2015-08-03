@@ -3,6 +3,7 @@ package com.github.mmonkey.Destinations.Commands;
 import java.util.ArrayList;
 
 import com.github.mmonkey.Destinations.Dams.HomeDam;
+import com.github.mmonkey.Destinations.Events.PlayerBackLocationSaveEvent;
 import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
@@ -43,9 +44,9 @@ public class HomeCommand implements CommandExecutor {
 			return CommandResult.success();
 		}
 
-		Location location = home.getDestination().getLocation(plugin.getGame());
-		player.setRotation(home.getDestination().getRotation());
-		player.setLocation(location);
+		plugin.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(player));
+        player.setRotation(home.getDestination().getRotation());
+        player.setLocation(home.getDestination().getLocation(plugin.getGame()));
 			
 		return CommandResult.success();
 	}

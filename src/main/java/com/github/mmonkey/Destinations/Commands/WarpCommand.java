@@ -1,6 +1,9 @@
 package com.github.mmonkey.Destinations.Commands;
 
+import com.github.mmonkey.Destinations.Dams.BackDam;
 import com.github.mmonkey.Destinations.Dams.WarpDam;
+import com.github.mmonkey.Destinations.Events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.Destinations.Models.BackModel;
 import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
@@ -19,6 +22,7 @@ public class WarpCommand implements CommandExecutor {
 
 	private Destinations plugin;
 	private WarpDam warpDam;
+	private BackDam backDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		
@@ -51,7 +55,8 @@ public class WarpCommand implements CommandExecutor {
 			return CommandResult.success();
 			
 		}
-		
+
+		plugin.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(player));
 		player.setRotation(warp.getDestination().getRotation());
 		player.setLocation(warp.getDestination().getLocation(plugin.getGame()));
 		
