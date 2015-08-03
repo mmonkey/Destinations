@@ -49,6 +49,11 @@
 	    <artifactId>Commando</artifactId>
 	    <version>v0.0.2-2.1</version>
 	</dependency>
+	<dependency>
+	    <groupId>com.h2database</groupId>
+	    <artifactId>h2</artifactId>
+	    <version>1.4.187</version>
+	</dependency>
   </dependencies>
   <description>Destinations is a Sponge plugin that specifically handles location based commands.</description>
   <artifactId>Destinations</artifactId>

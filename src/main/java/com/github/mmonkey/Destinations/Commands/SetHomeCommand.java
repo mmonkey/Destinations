@@ -1,8 +1,9 @@
 package com.github.mmonkey.Destinations.Commands;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import com.github.mmonkey.Destinations.Dams.HomeDam;
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
@@ -11,13 +12,12 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
-import com.github.mmonkey.Destinations.Home;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class SetHomeCommand implements CommandExecutor {
-	
-	private Destinations plugin;
+
+	private HomeDam homeDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -29,34 +29,36 @@ public class SetHomeCommand implements CommandExecutor {
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		
 		Player player = (Player) src;
-		List<String> list = plugin.getHomeStorageService().getHomeList(player);
-		Home home = createHome(player, name);
+		ArrayList<HomeModel> homes = homeDam.getPlayerHomes(player);
+		HomeModel home = homeDam.getPlayerHomeByName(player, name);
+        ArrayList<String> list = this.getHomeNames(homes);
 		
 		if (force && list.contains(home.getName())) {
-			
-			plugin.getHomeStorageService().updateHome(player, home);
-			
+
+            home = homeDam.updateHome(player, home);
+
 			player.sendMessage(
 				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
 				.build()
 			);
-			
+
 			return CommandResult.success();
-			
+
 		}
 		
-		if (list.contains(home.getName())) {
+		if (home != null) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.ERROR, " already exists!").builder()
+				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists!").builder()
 				.build()
 			);
 			
 			return CommandResult.success();
 			
 		}
-		
-		plugin.getHomeStorageService().addHome(player, home);
+
+		name = name.equals("") ? getAvailableName(homes) : name;
+		home = homeDam.insertHome(player, name);
 		
 		player.sendMessage(
 			Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully created!").builder()
@@ -66,34 +68,30 @@ public class SetHomeCommand implements CommandExecutor {
 		return CommandResult.success();
 
 	}
-	
-	/**
-	 * Creates a new home of given name, if no name is passed, one will be generated
-	 * 
-	 * @param player Player
-	 * @param name String
-	 * @return Home
-	 */
-	private Home createHome(Player player, String name) {
 
-		ArrayList<Home> playerHomes = plugin.getHomeStorageService().getHomes(player);
-		Home home = (name.equals("")) ? new Home(getAvailableName(playerHomes), player) : new Home(name, player);
-		
-		return home;
+	private ArrayList<String> getHomeNames(ArrayList<HomeModel> homes) {
+
+		ArrayList<String> list = new ArrayList<String>();
+		for (HomeModel home: homes) {
+			list.add(home.getName());
+		}
+
+		return list;
 
 	}
 	
 	/**
 	 * Returns available home name, example: home4
-	 * @param homes ArrayList<Home>
+	 *
+	 * @param homes ArrayList<HomeModel>
 	 * @return String
 	 */
-	private String getAvailableName(ArrayList<Home> homes) {
+	private String getAvailableName(ArrayList<HomeModel> homes) {
 		
 		int max = 0;
 		int temp = 0;
 		
-		for (Home home: homes) {
+		for (HomeModel home: homes) {
 			
 			if (home.getName().startsWith("home") && home.getName().matches(".*\\d.*")) {
 				temp = Integer.parseInt(home.getName().replaceAll("[\\D]", ""));
@@ -114,7 +112,7 @@ public class SetHomeCommand implements CommandExecutor {
 	}
 	
 	public SetHomeCommand(Destinations plugin) {
-		this.plugin = plugin;
+		this.homeDam = new HomeDam(plugin);
 	}
 
 }

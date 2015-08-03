@@ -1,23 +1,27 @@
 package com.github.mmonkey.Destinations.Filters;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.github.mmonkey.Destinations.Dams.WarpDam;
+import com.github.mmonkey.Destinations.Models.WarpModel;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 import com.gmail.mmonkey.Commando.Match;
 import com.gmail.mmonkey.Commando.Filters.Filter;
 
 public class WarpFilter extends Filter {
 
-	private Destinations plugin;
-	
+    private WarpDam warpDam;
+    private Player player;
+
 	@Override
 	public Pattern[] getPatterns() {
 		return new Pattern[] {Pattern.compile("\\[warp:([^]]+)\\]"), Pattern.compile("\\[w:([^]]+)\\]")};
@@ -26,10 +30,11 @@ public class WarpFilter extends Filter {
 	@Override
 	public Text filter(Match match) {
 		
-		List<String> warpList = plugin.getWarpStorageService().getWarpList();
-		if (warpList.contains(match.getContent())) {
-		
-			Warp warp = plugin.getWarpStorageService().getWarp(match.getContent());
+		ArrayList<WarpModel> warps = this.getWarps(player);
+        WarpModel warp = this.searchWarps(warps, match.getContent());
+
+		if (warp != null) {
+
 			return getWarpAction(match.getTitle(), warp.getName());
 		
 		} else {
@@ -38,6 +43,23 @@ public class WarpFilter extends Filter {
 		}
 		
 	}
+
+    private ArrayList<WarpModel> getWarps(Player player) {
+        // this is broken in sponge
+        // return (player.hasPermission("warp.admin")) ? warpDam.getAllWarps() : warpDam.getPlayerWarps(player);
+        return warpDam.getPlayerWarps(player);
+    }
+
+    public WarpModel searchWarps(ArrayList<WarpModel> warps, String name) {
+
+        for (WarpModel warp : warps) {
+            if (warp.getName().equalsIgnoreCase(name)) {
+                return warp;
+            }
+        }
+
+        return null;
+    }
 	
 	private Text getWarpAction(String title, String name) {
 		
@@ -51,8 +73,9 @@ public class WarpFilter extends Filter {
 			.build();
 	}
 	
-	public WarpFilter(Destinations plugin) {
-		this.plugin = plugin;
+	public WarpFilter(Destinations plugin, Player player) {
+		this.player = player;
+        this.warpDam = new WarpDam(plugin);
 	}
 
 }
