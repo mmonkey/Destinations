@@ -3,9 +3,7 @@ package com.github.mmonkey.Destinations.Commands;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Events.PlayerBackLocationSaveEvent;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
-import com.github.mmonkey.Destinations.Services.CallService;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
-import com.google.common.base.Optional;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
@@ -35,8 +33,12 @@ public class BringCommand implements CommandExecutor {
 		
 		if (caller == null) {
 
-            return listCallers(callee, args);
+            if (plugin.getCallService().hasCalls(callee)) {
+                return listCallers(callee, args);
+            }
 
+            callee.sendMessage(Texts.of(FormatUtil.ERROR, "You have no call requests."));
+            return CommandResult.success();
         }
 
         if (plugin.getCallService().isCalling(caller, callee)) {
@@ -46,7 +48,6 @@ public class BringCommand implements CommandExecutor {
         } else {
 
             TextBuilder message = Texts.builder();
-
             message.append(Texts.of(FormatUtil.WARN, "Call request from "));
             message.append(Texts.of(FormatUtil.OBJECT, caller.getName()));
             message.append(Texts.of(FormatUtil.WARN, " has expired."));
@@ -58,7 +59,7 @@ public class BringCommand implements CommandExecutor {
 	}
 
 	private CommandResult listCallers(Player callee, CommandContext args) {
-		
+
 		List<String> callList = plugin.getCallService().getCalling(callee);
         int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
 
@@ -90,6 +91,7 @@ public class BringCommand implements CommandExecutor {
 
 	private CommandResult executeBring(Player caller, Player callee, CommandContext args) {
 
+        plugin.getCallService().removeCall(caller, callee);
         plugin.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(caller));
         caller.setRotation(callee.getRotation());
 		caller.setLocation(callee.getLocation());

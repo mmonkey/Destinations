@@ -39,7 +39,7 @@ public class Destinations {
 	
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
-	public static final String VERSION = "0.3.0";
+	public static final String VERSION = "0.3.1";
     public static final int CONFIG_VERSION = 2;
     public static final int DATABASE_VERSION = 1;
 	
@@ -256,7 +256,7 @@ public class Destinations {
 
             game.getCommandDispatcher().register(this, callCommand, "call", "tpa");
             game.getCommandDispatcher().register(this, bringCommand, "bring");
-            game.getCommandDispatcher().register(this, bringCommand, "grab", "tphere");
+            game.getCommandDispatcher().register(this, grabCommand, "grab", "tphere");
 
         }
 

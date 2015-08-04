@@ -19,7 +19,6 @@ import org.spongepowered.api.text.Texts;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class CallService implements RemovalListener<Pair<User, User>, ObjectUtils.Null> {
@@ -44,24 +43,38 @@ public class CallService implements RemovalListener<Pair<User, User>, ObjectUtil
 			.delay(0)
 			.name("Notify Caller")
 			.execute(new Runnable() {
-				public void run() {
-                    expiredNotification(removal.getKey());
-				}
-			}).submit(plugin);
+                public void run() {
+                    if (removal.wasEvicted()) {
+                        expiredNotification(removal.getKey());
+                    }
+                }
+            }).submit(plugin);
 
 	}
 
 	public void expiredNotification(Pair<User, User> pair) {
 		
-		Optional<Player> caller = plugin.getGame().getServer().getPlayer(pair.getRight().getUniqueId());
+		Optional<Player> caller = plugin.getGame().getServer().getPlayer(pair.getLeft().getUniqueId());
+        Optional<Player> callee = plugin.getGame().getServer().getPlayer(pair.getRight().getUniqueId());
 
 		if (caller.isPresent()) {
+
             TextBuilder message = Texts.builder();
             message.append(Texts.of(FormatUtil.WARN, "Your call to "));
-            message.append(Texts.of(FormatUtil.OBJECT, pair.getLeft().getName()));
+            message.append(Texts.of(FormatUtil.OBJECT, pair.getRight().getName()));
             message.append(Texts.of(FormatUtil.WARN, " has expired."));
             caller.get().sendMessage(message.build());
 		}
+
+        if (callee.isPresent()) {
+
+            TextBuilder message = Texts.builder();
+            message.append(Texts.of(FormatUtil.WARN, " The request from "));
+            message.append(Texts.of(FormatUtil.OBJECT, pair.getLeft().getName()));
+            message.append(Texts.of(FormatUtil.WARN, " has expired."));
+            callee.get().sendMessage(message.build());
+
+        }
 		
 	}
 
@@ -70,13 +83,28 @@ public class CallService implements RemovalListener<Pair<User, User>, ObjectUtil
 		this.calls.put(pair, ObjectUtils.NULL);
 	}
 
+	public void removeCall(User caller, User callee) {
+		Pair<User, User> pair = Pair.of(caller, callee);
+		this.calls.invalidate(pair);
+	}
+
+	public boolean hasCalls(User callee) {
+
+		for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
+			if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public List<String> getCalling(Player callee) {
 		
 		List<String> list = new ArrayList<String>();
 		
 		for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
-			UUID uuid = entry.getKey().getRight().getUniqueId();	
-			if (uuid.equals(callee.getUniqueId())) {
+            if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())) {
 				list.add(entry.getKey().getLeft().getName());
 			}
 		}
@@ -87,8 +115,8 @@ public class CallService implements RemovalListener<Pair<User, User>, ObjectUtil
     public boolean isCalling(Player caller, Player callee) {
 
         for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
-            if (entry.getKey().getRight().getUniqueId().equals(caller.getUniqueId())
-                    && entry.getKey().getLeft().getUniqueId().equals(callee.getUniqueId())) {
+            if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())
+                    && entry.getKey().getLeft().getUniqueId().equals(caller.getUniqueId())) {
                 return true;
             }
         }

@@ -23,8 +23,6 @@ public class CallCommand implements CommandExecutor {
 		}
 
 		Player caller = (Player) src;
-		String callerName = caller.getName();
-
 		Player callee = args.getOne("player").isPresent() ? (Player) args.getOne("player").get() : null;
 
 		if (callee == null) {
@@ -34,14 +32,14 @@ public class CallCommand implements CommandExecutor {
 
         TextBuilder message = Texts.builder();
         message.append(Texts.of(FormatUtil.OBJECT, caller.getName(), FormatUtil.DIALOG, " has requested a teleport type "));
-        message.append(BringCommand.getBringAction(callerName));
+        message.append(BringCommand.getBringAction(caller.getName()));
         message.append(Texts.of(FormatUtil.DIALOG, " to teleport them to you."));
 
         // Send messages
 		callee.sendMessage(message.build());
         caller.sendMessage(Texts.of(FormatUtil.OBJECT, callee.getName(), FormatUtil.DIALOG, " was called."));
 
-        plugin.getCallService().call(callee, caller);
+        plugin.getCallService().call(caller, callee);
 
 		return CommandResult.success();
 	}
