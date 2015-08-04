@@ -1,4 +1,4 @@
-package com.github.mmonkey.Destinations;
+package com.github.mmonkey.Destinations.Models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,15 +6,18 @@ import java.util.UUID;
 
 import org.spongepowered.api.entity.player.Player;
 
-import com.github.mmonkey.Destinations.Utilities.DestinationTypes;
+public class WarpModel {
 
-public class Warp {
-
+    private int id;
 	private String name;
 	private UUID ownerUniqueId;
-	private Destination destination;
+	private DestinationModel destination;
 	private boolean isPublic = true;
 	private Map<UUID, Boolean> whitelist = new HashMap<UUID, Boolean>();
+
+    public int getId() {
+        return this.id;
+    }
 	
 	public String getName() {
 		return this.name;
@@ -23,20 +26,20 @@ public class Warp {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public UUID getOwnerUniqueId() {
 		return this.ownerUniqueId;
 	}
-	
+
 	public void setOwnerUniqueId(UUID uniqueId) {
 		this.ownerUniqueId = uniqueId;
 	}
 	
-	public Destination getDestination() {
+	public DestinationModel getDestination() {
 		return this.destination;
 	}
 	
-	public void setDestination(Destination destination) {
+	public void setDestination(DestinationModel destination) {
 		this.destination = destination;
 	}
 	
@@ -56,13 +59,15 @@ public class Warp {
 		this.whitelist = whitelist;
 	}
 	
-	public Warp() {
-	}
+//	public WarpModel() {
+//	}
 	
-	public Warp(String name, Player player) {
+	public WarpModel(int id, String name, UUID playerUniqueId, DestinationModel destination, boolean isPublic) {
+        this.id = id;
 		this.name = name;
-		this.ownerUniqueId = player.getUniqueId();
-		this.destination = new Destination(player, DestinationTypes.WARP);
+		this.ownerUniqueId = playerUniqueId;
+		this.destination = destination;
+		this.isPublic = isPublic;
 	}
 	
 }

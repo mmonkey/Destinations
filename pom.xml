@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.mmonkey</groupId>
-  <version>0.1.2-2.1</version>
+  <version>0.2.0</version>
   <packaging>jar</packaging>
 
   <name>Destinations</name>
@@ -48,6 +48,11 @@
 	    <groupId>com.github.mmonkey</groupId>
 	    <artifactId>Commando</artifactId>
 	    <version>v0.0.2-2.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>com.h2database</groupId>
+	    <artifactId>h2</artifactId>
+	    <version>1.4.187</version>
 	</dependency>
   </dependencies>
   <description>Destinations is a Sponge plugin that specifically handles location based commands.</description>

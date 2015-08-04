@@ -1,7 +1,10 @@
 package com.github.mmonkey.Destinations.Commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.github.mmonkey.Destinations.Dams.WarpDam;
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -15,12 +18,11 @@ import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Warp;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 
 public class DelWarpCommand implements CommandExecutor {
 
-	private Destinations plugin;
+    private WarpDam warpDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 		
@@ -32,8 +34,10 @@ public class DelWarpCommand implements CommandExecutor {
 		boolean cancel = (args.hasAny("c")) ? (Boolean) args.getOne("c").get() : false;
 		String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
 		Player player = (Player) src;
-		List<String> list = plugin.getWarpStorageService().getPlayerWarpList(player);
-		
+
+        ArrayList<WarpModel> warps = this.getWarps(player);
+		WarpModel warp = this.searchWarps(warps, name);
+
 		if (cancel) {
 			
 			player.sendMessage(
@@ -45,18 +49,18 @@ public class DelWarpCommand implements CommandExecutor {
 			
 		}
 		
-		if (force && list.contains(name)) {
+		if (force && warp != null) {
 			
-			deleteWarp(player, name);
+			deleteWarp(player, warp);
 			return CommandResult.success();
 				
 		}
 		
-		if (list.contains(name)) {
+		if (warp != null) {
 			
 			player.sendMessage(
 				Texts.of(CommandMessageFormatting.NEWLINE_TEXT).builder()
-				.append(Texts.of(FormatUtil.DIALOG, "Are you sure you want to delete warp ", FormatUtil.OBJECT, name, FormatUtil.DIALOG, "?  "))
+				.append(Texts.of(FormatUtil.DIALOG, "Are you sure you want to delete warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.DIALOG, "?  "))
 				.append(getDeleteWarpConfirmationAction(name, "Yes"))
 				.append(Texts.of("  "))
 				.append(getDeleteWarpCancelAction(name, "No"))
@@ -78,22 +82,37 @@ public class DelWarpCommand implements CommandExecutor {
 		}
 		
 	}
+
+    private ArrayList<WarpModel> getWarps(Player player) {
+        // this is broken in sponge
+        // return (player.hasPermission("warp.admin")) ? warpDam.getAllWarps() : warpDam.getPlayerWarps(player);
+        return warpDam.getPlayerWarps(player);
+    }
+
+    private WarpModel searchWarps(ArrayList<WarpModel> warps, String name) {
+
+        for (WarpModel warp : warps) {
+            if (warp.getName().equalsIgnoreCase(name)) {
+                return warp;
+            }
+        }
+
+        return null;
+    }
 	
-	private void deleteWarp(Player player, String name) {
+	private void deleteWarp(Player player, WarpModel warp) {
 		
-		Warp warp = plugin.getWarpStorageService().getWarp(name);
-		
-		if (warp != null && plugin.getWarpStorageService().removeWarp(warp)) {
+		if (warpDam.deleteWarp(warp)) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.SUCCESS, " was successfully deleted!").builder()
-				.build()
-			);
+                    Texts.of(FormatUtil.empty(), FormatUtil.SUCCESS, "Warp ", FormatUtil.DELETED_OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully deleted!").builder()
+                    .build()
+            );
 			
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
+				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, warp.getName(), FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
 				.build()
 			);
 			
@@ -124,6 +143,6 @@ public class DelWarpCommand implements CommandExecutor {
 	}
 	
 	public DelWarpCommand(Destinations plugin) {
-		this.plugin = plugin;
+        this.warpDam = new WarpDam(plugin);
 	}
 }

@@ -1,7 +1,9 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.List;
+import java.util.ArrayList;
 
+import com.github.mmonkey.Destinations.Dams.HomeDam;
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
@@ -21,6 +23,7 @@ import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 public class ListHomesCommand implements CommandExecutor {
 	
 	private Destinations plugin;
+	private HomeDam homeDam;
 	
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -34,7 +37,8 @@ public class ListHomesCommand implements CommandExecutor {
 		int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
 		
 		// Get this players list of homes
-		List<String> list = plugin.getHomeStorageService().getHomeList(player);
+		ArrayList<HomeModel> homes = homeDam.getPlayerHomes(player);
+		ArrayList<String> list = this.getHomeNames(homes);
 		
 		// If this player doesn't have any homes, return with message
 		if (list.isEmpty()) {
@@ -77,6 +81,17 @@ public class ListHomesCommand implements CommandExecutor {
 		return CommandResult.success();
 
 	}
+
+	private ArrayList<String> getHomeNames(ArrayList<HomeModel> homes) {
+
+		ArrayList<String> list = new ArrayList<String>();
+		for (HomeModel home: homes) {
+			list.add(home.getName());
+		}
+
+		return list;
+
+	}
 	
 	private Text getHomeAction(String name) {
 		
@@ -102,6 +117,7 @@ public class ListHomesCommand implements CommandExecutor {
 	
 	public ListHomesCommand(Destinations plugin) {
 		this.plugin = plugin;
+		this.homeDam = new HomeDam(plugin);
 	}
 
 }

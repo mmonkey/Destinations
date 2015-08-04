@@ -1,4 +1,4 @@
-package com.github.mmonkey.Destinations.Services;
+package com.github.mmonkey.Destinations.Configs;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import com.github.mmonkey.Destinations.Destinations;
 
-public class StorageService {
+public class Config {
 
 	public static final String LIST = "list";
 	
@@ -100,7 +100,7 @@ public class StorageService {
 		
 	}
 	
-	public StorageService(Destinations plugin, File configDir) {
+	public Config(Destinations plugin, File configDir) {
 		this.plugin = plugin;
 		this.configDir = configDir;
 	}
