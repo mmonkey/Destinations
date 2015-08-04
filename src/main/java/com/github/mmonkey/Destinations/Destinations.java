@@ -39,7 +39,7 @@ public class Destinations {
 	
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
-	public static final String VERSION = "0.2.0";
+	public static final String VERSION = "0.3.0";
     public static final int CONFIG_VERSION = 2;
     public static final int DATABASE_VERSION = 1;
 	
@@ -226,9 +226,9 @@ public class Destinations {
 		 */
 		CommandSpec callCommand = CommandSpec.builder()
 				.description(Texts.of("Requests a player to teleport you."))
-				.extendedDescription(Texts.of("Requests a player to teleport you to their current location. Required: /call <name>"))
+				.extendedDescription(Texts.of("Requests a player to teleport you to their current location. Required: /call <player>"))
 				.executor(new CallCommand(this))
-				.arguments(GenericArguments.player(Texts.of("callee"), game))
+				.arguments(GenericArguments.player(Texts.of("player"), game))
 				.build();
 
 		/**
@@ -238,7 +238,7 @@ public class Destinations {
 				.description(Texts.of("Bring a calling player to you."))
 				.extendedDescription(Texts.of("Teleports a player that has issued a call request to your current location."))
 				.executor(new BringCommand(this))
-				.arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Texts.of("caller"), game), GenericArguments.integer(Texts.of("page")))))
+				.arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Texts.of("player"), game), GenericArguments.integer(Texts.of("page")))))
 				.build();
 
         /**

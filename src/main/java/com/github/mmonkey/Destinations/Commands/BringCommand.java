@@ -31,7 +31,7 @@ public class BringCommand implements CommandExecutor {
 		}
 
         Player callee = (Player) src;
-		Player caller = args.getOne("caller").isPresent() ? (Player) args.getOne("caller").get() : null;
+		Player caller = args.getOne("player").isPresent() ? (Player) args.getOne("player").get() : null;
 		
 		if (caller == null) {
 

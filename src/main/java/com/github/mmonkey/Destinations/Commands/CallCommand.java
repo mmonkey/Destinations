@@ -25,16 +25,14 @@ public class CallCommand implements CommandExecutor {
 		Player caller = (Player) src;
 		String callerName = caller.getName();
 
-		Optional<Player> player = args.getOne("callee");
+		Player callee = args.getOne("player").isPresent() ? (Player) args.getOne("player").get() : null;
 
-		if (!player.isPresent()) {
+		if (callee == null) {
             caller.sendMessage(Texts.of(FormatUtil.ERROR, "Invalid player."));
 			return CommandResult.empty();
 		}
 
-		Player callee = player.get();
         TextBuilder message = Texts.builder();
-
         message.append(Texts.of(FormatUtil.OBJECT, caller.getName(), FormatUtil.DIALOG, " has requested a teleport type "));
         message.append(BringCommand.getBringAction(callerName));
         message.append(Texts.of(FormatUtil.DIALOG, " to teleport them to you."));
