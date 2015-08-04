@@ -60,6 +60,8 @@ public class ListHomesCommand implements CommandExecutor {
 			
 			paginatedList.add(row.build());
 		}
+
+		currentPage = currentPage > paginatedList.getTotalPages() ? paginatedList.getTotalPages() : currentPage;
 		
 		// Created header for paginatedList
 		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));

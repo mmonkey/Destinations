@@ -44,7 +44,9 @@ public class ListWarpsCommand implements CommandExecutor {
 			return CommandResult.success();
 			
 		}
-		
+
+		TextBuilder header = Texts.builder();
+		TextBuilder message = Texts.builder();
 		PaginatedList paginatedList = new PaginatedList("/listwarps");
 		
 		for (WarpModel warp: warps) {
@@ -56,10 +58,9 @@ public class ListWarpsCommand implements CommandExecutor {
 			paginatedList.add(row.build());
 			
 		}
-		
-		TextBuilder header = Texts.builder();
-		TextBuilder message = Texts.builder();
-		
+
+		currentPage = currentPage > paginatedList.getTotalPages() ? paginatedList.getTotalPages() : currentPage;
+
 		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
 		header.append(Texts.of(FormatUtil.HEADLINE, " Showing warps page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
 		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));

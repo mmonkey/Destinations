@@ -60,26 +60,28 @@ public class BringCommand implements CommandExecutor {
 	private CommandResult listCallers(Player callee, CommandContext args) {
 		
 		List<String> callList = plugin.getCallService().getCalling(callee);
-		PaginatedList pager = new PaginatedList("/bring");
-		int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
+        int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
+
+        TextBuilder header = Texts.builder();
+        TextBuilder message = Texts.builder();
+		PaginatedList paginatedList = new PaginatedList("/bring");
 
 		for (String name : callList) {
 			TextBuilder row = Texts.builder();
 			row.append(getBringAction(name));
-			pager.add(row.build());
+            paginatedList.add(row.build());
 		}
 
-		TextBuilder header = Texts.builder();
-		TextBuilder message = Texts.builder();
+        currentPage = currentPage > paginatedList.getTotalPages() ? paginatedList.getTotalPages() : currentPage;
 
 		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
-		header.append(Texts.of(FormatUtil.HEADLINE, " Showing callers page " + currentPage + " of " + pager.getTotalPages() + " "));
+		header.append(Texts.of(FormatUtil.HEADLINE, " Showing callers page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
 		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
-		pager.setHeader(header.build());
+        paginatedList.setHeader(header.build());
 		
 		// clear the chat
 		message.append(FormatUtil.empty());
-		message.append(pager.getPage(currentPage));
+		message.append(paginatedList.getPage(currentPage));
 		callee.sendMessage(message.build());
 
 		return CommandResult.success();
