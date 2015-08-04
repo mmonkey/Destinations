@@ -337,20 +337,7 @@ public class Destinations {
 
         while (version != CONFIG_VERSION) {
 
-            Migration migration = null;
-
-            switch (configVersion) {
-                case 0:
-                    migration = new AddDatabaseSettingsToDefaultConfig(this);
-                    break;
-
-                case 1:
-                    migration = new AddCallBringSettingsToDefaultConfig(this);
-                    break;
-
-                default:
-                    break;
-            }
+            Migration migration = this.getConfigMigration(version);
 
             if (migration != null) {
                 if (isLess) {
@@ -365,23 +352,14 @@ public class Destinations {
 
     }
 
-    private void runDatabaseMigrations(int configVersion) {
+    private void runDatabaseMigrations(int databaseVersion) {
 
-        int version = configVersion;
+        int version = databaseVersion;
         boolean isLess = (version < DATABASE_VERSION);
 
         while (version != DATABASE_VERSION) {
 
-            Migration migration = null;
-
-            switch (configVersion) {
-                case 0:
-                    migration = new AddInitialDatabaseTables(this.database);
-                    break;
-
-                default:
-                    break;
-            }
+            Migration migration = this.getDatabaseMigration(version);
 
             if (migration != null) {
                 if (isLess) {
@@ -392,6 +370,32 @@ public class Destinations {
                     version--;
                 }
             }
+        }
+
+    }
+
+    private Migration getConfigMigration(int configVersion) {
+
+        switch (configVersion) {
+            case 0:
+                return new AddDatabaseSettingsToDefaultConfig(this);
+
+            case 1:
+                return new AddCallBringSettingsToDefaultConfig(this);
+
+            default:
+                return null;
+        }
+    }
+
+    private Migration getDatabaseMigration(int databaseVersion) {
+
+        switch (databaseVersion) {
+            case 0:
+                return new AddInitialDatabaseTables(this.database);
+
+            default:
+                return null;
         }
 
     }
