@@ -45,7 +45,7 @@ public class Config {
 		this.configLoader = configLoader;
 	}
 	
-	public CommentedConfigurationNode getConfig() {
+	public CommentedConfigurationNode get() {
 		return this.config;
 	}
 	
@@ -73,11 +73,11 @@ public class Config {
 		
 	}
 	
-	public void saveConfig() {
+	public void save() {
 		
 		try {
 			
-			this.getConfigLoader().save(this.getConfig());
+			this.getConfigLoader().save(this.get());
 		
 		} catch (IOException e) {
 			

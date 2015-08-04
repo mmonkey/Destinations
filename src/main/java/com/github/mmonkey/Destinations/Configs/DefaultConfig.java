@@ -9,17 +9,20 @@ import com.github.mmonkey.Destinations.Destinations;
 
 public class DefaultConfig extends Config {
 	
-	public static final String VERSION = "version";
+	public static final String CONFIG_VERSION = "version";
+    public static final String DATABASE_VERSION = "databaseVersion";
 	public static final String HOME_SETTINGS = "HomeSettings";
 	public static final String WARP_SETTINGS = "WarpSettings";
 	public static final String BACK_SETTINGS = "BackSettings";
 	public static final String DATABASE_SETTINGS = "DatabaseSettings";
-	public static final String USERNAME = "username";
+    public static final String TELEPORT_SETTINGS = "TeleportSettings";
+    public static final String USERNAME = "username";
 	public static final String PASSWORD = "password";
 	public static final String WEBSERVER = "webserver";
 	public static final String ENABLED = "enabled";
 	public static final String MAX_HOMES = "maxHomes";
 	public static final String SAVE_ON_DEATH = "saveOnDeath";
+    public static final String EXPIRES_AFTER = "requestsExpireAfter";
 
 	@Override
 	public void load() {
@@ -30,7 +33,7 @@ public class DefaultConfig extends Config {
 			
 			if (!getConfigFile().isFile()) {
 				getConfigFile().createNewFile();
-				save();
+				saveDefaults();
 			}
 			
 			setConfig(getConfigLoader().load());
@@ -43,7 +46,7 @@ public class DefaultConfig extends Config {
 		
 	}
 
-	public void save() {
+	private void saveDefaults() {
 		
 		try {
 			
@@ -55,17 +58,17 @@ public class DefaultConfig extends Config {
 			
 		}
 
-		getConfig().getNode(VERSION).setValue(0);
-		getConfig().getNode(DATABASE_SETTINGS, USERNAME).setValue("admin");
-		getConfig().getNode(DATABASE_SETTINGS, PASSWORD).setValue("");
-		getConfig().getNode(DATABASE_SETTINGS, WEBSERVER).setValue(false);
-		getConfig().getNode(HOME_SETTINGS, ENABLED).setValue(true);
-		getConfig().getNode(HOME_SETTINGS, MAX_HOMES).setValue(0);
-		getConfig().getNode(WARP_SETTINGS, ENABLED).setValue(true);
-		getConfig().getNode(BACK_SETTINGS, ENABLED).setValue(true);
-		getConfig().getNode(BACK_SETTINGS, SAVE_ON_DEATH).setValue(true);
+		get().getNode(CONFIG_VERSION).setValue(0);
+		get().getNode(DATABASE_SETTINGS, USERNAME).setValue("admin");
+		get().getNode(DATABASE_SETTINGS, PASSWORD).setValue("");
+		get().getNode(DATABASE_SETTINGS, WEBSERVER).setValue(false);
+		get().getNode(HOME_SETTINGS, ENABLED).setValue(true);
+		get().getNode(HOME_SETTINGS, MAX_HOMES).setValue(0);
+		get().getNode(WARP_SETTINGS, ENABLED).setValue(true);
+		get().getNode(BACK_SETTINGS, ENABLED).setValue(true);
+		get().getNode(BACK_SETTINGS, SAVE_ON_DEATH).setValue(true);
 		
-		saveConfig();
+		save();
 		
 	}
 	

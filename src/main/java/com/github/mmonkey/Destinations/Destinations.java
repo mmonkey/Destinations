@@ -7,14 +7,13 @@ import com.github.mmonkey.Destinations.Dams.TestConnectionDam;
 import com.github.mmonkey.Destinations.Database.Database;
 import com.github.mmonkey.Destinations.Listeners.BackListener;
 import com.github.mmonkey.Destinations.Listeners.DeathListener;
+import com.github.mmonkey.Destinations.Migrations.AddCallBringSettingsToDefaultConfig;
 import com.github.mmonkey.Destinations.Migrations.AddDatabaseSettingsToDefaultConfig;
 import com.github.mmonkey.Destinations.Migrations.AddInitialDatabaseTables;
 import com.github.mmonkey.Destinations.Migrations.Migration;
+import com.github.mmonkey.Destinations.Services.CallService;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
-import com.github.mmonkey.Destinations.Commands.BringCommand;
-import com.github.mmonkey.Destinations.Commands.CallCommand;
-import com.github.mmonkey.Destinations.Services.CallService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
@@ -41,7 +40,8 @@ public class Destinations {
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
 	public static final String VERSION = "0.2.0";
-    public static final int CURRENT_CONFIG_VERSION = 1;
+    public static final int CONFIG_VERSION = 2;
+    public static final int DATABASE_VERSION = 1;
 	
 	private Game game;
 	private Optional<PluginContainer> pluginContainer;
@@ -74,6 +74,10 @@ public class Destinations {
 	public Database getDatabase() {
 		return this.database;
 	}
+
+    public CallService getCallService() {
+        return this.callService;
+    }
 	
 	@Subscribe
 	public void onPreInit(PreInitializationEvent event) {
@@ -89,14 +93,20 @@ public class Destinations {
                 getLogger().info("Destinations config directory successfully created!");
             }
 		}
-		
+
+        // Load default config
 		this.defaultConfig = new DefaultConfig(this, this.configDir);
 		this.defaultConfig.load();
-        int configVersion = this.defaultConfig.getConfig().getNode(DefaultConfig.VERSION).getInt(0);
 
+        // Run migrations
+        int configVersion = this.defaultConfig.get().getNode(DefaultConfig.CONFIG_VERSION).getInt(0);
+        int databaseVersion = this.defaultConfig.get().getNode(DefaultConfig.DATABASE_VERSION).getInt(0);
         this.runConfigMigrations(configVersion);
         this.setupDatabase();
-        this.runDatabaseMigrations(configVersion);
+        this.runDatabaseMigrations(databaseVersion);
+
+        // Load callService
+        this.callService = new CallService(this, event.getGame().getScheduler());
 	}
 	
 	@Subscribe
@@ -106,7 +116,7 @@ public class Destinations {
         game.getEventManager().register(this, new BackListener(this));
 
         // Register back on death if enabled
-        if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.BACK_SETTINGS, DefaultConfig.SAVE_ON_DEATH).getBoolean()) {
+        if (this.getDefaultConfig().get().getNode(DefaultConfig.BACK_SETTINGS, DefaultConfig.SAVE_ON_DEATH).getBoolean()) {
             game.getEventManager().register(this, new DeathListener(this));
         }
 
@@ -152,7 +162,7 @@ public class Destinations {
 			.build();
 		
 		// Register home commands if enabled
-		if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.HOME_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
+		if (this.getDefaultConfig().get().getNode(DefaultConfig.HOME_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
 			
 			game.getCommandDispatcher().register(this, homeCommand, "home", "h");
 			game.getCommandDispatcher().register(this, setHomeCommand, "sethome");
@@ -175,7 +185,7 @@ public class Destinations {
 		 * /setwarp <name>
 		 */
 		CommandSpec setWarpCommand = CommandSpec.builder()
-			.description(Texts.of("Set a warp."))
+			.description(Texts.of("Set a warp"))
 			.extendedDescription(Texts.of("Set this location as a public warp."))
 			.executor(new SetWarpCommand(this))
 			.arguments(GenericArguments.remainingJoinedStrings(Texts.of("name")))
@@ -202,7 +212,7 @@ public class Destinations {
 			.build();
 		
 		// Register warp commands if enabled
-		if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.WARP_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
+		if (this.getDefaultConfig().get().getNode(DefaultConfig.WARP_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
 		
 			game.getCommandDispatcher().register(this, warpCommand, "warp", "w");
 			game.getCommandDispatcher().register(this, setWarpCommand, "setwarp");
@@ -212,47 +222,63 @@ public class Destinations {
 		}
 
 		/**
-		 * /call <player>
+		 * /call <player>, /tpa <player>
 		 */
 		CommandSpec callCommand = CommandSpec.builder()
-				.description(Texts.of("Requests a player to teleport you"))
-				.extendedDescription(Texts.of("Requests a player to teleport you to their current location /call <name>"))
-				.executor(new CallCommand(callService))
-				.arguments(GenericArguments.player(Texts.of("call-ee"), game))
+				.description(Texts.of("Requests a player to teleport you."))
+				.extendedDescription(Texts.of("Requests a player to teleport you to their current location. Required: /call <name>"))
+				.executor(new CallCommand(this))
+				.arguments(GenericArguments.player(Texts.of("callee"), game))
 				.build();
 
 		/**
-		 * /bring <player> [page]
+		 * /bring [player] [page]
 		 */
 		CommandSpec bringCommand = CommandSpec.builder()
-				.description(Texts.of("Bring a calling player to you"))
-				.extendedDescription(Texts.of("Teleports a player that has issued a call request to your current location. /bring <name>"))
-				.executor(new BringCommand(callService))
+				.description(Texts.of("Bring a calling player to you."))
+				.extendedDescription(Texts.of("Teleports a player that has issued a call request to your current location."))
+				.executor(new BringCommand(this))
 				.arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Texts.of("caller"), game), GenericArguments.integer(Texts.of("page")))))
 				.build();
 
-		game.getCommandDispatcher().register(this, callCommand, "call");
-		game.getCommandDispatcher().register(this, bringCommand, "bring");
+        /**
+         * /grab <player>, /tphere <player>
+         */
+        CommandSpec grabCommand = CommandSpec.builder()
+                .description(Texts.of("Teleport a player to you."))
+                .extendedDescription(Texts.of("Teleports a player to your current location. Required: /tphere <name>"))
+                .executor(new GrabCommand(this))
+                .arguments(GenericArguments.player(Texts.of("player"), game))
+                .build();
 
-		// Load Commando events
-		if (game.getPluginManager().getPlugin("Commando").isPresent()) {
-			game.getEventManager().register(this, new ConvertTextListener(this));
-		}
+        // Register call and bring commands if enabled
+        if (this.getDefaultConfig().get().getNode(DefaultConfig.TELEPORT_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
+
+            game.getCommandDispatcher().register(this, callCommand, "call", "tpa");
+            game.getCommandDispatcher().register(this, bringCommand, "bring");
+            game.getCommandDispatcher().register(this, bringCommand, "grab", "tphere");
+
+        }
 
 		/**
 		 * /back
 		 */
 		CommandSpec backCommand = CommandSpec.builder()
-				.description(Texts.of("Teleport back"))
+				.description(Texts.of("Teleport back."))
 				.extendedDescription(Texts.of("Teleport to your previous location."))
 				.executor(new BackCommand(this))
                 .build();
 
-        // Register back commands if enabled
-        if (this.getDefaultConfig().getConfig().getNode(DefaultConfig.BACK_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
+        // Register back command if enabled
+        if (this.getDefaultConfig().get().getNode(DefaultConfig.BACK_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
 
             game.getCommandDispatcher().register(this, backCommand, "back", "b");
 
+        }
+
+        // Load Commando events
+        if (game.getPluginManager().getPlugin("Commando").isPresent()) {
+            game.getEventManager().register(this, new ConvertTextListener(this));
         }
 
 	}
@@ -272,7 +298,7 @@ public class Destinations {
 
     private void setupDatabase() {
 
-        CommentedConfigurationNode dbConfig = this.defaultConfig.getConfig().getNode(DefaultConfig.DATABASE_SETTINGS);
+        CommentedConfigurationNode dbConfig = this.defaultConfig.get().getNode(DefaultConfig.DATABASE_SETTINGS);
         String username = dbConfig.getNode(DefaultConfig.USERNAME).getString();
         String password = dbConfig.getNode(DefaultConfig.PASSWORD).getString();
         this.database = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
@@ -289,7 +315,7 @@ public class Destinations {
     }
 
     private void startWebServer() {
-        CommentedConfigurationNode dbConfig = this.defaultConfig.getConfig().getNode(DefaultConfig.DATABASE_SETTINGS);
+        CommentedConfigurationNode dbConfig = this.defaultConfig.get().getNode(DefaultConfig.DATABASE_SETTINGS);
         if (dbConfig.getNode(DefaultConfig.WEBSERVER).getBoolean()) {
             if (this.database instanceof H2EmbeddedDatabase && !this.webServerRunning) {
                 if (((H2EmbeddedDatabase) this.database).startWebServer()) {
@@ -307,15 +333,19 @@ public class Destinations {
     private void runConfigMigrations(int configVersion) {
 
         int version = configVersion;
-        boolean isLess = (version < CURRENT_CONFIG_VERSION);
+        boolean isLess = (version < CONFIG_VERSION);
 
-        while (version != CURRENT_CONFIG_VERSION) {
+        while (version != CONFIG_VERSION) {
 
             Migration migration = null;
 
             switch (configVersion) {
                 case 0:
                     migration = new AddDatabaseSettingsToDefaultConfig(this);
+                    break;
+
+                case 1:
+                    migration = new AddCallBringSettingsToDefaultConfig(this);
                     break;
 
                 default:
@@ -338,9 +368,9 @@ public class Destinations {
     private void runDatabaseMigrations(int configVersion) {
 
         int version = configVersion;
-        boolean isLess = (version < CURRENT_CONFIG_VERSION);
+        boolean isLess = (version < DATABASE_VERSION);
 
-        while (version != CURRENT_CONFIG_VERSION) {
+        while (version != DATABASE_VERSION) {
 
             Migration migration = null;
 

@@ -1,9 +1,10 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import com.github.mmonkey.Destinations.Services.CallService;
+import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 import com.google.common.base.Optional;
 import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -13,11 +14,7 @@ import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 public class CallCommand implements CommandExecutor {
 
-	private final CallService callService;
-
-	public CallCommand(CallService callService) {
-		this.callService = callService;
-	}
+	private Destinations plugin;
 
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
@@ -25,29 +22,33 @@ public class CallCommand implements CommandExecutor {
 			return CommandResult.empty();
 		}
 
-		Player srcAsPlayer = (Player) src;
-		String srcName = srcAsPlayer.getName();
+		Player caller = (Player) src;
+		String callerName = caller.getName();
 
-		Optional<Player> playerOptional = args.getOne("call-ee");
+		Optional<Player> player = args.getOne("callee");
 
-		if (!playerOptional.isPresent()) {
+		if (!player.isPresent()) {
+            caller.sendMessage(Texts.of(FormatUtil.ERROR, "Invalid player."));
 			return CommandResult.empty();
 		}
 
-		Player player = playerOptional.get();
+		Player callee = player.get();
+        TextBuilder message = Texts.builder();
 
-		callService.call(player, srcAsPlayer);
-		src.sendMessage(Texts.of(player.getName() + " was called."));
+        message.append(Texts.of(FormatUtil.OBJECT, caller.getName(), FormatUtil.DIALOG, " has requested a teleport type "));
+        message.append(BringCommand.getBringAction(callerName));
+        message.append(Texts.of(FormatUtil.DIALOG, " to teleport them to you."));
 
-		Text callText = Texts
-				.builder(
-						srcAsPlayer.getName()
-								+ " has requested a teleport type ")
-				.append(BringCommand.getBringAction(srcName))
-				.append(Texts.of(" to teleport them to you.")).build();
+        // Send messages
+		callee.sendMessage(message.build());
+        caller.sendMessage(Texts.of(FormatUtil.OBJECT, callee.getName(), FormatUtil.DIALOG, " was called."));
 
-		player.sendMessage(callText);
+        plugin.getCallService().call(callee, caller);
 
 		return CommandResult.success();
+	}
+
+	public CallCommand(Destinations plugin) {
+		this.plugin = plugin;
 	}
 }
