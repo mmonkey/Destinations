@@ -7,10 +7,7 @@ import com.github.mmonkey.Destinations.Dams.TestConnectionDam;
 import com.github.mmonkey.Destinations.Database.Database;
 import com.github.mmonkey.Destinations.Listeners.BackListener;
 import com.github.mmonkey.Destinations.Listeners.DeathListener;
-import com.github.mmonkey.Destinations.Migrations.AddCallBringSettingsToDefaultConfig;
-import com.github.mmonkey.Destinations.Migrations.AddDatabaseSettingsToDefaultConfig;
-import com.github.mmonkey.Destinations.Migrations.AddInitialDatabaseTables;
-import com.github.mmonkey.Destinations.Migrations.Migration;
+import com.github.mmonkey.Destinations.Migrations.*;
 import com.github.mmonkey.Destinations.Services.CallService;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -39,8 +36,8 @@ public class Destinations {
 	
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
-	public static final String VERSION = "0.3.1";
-    public static final int CONFIG_VERSION = 2;
+	public static final String VERSION = "0.3.2";
+    public static final int CONFIG_VERSION = 3;
     public static final int DATABASE_VERSION = 1;
 	
 	private Game game;
@@ -298,11 +295,7 @@ public class Destinations {
 
     private void setupDatabase() {
 
-        CommentedConfigurationNode dbConfig = this.defaultConfig.get().getNode(DefaultConfig.DATABASE_SETTINGS);
-        String username = dbConfig.getNode(DefaultConfig.USERNAME).getString();
-        String password = dbConfig.getNode(DefaultConfig.PASSWORD).getString();
-        this.database = new H2EmbeddedDatabase(this.getGame(), "destinations", username, password);
-
+        this.database = new H2EmbeddedDatabase(this.getGame(), "destinations", "admin", "");
         this.startWebServer();
 
         TestConnectionDam testConnectionDam = new TestConnectionDam(this.database);
@@ -323,30 +316,18 @@ public class Destinations {
                 }
             }
         }
-
-        if (this.webServerRunning) {
-            String address = this.getGame().getServer().getBoundAddress().get().getAddress().getHostAddress();
-            getLogger().info("H2 console started at " + address + ":8082");
-        }
     }
 
     private void runConfigMigrations(int configVersion) {
 
         int version = configVersion;
-        boolean isLess = (version < CONFIG_VERSION);
-
         while (version != CONFIG_VERSION) {
 
             Migration migration = this.getConfigMigration(version);
 
             if (migration != null) {
-                if (isLess) {
-                    migration.up();
-                    version++;
-                } else {
-                    migration.down();
-                    version--;
-                }
+                migration.up();
+                version++;
             }
         }
 
@@ -355,20 +336,13 @@ public class Destinations {
     private void runDatabaseMigrations(int databaseVersion) {
 
         int version = databaseVersion;
-        boolean isLess = (version < DATABASE_VERSION);
-
         while (version != DATABASE_VERSION) {
 
             Migration migration = this.getDatabaseMigration(version);
 
-            if (migration != null) {
-                if (isLess) {
-                    migration.up();
-                    version++;
-                } else {
-                    migration.down();
-                    version--;
-                }
+            if (this.getDatabaseMigration(version) != null) {
+                migration.up();
+                version++;
             }
         }
 
@@ -382,6 +356,9 @@ public class Destinations {
 
             case 1:
                 return new AddCallBringSettingsToDefaultConfig(this);
+
+            case 2:
+                return new RemoveDatabaseUserFromDefaultConfig(this);
 
             default:
                 return null;

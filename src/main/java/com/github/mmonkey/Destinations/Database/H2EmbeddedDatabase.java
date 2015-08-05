@@ -1,5 +1,6 @@
 package com.github.mmonkey.Destinations.Database;
 
+import com.github.mmonkey.Destinations.Destinations;
 import org.h2.tools.Server;
 import org.spongepowered.api.Game;
 
@@ -45,13 +46,15 @@ public class H2EmbeddedDatabase extends Database {
 		
 			this.webServer = Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
 			this.tcpServer = Server.createTcpServer("-tcp", "-tcpAllowOthers", "true", "-tcpPort", "9092", "-tcpPassword", "test123").start();
+            Destinations.getLogger().info("H2 console started on port 8082.");
 			return true;
 		
 		} catch (SQLException e) {
-			
-			return false;
-		
-		}
+
+            Destinations.getLogger().info("H2 console was unable to start.");
+            return false;
+
+        }
 	}
 	
 	public void stopWebServer() {

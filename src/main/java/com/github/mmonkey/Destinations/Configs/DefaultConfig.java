@@ -16,8 +16,6 @@ public class DefaultConfig extends Config {
 	public static final String BACK_SETTINGS = "BackSettings";
 	public static final String DATABASE_SETTINGS = "DatabaseSettings";
     public static final String TELEPORT_SETTINGS = "TeleportSettings";
-    public static final String USERNAME = "username";
-	public static final String PASSWORD = "password";
 	public static final String WEBSERVER = "webserver";
 	public static final String ENABLED = "enabled";
 	public static final String MAX_HOMES = "maxHomes";
@@ -59,8 +57,6 @@ public class DefaultConfig extends Config {
 		}
 
 		get().getNode(CONFIG_VERSION).setValue(0);
-		get().getNode(DATABASE_SETTINGS, USERNAME).setValue("admin");
-		get().getNode(DATABASE_SETTINGS, PASSWORD).setValue("");
 		get().getNode(DATABASE_SETTINGS, WEBSERVER).setValue(false);
 		get().getNode(HOME_SETTINGS, ENABLED).setValue(true);
 		get().getNode(HOME_SETTINGS, MAX_HOMES).setValue(0);
