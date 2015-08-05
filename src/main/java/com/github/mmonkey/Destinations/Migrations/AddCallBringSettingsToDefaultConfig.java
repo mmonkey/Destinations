@@ -17,14 +17,6 @@ public class AddCallBringSettingsToDefaultConfig implements Migration {
         plugin.getDefaultConfig().save();
     }
 
-    public void down() {
-        CommentedConfigurationNode config = plugin.getDefaultConfig().get();
-        config.getNode(DefaultConfig.CONFIG_VERSION).setValue(1);
-        config.getNode(DefaultConfig.DATABASE_VERSION).setValue(0);
-        config.removeChild(DefaultConfig.TELEPORT_SETTINGS);
-        plugin.getDefaultConfig().save();
-    }
-
     public AddCallBringSettingsToDefaultConfig(Destinations plugin) {
         this.plugin = plugin;
     }
