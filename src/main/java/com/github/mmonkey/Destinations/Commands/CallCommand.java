@@ -30,6 +30,16 @@ public class CallCommand implements CommandExecutor {
 			return CommandResult.empty();
 		}
 
+        if (plugin.getCallService().isCalling(caller, callee)) {
+            TextBuilder message = Texts.builder();
+            message.append(Texts.of(FormatUtil.ERROR, "You must wait until your current call to "));
+            message.append(Texts.of(FormatUtil.OBJECT, callee.getName()));
+            message.append(Texts.of(FormatUtil.ERROR, " expires before calling them again."));
+
+            caller.sendMessage(message.build());
+            return CommandResult.success();
+        }
+
         TextBuilder message = Texts.builder();
         message.append(Texts.of(FormatUtil.OBJECT, caller.getName(), FormatUtil.DIALOG, " has requested a teleport type "));
         message.append(BringCommand.getBringAction(caller.getName()));
