@@ -88,16 +88,29 @@ public class CallService implements RemovalListener<Pair<User, User>, ObjectUtil
 		this.calls.invalidate(pair);
 	}
 
-	public boolean hasCalls(User callee) {
+	public User getFirstCaller(User callee) {
 
+        User caller = null;
 		for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
 			if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())) {
-				return true;
+				caller = entry.getKey().getLeft();
 			}
 		}
 
-		return false;
+		return caller;
 	}
+
+    public int getNumCallers(User callee) {
+
+        int callers = 0;
+        for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
+            if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())) {
+                callers++;
+            }
+        }
+
+        return callers;
+    }
 
 	public List<String> getCalling(Player callee) {
 		

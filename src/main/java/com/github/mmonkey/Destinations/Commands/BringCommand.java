@@ -33,17 +33,25 @@ public class BringCommand implements CommandExecutor {
 		
 		if (caller == null) {
 
-            if (plugin.getCallService().hasCalls(callee)) {
-                return listCallers(callee, args);
-            }
+            int numCallers = plugin.getCallService().getNumCallers(callee);
 
-            callee.sendMessage(Texts.of(FormatUtil.ERROR, "You have no call requests."));
-            return CommandResult.success();
+            switch (numCallers) {
+                case 0:
+                    callee.sendMessage(Texts.of(FormatUtil.ERROR, "You have no call requests."));
+                    return CommandResult.success();
+
+                case 1:
+                    Player calling = (Player) plugin.getCallService().getFirstCaller(callee);
+                    return executeBring(calling, callee);
+
+                default:
+                    return listCallers(callee, args);
+            }
         }
 
         if (plugin.getCallService().isCalling(caller, callee)) {
 
-            return executeBring(caller, callee, args);
+            return executeBring(caller, callee);
 
         } else {
 
@@ -89,7 +97,7 @@ public class BringCommand implements CommandExecutor {
 
 	}
 
-	private CommandResult executeBring(Player caller, Player callee, CommandContext args) {
+	private CommandResult executeBring(Player caller, Player callee) {
 
         plugin.getCallService().removeCall(caller, callee);
         plugin.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(caller));
