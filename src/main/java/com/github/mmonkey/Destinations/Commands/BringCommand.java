@@ -28,30 +28,30 @@ public class BringCommand implements CommandExecutor {
 			return CommandResult.empty();
 		}
 
-        Player callee = (Player) src;
+        Player target = (Player) src;
 		Player caller = args.getOne("player").isPresent() ? (Player) args.getOne("player").get() : null;
 		
 		if (caller == null) {
 
-            int numCallers = plugin.getCallService().getNumCallers(callee);
+            int numCallers = plugin.getCallService().getNumCallers(target);
 
             switch (numCallers) {
                 case 0:
-                    callee.sendMessage(Texts.of(FormatUtil.ERROR, "You have no call requests."));
+                    target.sendMessage(Texts.of(FormatUtil.ERROR, "You have no call requests."));
                     return CommandResult.success();
 
                 case 1:
-                    Player calling = (Player) plugin.getCallService().getFirstCaller(callee);
-                    return executeBring(calling, callee);
+                    Player calling = (Player) plugin.getCallService().getFirstCaller(target);
+                    return executeBring(calling, target);
 
                 default:
-                    return listCallers(callee, args);
+                    return listCallers(target, args);
             }
         }
 
-        if (plugin.getCallService().isCalling(caller, callee)) {
+        if (plugin.getCallService().isCalling(caller, target)) {
 
-            return executeBring(caller, callee);
+            return executeBring(caller, target);
 
         } else {
 
@@ -60,15 +60,15 @@ public class BringCommand implements CommandExecutor {
             message.append(Texts.of(FormatUtil.OBJECT, caller.getName()));
             message.append(Texts.of(FormatUtil.WARN, " has expired."));
 
-            callee.sendMessage(message.build());
+            target.sendMessage(message.build());
             return CommandResult.success();
         }
 
 	}
 
-	private CommandResult listCallers(Player callee, CommandContext args) {
+	private CommandResult listCallers(Player target, CommandContext args) {
 
-		List<String> callList = plugin.getCallService().getCalling(callee);
+		List<String> callList = plugin.getCallService().getCalling(target);
         int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
 
         TextBuilder header = Texts.builder();
@@ -91,22 +91,22 @@ public class BringCommand implements CommandExecutor {
 		// clear the chat
 		message.append(FormatUtil.empty());
 		message.append(paginatedList.getPage(currentPage));
-		callee.sendMessage(message.build());
+		target.sendMessage(message.build());
 
 		return CommandResult.success();
 
 	}
 
-	private CommandResult executeBring(Player caller, Player callee) {
+	private CommandResult executeBring(Player caller, Player target) {
 
-        plugin.getCallService().removeCall(caller, callee);
+        plugin.getCallService().removeCall(caller, target);
         plugin.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(caller));
-        caller.setRotation(callee.getRotation());
-		caller.setLocation(callee.getLocation());
+        caller.setRotation(target.getRotation());
+		caller.setLocation(target.getLocation());
 
         TextBuilder message = Texts.builder();
         message.append(Texts.of(FormatUtil.DIALOG, "You have been teleported to "));
-        message.append(Texts.of(FormatUtil.OBJECT, callee.getName(), FormatUtil.DIALOG, "."));
+        message.append(Texts.of(FormatUtil.OBJECT, target.getName(), FormatUtil.DIALOG, "."));
         caller.sendMessage(message.build());
 
 		return CommandResult.success();

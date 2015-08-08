@@ -2,109 +2,104 @@ package com.github.mmonkey.Destinations.Services;
 
 import com.github.mmonkey.Destinations.Configs.DefaultConfig;
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Models.CallModel;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.entity.player.User;
 import org.spongepowered.api.service.scheduler.SchedulerService;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class CallService implements RemovalListener<Pair<User, User>, ObjectUtils.Null> {
+public class CallService {
 
 	private Destinations plugin;
 	private SchedulerService schedulerService;
-	private Cache<Pair<User, User>, ObjectUtils.Null> calls;
+    private HashMap<CallModel, Timestamp> calls;
+    private int expires;
 
-    private void startCleanupTask(final Cache<Pair<User, User>, ObjectUtils.Null> calls) {
+    private void startCleanupTask(final HashMap<CallModel, Timestamp> calls) {
 
         this.schedulerService.getTaskBuilder().interval(1, TimeUnit.SECONDS).name("CallCache cleanup").execute(new Runnable() {
             public void run() {
-                calls.cleanUp();
+                cleanup(calls);
             }
         }).submit(plugin);
 
     }
 
-	public void onRemoval(final RemovalNotification<Pair<User, User>, ObjectUtils.Null> removal) {
-		
-		schedulerService.getTaskBuilder()
-			.delay(0)
-			.name("Notify Caller")
-			.execute(new Runnable() {
-                public void run() {
-                    if (removal.wasEvicted()) {
-                        expiredNotification(removal.getKey());
-                    }
-                }
-            }).submit(plugin);
+    public void cleanup(HashMap<CallModel, Timestamp> calls) {
 
-	}
+        Timestamp now = new Timestamp(System.currentTimeMillis());
 
-	public void expiredNotification(Pair<User, User> pair) {
-		
-		Optional<Player> caller = plugin.getGame().getServer().getPlayer(pair.getLeft().getUniqueId());
-        Optional<Player> callee = plugin.getGame().getServer().getPlayer(pair.getRight().getUniqueId());
+        for (Map.Entry<CallModel, Timestamp> call : calls.entrySet()) {
+            if (now.after(call.getValue())) {
+                expiredNotification(call.getKey().getCaller(), call.getKey().getTarget());
+                calls.remove(call);
+            }
+        }
 
-		if (caller.isPresent()) {
+    }
+
+	public void expiredNotification(Player caller, Player target) {
+
+		Optional<Player> optionalCaller = plugin.getGame().getServer().getPlayer(caller.getUniqueId());
+        Optional<Player> optionalTarget = plugin.getGame().getServer().getPlayer(target.getUniqueId());
+
+		if (optionalCaller.isPresent()) {
 
             TextBuilder message = Texts.builder();
             message.append(Texts.of(FormatUtil.WARN, "Your call to "));
-            message.append(Texts.of(FormatUtil.OBJECT, pair.getRight().getName()));
+            message.append(Texts.of(FormatUtil.OBJECT, target.getName()));
             message.append(Texts.of(FormatUtil.WARN, " has expired."));
-            caller.get().sendMessage(message.build());
+            optionalCaller.get().sendMessage(message.build());
 		}
 
-        if (callee.isPresent()) {
+        if (optionalTarget.isPresent()) {
 
             TextBuilder message = Texts.builder();
             message.append(Texts.of(FormatUtil.WARN, " The request from "));
-            message.append(Texts.of(FormatUtil.OBJECT, pair.getLeft().getName()));
+            message.append(Texts.of(FormatUtil.OBJECT, caller.getName()));
             message.append(Texts.of(FormatUtil.WARN, " has expired."));
-            callee.get().sendMessage(message.build());
+            optionalTarget.get().sendMessage(message.build());
 
         }
 		
 	}
 
-	public void call(User caller, User callee) {
-		Pair<User, User> pair = Pair.of(caller, callee);
-		this.calls.put(pair, ObjectUtils.NULL);
+	public void call(Player caller, Player target) {
+        CallModel call = new CallModel(caller, target);
+        Timestamp expireTime = new Timestamp(System.currentTimeMillis() + this.expires * 1000);
+		this.calls.put(call, expireTime);
 	}
 
-	public void removeCall(User caller, User callee) {
-		Pair<User, User> pair = Pair.of(caller, callee);
-		this.calls.invalidate(pair);
+	public void removeCall(Player caller, Player target) {
+        CallModel call = new CallModel(caller, target);
+        if (this.calls.containsKey(call)) {
+            this.calls.remove(call);
+        }
 	}
 
-	public User getFirstCaller(User callee) {
+	public Player getFirstCaller(Player target) {
 
-        User caller = null;
-		for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
-			if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())) {
-				caller = entry.getKey().getLeft();
+        Player caller = null;
+		for (Map.Entry<CallModel, Timestamp> call : this.calls.entrySet()) {
+			if (call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
+				caller = call.getKey().getCaller();
 			}
 		}
 
 		return caller;
 	}
 
-    public int getNumCallers(User callee) {
+    public int getNumCallers(Player target) {
 
         int callers = 0;
-        for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
-            if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())) {
+        for (Map.Entry<CallModel, Timestamp> call : this.calls.entrySet()) {
+            if (call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
                 callers++;
             }
         }
@@ -112,24 +107,24 @@ public class CallService implements RemovalListener<Pair<User, User>, ObjectUtil
         return callers;
     }
 
-	public List<String> getCalling(Player callee) {
+	public List<String> getCalling(Player target) {
 		
 		List<String> list = new ArrayList<String>();
-		
-		for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
-            if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())) {
-				list.add(entry.getKey().getLeft().getName());
+
+        for (Map.Entry<CallModel, Timestamp> call : this.calls.entrySet()) {
+            if (call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
+				list.add(call.getKey().getCaller().getName());
 			}
 		}
 		
 		return list;
 	}
 
-    public boolean isCalling(Player caller, Player callee) {
+    public boolean isCalling(Player caller, Player target) {
 
-        for (Map.Entry<Pair<User, User>, ObjectUtils.Null> entry : calls.asMap().entrySet()) {
-            if (entry.getKey().getRight().getUniqueId().equals(callee.getUniqueId())
-                    && entry.getKey().getLeft().getUniqueId().equals(caller.getUniqueId())) {
+        for (Map.Entry<CallModel, Timestamp> call : this.calls.entrySet()) {
+            if (call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())
+                    && call.getKey().getCaller().getUniqueId().equals(caller.getUniqueId())) {
                 return true;
             }
         }
@@ -140,9 +135,8 @@ public class CallService implements RemovalListener<Pair<User, User>, ObjectUtil
 	public CallService(Destinations plugin, SchedulerService schedulerService) {
 		this.plugin = plugin;
 		this.schedulerService = schedulerService;
-
-        int timeout = plugin.getDefaultConfig().get().getNode(DefaultConfig.TELEPORT_SETTINGS, DefaultConfig.EXPIRES_AFTER).getInt(1);
-		this.calls = CacheBuilder.newBuilder().expireAfterWrite(timeout, TimeUnit.MINUTES).removalListener(this).build();
+        this.expires = plugin.getDefaultConfig().get().getNode(DefaultConfig.TELEPORT_SETTINGS, DefaultConfig.EXPIRES_AFTER).getInt(60);
+        this.calls = new HashMap<CallModel, Timestamp>();
         this.startCleanupTask(calls);
 	}
 }

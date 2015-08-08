@@ -23,17 +23,17 @@ public class CallCommand implements CommandExecutor {
 		}
 
 		Player caller = (Player) src;
-		Player callee = args.getOne("player").isPresent() ? (Player) args.getOne("player").get() : null;
+		Player target = args.getOne("player").isPresent() ? (Player) args.getOne("player").get() : null;
 
-		if (callee == null) {
+		if (target == null) {
             caller.sendMessage(Texts.of(FormatUtil.ERROR, "Invalid player."));
 			return CommandResult.empty();
 		}
 
-        if (plugin.getCallService().isCalling(caller, callee)) {
+        if (plugin.getCallService().isCalling(caller, target)) {
             TextBuilder message = Texts.builder();
             message.append(Texts.of(FormatUtil.ERROR, "You must wait until your current call to "));
-            message.append(Texts.of(FormatUtil.OBJECT, callee.getName()));
+            message.append(Texts.of(FormatUtil.OBJECT, target.getName()));
             message.append(Texts.of(FormatUtil.ERROR, " expires before calling them again."));
 
             caller.sendMessage(message.build());
@@ -46,10 +46,10 @@ public class CallCommand implements CommandExecutor {
         message.append(Texts.of(FormatUtil.DIALOG, " to teleport them to you."));
 
         // Send messages
-		callee.sendMessage(message.build());
-        caller.sendMessage(Texts.of(FormatUtil.OBJECT, callee.getName(), FormatUtil.DIALOG, " was called."));
+		target.sendMessage(message.build());
+        caller.sendMessage(Texts.of(FormatUtil.OBJECT, target.getName(), FormatUtil.DIALOG, " was called."));
 
-        plugin.getCallService().call(caller, callee);
+        plugin.getCallService().call(caller, target);
 
 		return CommandResult.success();
 	}
