@@ -56,9 +56,9 @@ public class BringCommand implements CommandExecutor {
         } else {
 
             TextBuilder message = Texts.builder();
-            message.append(Texts.of(FormatUtil.WARN, "Call request from "));
+            message.append(Texts.of(FormatUtil.WARN, "You have no active requests from "));
             message.append(Texts.of(FormatUtil.OBJECT, caller.getName()));
-            message.append(Texts.of(FormatUtil.WARN, " has expired."));
+            message.append(Texts.of(FormatUtil.WARN, "."));
 
             target.sendMessage(message.build());
             return CommandResult.success();
