@@ -8,6 +8,10 @@ import com.github.mmonkey.Destinations.Database.Database;
 import com.github.mmonkey.Destinations.Listeners.BackListener;
 import com.github.mmonkey.Destinations.Listeners.DeathListener;
 import com.github.mmonkey.Destinations.Migrations.*;
+import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M02_AddCallBringSettings;
+import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M01_AddDatabaseSettings;
+import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M03_RemoveDatabaseUserCredentials;
+import com.github.mmonkey.Destinations.Migrations.DatabaseMigrations.M01_AddInitialDatabaseTables;
 import com.github.mmonkey.Destinations.Services.CallService;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -37,7 +41,7 @@ public class Destinations {
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
 	public static final String VERSION = "0.3.2";
-    public static final int CONFIG_VERSION = 3;
+    public static final int CONFIG_VERSION = 4;
     public static final int DATABASE_VERSION = 1;
 	
 	private Game game;
@@ -95,15 +99,18 @@ public class Destinations {
 		this.defaultConfig = new DefaultConfig(this, this.configDir);
 		this.defaultConfig.load();
 
-        // Run migrations
+        // Run config migrations
         int configVersion = this.defaultConfig.get().getNode(DefaultConfig.CONFIG_VERSION).getInt(0);
-        int databaseVersion = this.defaultConfig.get().getNode(DefaultConfig.DATABASE_VERSION).getInt(0);
-        this.runConfigMigrations(configVersion);
-        this.setupDatabase();
-        this.runDatabaseMigrations(databaseVersion);
+        ConfigMigrationRunner configMigrationRunner = new ConfigMigrationRunner(this, configVersion);
+        configMigrationRunner.run();
 
-        // Load callService
-        this.callService = new CallService(this, event.getGame().getScheduler());
+        // Setup database
+        this.setupDatabase();
+
+        // Run database migrations
+        int databaseVersion = this.defaultConfig.get().getNode(DefaultConfig.DATABASE_VERSION).getInt(0);
+        DatabaseMigrationRunner databaseMigrationRunner = new DatabaseMigrationRunner(this, databaseVersion);
+        databaseMigrationRunner.run();
 	}
 	
 	@Subscribe
@@ -251,6 +258,9 @@ public class Destinations {
         // Register call and bring commands if enabled
         if (this.getDefaultConfig().get().getNode(DefaultConfig.TELEPORT_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
 
+            // Load callService
+            this.callService = new CallService(this, event.getGame().getScheduler());
+
             game.getCommandDispatcher().register(this, callCommand, "call", "tpa");
             game.getCommandDispatcher().register(this, bringCommand, "bring");
             game.getCommandDispatcher().register(this, grabCommand, "grab", "tphere");
@@ -316,65 +326,6 @@ public class Destinations {
                 }
             }
         }
-    }
-
-    private void runConfigMigrations(int configVersion) {
-
-        int version = configVersion;
-        while (version != CONFIG_VERSION) {
-
-            Migration migration = this.getConfigMigration(version);
-
-            if (migration != null) {
-                migration.up();
-                version++;
-            }
-        }
-
-    }
-
-    private void runDatabaseMigrations(int databaseVersion) {
-
-        int version = databaseVersion;
-        while (version != DATABASE_VERSION) {
-
-            Migration migration = this.getDatabaseMigration(version);
-
-            if (this.getDatabaseMigration(version) != null) {
-                migration.up();
-                version++;
-            }
-        }
-
-    }
-
-    private Migration getConfigMigration(int configVersion) {
-
-        switch (configVersion) {
-            case 0:
-                return new AddDatabaseSettingsToDefaultConfig(this);
-
-            case 1:
-                return new AddCallBringSettingsToDefaultConfig(this);
-
-            case 2:
-                return new RemoveDatabaseUserFromDefaultConfig(this);
-
-            default:
-                return null;
-        }
-    }
-
-    private Migration getDatabaseMigration(int databaseVersion) {
-
-        switch (databaseVersion) {
-            case 0:
-                return new AddInitialDatabaseTables(this.database);
-
-            default:
-                return null;
-        }
-
     }
 	
 	public Destinations() {

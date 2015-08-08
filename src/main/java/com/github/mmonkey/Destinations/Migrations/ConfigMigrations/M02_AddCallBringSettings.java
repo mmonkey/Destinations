@@ -1,10 +1,11 @@
-package com.github.mmonkey.Destinations.Migrations;
+package com.github.mmonkey.Destinations.Migrations.ConfigMigrations;
 
 import com.github.mmonkey.Destinations.Configs.DefaultConfig;
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Migrations.MigrationInterface;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
-public class AddCallBringSettingsToDefaultConfig implements Migration {
+public class M02_AddCallBringSettings implements MigrationInterface {
 
     private Destinations plugin;
 
@@ -17,7 +18,7 @@ public class AddCallBringSettingsToDefaultConfig implements Migration {
         plugin.getDefaultConfig().save();
     }
 
-    public AddCallBringSettingsToDefaultConfig(Destinations plugin) {
+    public M02_AddCallBringSettings(Destinations plugin) {
         this.plugin = plugin;
     }
 }

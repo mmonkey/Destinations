@@ -1,10 +1,11 @@
-package com.github.mmonkey.Destinations.Migrations;
+package com.github.mmonkey.Destinations.Migrations.ConfigMigrations;
 
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Configs.DefaultConfig;
+import com.github.mmonkey.Destinations.Migrations.MigrationInterface;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
-public class AddDatabaseSettingsToDefaultConfig implements Migration {
+public class M01_AddDatabaseSettings implements MigrationInterface {
 
     private Destinations plugin;
 
@@ -17,7 +18,7 @@ public class AddDatabaseSettingsToDefaultConfig implements Migration {
         plugin.getDefaultConfig().save();
     }
 
-    public AddDatabaseSettingsToDefaultConfig(Destinations plugin) {
+    public M01_AddDatabaseSettings(Destinations plugin) {
         this.plugin = plugin;
     }
 }

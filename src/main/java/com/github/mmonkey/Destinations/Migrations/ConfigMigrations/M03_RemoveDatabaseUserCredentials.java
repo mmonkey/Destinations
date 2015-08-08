@@ -1,10 +1,11 @@
-package com.github.mmonkey.Destinations.Migrations;
+package com.github.mmonkey.Destinations.Migrations.ConfigMigrations;
 
 import com.github.mmonkey.Destinations.Configs.DefaultConfig;
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Migrations.MigrationInterface;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
-public class RemoveDatabaseUserFromDefaultConfig implements Migration {
+public class M03_RemoveDatabaseUserCredentials implements MigrationInterface {
 
     private Destinations plugin;
 
@@ -16,7 +17,7 @@ public class RemoveDatabaseUserFromDefaultConfig implements Migration {
         plugin.getDefaultConfig().save();
     }
 
-    public RemoveDatabaseUserFromDefaultConfig(Destinations plugin) {
+    public M03_RemoveDatabaseUserCredentials(Destinations plugin) {
         this.plugin = plugin;
     }
 

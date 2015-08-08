@@ -1,12 +1,13 @@
-package com.github.mmonkey.Destinations.Migrations;
+package com.github.mmonkey.Destinations.Migrations.DatabaseMigrations;
 
 import com.github.mmonkey.Destinations.Database.Database;
+import com.github.mmonkey.Destinations.Migrations.MigrationInterface;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class AddInitialDatabaseTables implements Migration {
+public class M01_AddInitialDatabaseTables implements MigrationInterface {
 
     private Database database;
 
@@ -80,7 +81,7 @@ public class AddInitialDatabaseTables implements Migration {
         }
     }
 
-    public AddInitialDatabaseTables(Database database) {
+    public M01_AddInitialDatabaseTables(Database database) {
         this.database = database;
     }
 }

@@ -1,6 +1,6 @@
 package com.github.mmonkey.Destinations.Migrations;
 
-public interface Migration {
+public interface MigrationInterface {
 
     void up();
 
