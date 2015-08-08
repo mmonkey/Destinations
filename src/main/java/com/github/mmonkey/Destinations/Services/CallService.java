@@ -18,27 +18,27 @@ public class CallService {
 
 	private Destinations plugin;
 	private SchedulerService schedulerService;
-    private HashMap<CallModel, Timestamp> calls;
+    private HashMap<CallModel, Timestamp> calls = new HashMap<CallModel, Timestamp>();
     private int expires;
 
-    private void startCleanupTask(final HashMap<CallModel, Timestamp> calls) {
+    private void startCleanupTask() {
 
-        this.schedulerService.getTaskBuilder().interval(1, TimeUnit.SECONDS).name("CallCache cleanup").execute(new Runnable() {
+        this.schedulerService.getTaskBuilder().interval(1, TimeUnit.SECONDS).name("Call cleanup").execute(new Runnable() {
             public void run() {
-                cleanup(calls);
+                cleanup();
             }
         }).submit(plugin);
 
     }
 
-    public void cleanup(HashMap<CallModel, Timestamp> calls) {
+    public void cleanup() {
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
-        for (Map.Entry<CallModel, Timestamp> call : calls.entrySet()) {
+        for (Map.Entry<CallModel, Timestamp> call : this.calls.entrySet()) {
             if (now.after(call.getValue())) {
-                expiredNotification(call.getKey().getCaller(), call.getKey().getTarget());
-                calls.remove(call);
+                this.expiredNotification(call.getKey().getCaller(), call.getKey().getTarget());
+                this.calls.remove(call.getKey());
             }
         }
 
@@ -77,9 +77,12 @@ public class CallService {
 	}
 
 	public void removeCall(Player caller, Player target) {
-        CallModel call = new CallModel(caller, target);
-        if (this.calls.containsKey(call)) {
-            this.calls.remove(call);
+
+        for (Map.Entry<CallModel, Timestamp> call : this.calls.entrySet()) {
+            if (call.getKey().getCaller().getUniqueId().equals(caller.getUniqueId())
+                    && call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
+                this.calls.remove(call.getKey());
+            }
         }
 	}
 
@@ -136,7 +139,6 @@ public class CallService {
 		this.plugin = plugin;
 		this.schedulerService = schedulerService;
         this.expires = plugin.getDefaultConfig().get().getNode(DefaultConfig.TELEPORT_SETTINGS, DefaultConfig.EXPIRES_AFTER).getInt(60);
-        this.calls = new HashMap<CallModel, Timestamp>();
-        this.startCleanupTask(calls);
+        this.startCleanupTask();
 	}
 }
