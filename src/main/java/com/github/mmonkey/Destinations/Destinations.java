@@ -40,7 +40,7 @@ public class Destinations {
 	
 	public static final String NAME = "Destinations";
 	public static final String ID = "Destinations";
-	public static final String VERSION = "0.3.2";
+	public static final String VERSION = "0.3.3";
     public static final int CONFIG_VERSION = 4;
     public static final int DATABASE_VERSION = 1;
 	
