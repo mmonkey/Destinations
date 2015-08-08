@@ -1,13 +1,15 @@
 package com.github.mmonkey.Destinations.Migrations.DatabaseMigrations;
 
+import com.github.mmonkey.Destinations.Configs.DefaultConfig;
 import com.github.mmonkey.Destinations.Database.Database;
-import com.github.mmonkey.Destinations.Migrations.MigrationInterface;
+import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Migrations.Migration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class M01_AddInitialDatabaseTables implements MigrationInterface {
+public class M01_AddInitialDatabaseTables extends Migration {
 
     private Database database;
 
@@ -69,6 +71,8 @@ public class M01_AddInitialDatabaseTables implements MigrationInterface {
             statement = connection.createStatement();
             statement.execute(sql.toString());
 
+            this.bumpVersion(DefaultConfig.DATABASE_VERSION, 1);
+
         } catch (SQLException e) {
 
             e.printStackTrace();
@@ -81,7 +85,8 @@ public class M01_AddInitialDatabaseTables implements MigrationInterface {
         }
     }
 
-    public M01_AddInitialDatabaseTables(Database database) {
-        this.database = database;
+    public M01_AddInitialDatabaseTables(Destinations plugin) {
+        super(plugin);
+        this.database = this.plugin.getDatabase();
     }
 }

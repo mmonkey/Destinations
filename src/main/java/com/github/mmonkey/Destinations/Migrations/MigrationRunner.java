@@ -2,7 +2,7 @@ package com.github.mmonkey.Destinations.Migrations;
 
 import com.github.mmonkey.Destinations.Destinations;
 
-abstract class MigrationRunner {
+public abstract class MigrationRunner {
 
     protected Destinations plugin;
     protected int version;
@@ -27,4 +27,5 @@ abstract class MigrationRunner {
         this.plugin = plugin;
         this.version = version;
     }
+
 }

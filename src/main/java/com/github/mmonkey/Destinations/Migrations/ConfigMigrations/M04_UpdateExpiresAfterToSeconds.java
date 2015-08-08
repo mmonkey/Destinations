@@ -2,25 +2,24 @@ package com.github.mmonkey.Destinations.Migrations.ConfigMigrations;
 
 import com.github.mmonkey.Destinations.Configs.DefaultConfig;
 import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Migrations.MigrationInterface;
+import com.github.mmonkey.Destinations.Migrations.Migration;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
-public class M04_UpdateExpiresAfterToSeconds implements MigrationInterface {
-
-    private Destinations plugin;
+public class M04_UpdateExpiresAfterToSeconds extends Migration {
 
     public void up() {
-        CommentedConfigurationNode config = plugin.getDefaultConfig().get();
-        config.getNode(DefaultConfig.CONFIG_VERSION).setValue(4);
+        CommentedConfigurationNode config = this.plugin.getDefaultConfig().get();
 
         int time = config.getNode(DefaultConfig.TELEPORT_SETTINGS, DefaultConfig.EXPIRES_AFTER).getInt(1);
         time = (time == 1) ? 30 : time * 60;
 
         config.getNode(DefaultConfig.TELEPORT_SETTINGS, DefaultConfig.EXPIRES_AFTER).setValue(time).setComment("Number of seconds before call requests expire");
-        plugin.getDefaultConfig().save();
+        this.plugin.getDefaultConfig().save();
+
+        this.bumpVersion(DefaultConfig.CONFIG_VERSION, 4);
     }
 
     public M04_UpdateExpiresAfterToSeconds(Destinations plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 }

@@ -9,7 +9,7 @@ public class DatabaseMigrationRunner extends MigrationRunner {
 
         switch (version) {
             case 0:
-                return new M01_AddInitialDatabaseTables(this.plugin.getDatabase());
+                return new M01_AddInitialDatabaseTables(this.plugin);
 
             default:
                 return null;
