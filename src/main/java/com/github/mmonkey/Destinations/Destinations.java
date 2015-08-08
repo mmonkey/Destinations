@@ -176,7 +176,7 @@ public class Destinations {
 		}
 		
 		/**
-		 * /warp <warp>
+		 * /warp <name>
 		 */
 		CommandSpec warpCommand = CommandSpec.builder()
 			.description(Texts.of("Teleport to Warp"))
