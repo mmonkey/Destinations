@@ -46,12 +46,12 @@ public class H2EmbeddedDatabase extends Database {
 		
 			this.webServer = Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
 			this.tcpServer = Server.createTcpServer("-tcp", "-tcpAllowOthers", "true", "-tcpPort", "9092", "-tcpPassword", "test123").start();
-            Destinations.getLogger().info("H2 console started on port 8082.");
+            Destinations.getInstance().getLogger().info("H2 console started on port 8082.");
 			return true;
 		
 		} catch (SQLException e) {
 
-            Destinations.getLogger().info("H2 console was unable to start.");
+            Destinations.getInstance().getLogger().info("H2 console was unable to start.");
             return false;
 
         }

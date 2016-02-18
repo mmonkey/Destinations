@@ -1,24 +1,20 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.mmonkey.Destinations.Dams.WarpDam;
+import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Models.WarpModel;
-import org.spongepowered.api.entity.player.Player;
+import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandMessageFormatting;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
 
-import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import java.util.ArrayList;
 
 public class DelWarpCommand implements CommandExecutor {
 
@@ -41,8 +37,7 @@ public class DelWarpCommand implements CommandExecutor {
 		if (cancel) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.").builder()
-				.build()
+				Text.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.")
 			);
 			
 			return CommandResult.success();
@@ -59,12 +54,12 @@ public class DelWarpCommand implements CommandExecutor {
 		if (warp != null) {
 			
 			player.sendMessage(
-				Texts.of(CommandMessageFormatting.NEWLINE_TEXT).builder()
-				.append(Texts.of(FormatUtil.DIALOG, "Are you sure you want to delete warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.DIALOG, "?  "))
+				Text.of(System.lineSeparator()).toBuilder()
+				.append(Text.of(FormatUtil.DIALOG, "Are you sure you want to delete warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.DIALOG, "?  "))
 				.append(getDeleteWarpConfirmationAction(name, "Yes"))
-				.append(Texts.of("  "))
+				.append(Text.of("  "))
 				.append(getDeleteWarpCancelAction(name, "No"))
-				.append(CommandMessageFormatting.NEWLINE_TEXT)
+				.append(Text.of(System.lineSeparator()))
 				.build()
 			);
 			
@@ -73,8 +68,7 @@ public class DelWarpCommand implements CommandExecutor {
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
-				.build()
+				Text.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.")
 			);
 			
 			return CommandResult.success();
@@ -105,15 +99,13 @@ public class DelWarpCommand implements CommandExecutor {
 		if (warpDam.deleteWarp(warp)) {
 			
 			player.sendMessage(
-                    Texts.of(FormatUtil.empty(), FormatUtil.SUCCESS, "Warp ", FormatUtil.DELETED_OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully deleted!").builder()
-                    .build()
+            	Text.of(FormatUtil.empty(), FormatUtil.SUCCESS, "Warp ", FormatUtil.DELETED_OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully deleted!")
             );
 			
 		} else {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, warp.getName(), FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.").builder()
-				.build()
+				Text.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, warp.getName(), FormatUtil.ERROR, " doesn't exist, or you don't have permissions to delete it.")
 			);
 			
 		}
@@ -122,9 +114,9 @@ public class DelWarpCommand implements CommandExecutor {
 	
 	private Text getDeleteWarpConfirmationAction(String name, String linkText) {
 		
-		return Texts.builder(linkText)
+		return Text.builder(linkText)
 			.onClick(TextActions.runCommand("/delwarp -f " + name))
-			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Delete warp ", FormatUtil.OBJECT, name)))
+			.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Delete warp ", FormatUtil.OBJECT, name)))
 			.color(FormatUtil.CONFIRM)
 			.style(TextStyles.UNDERLINE)
 			.build();
@@ -133,9 +125,9 @@ public class DelWarpCommand implements CommandExecutor {
 	
 	private Text getDeleteWarpCancelAction(String name, String linkText) {
 		
-		return Texts.builder(linkText)
+		return Text.builder(linkText)
 			.onClick(TextActions.runCommand("/delwarp -c " + name))
-			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Do not delete warp ", FormatUtil.OBJECT, name)))
+			.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Do not delete warp ", FormatUtil.OBJECT, name)))
 			.color(FormatUtil.CANCEL)
 			.style(TextStyles.UNDERLINE)
 			.build();

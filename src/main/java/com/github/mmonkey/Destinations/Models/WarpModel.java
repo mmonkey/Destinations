@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.spongepowered.api.entity.player.Player;
-
 public class WarpModel {
 
     private int id;
@@ -58,9 +56,6 @@ public class WarpModel {
 	public void setWhitelist(Map<UUID, Boolean> whitelist) {
 		this.whitelist = whitelist;
 	}
-	
-//	public WarpModel() {
-//	}
 	
 	public WarpModel(int id, String name, UUID playerUniqueId, DestinationModel destination, boolean isPublic) {
         this.id = id;

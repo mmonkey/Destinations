@@ -1,21 +1,18 @@
 package com.github.mmonkey.Destinations.Filters;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import com.github.mmonkey.Destinations.Dams.WarpDam;
+import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Models.WarpModel;
-import org.spongepowered.api.entity.player.Player;
+import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import com.gmail.mmonkey.Commando.Filters.Filter;
+import com.gmail.mmonkey.Commando.Match;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
 
-import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Utilities.FormatUtil;
-import com.gmail.mmonkey.Commando.Match;
-import com.gmail.mmonkey.Commando.Filters.Filter;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class WarpFilter extends Filter {
 
@@ -39,7 +36,7 @@ public class WarpFilter extends Filter {
 		
 		} else {
 			
-			return Texts.of(match.getContent());
+			return Text.of(match.getContent());
 		}
 		
 	}
@@ -65,9 +62,9 @@ public class WarpFilter extends Filter {
 		
 		String showText = (title.length() > 0) ? title : name;
 		
-		return Texts.builder(showText)
+		return Text.builder(showText)
 			.onClick(TextActions.runCommand("/warp " + name))
-			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, name)))
+			.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, name)))
 			.color(FormatUtil.GENERIC_LINK)
 			.style(TextStyles.UNDERLINE)
 			.build();

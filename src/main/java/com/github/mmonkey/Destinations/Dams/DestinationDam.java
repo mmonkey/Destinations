@@ -2,7 +2,7 @@ package com.github.mmonkey.Destinations.Dams;
 
 import com.github.mmonkey.Destinations.Database.Database;
 import com.github.mmonkey.Destinations.Models.DestinationModel;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.sql.*;
 

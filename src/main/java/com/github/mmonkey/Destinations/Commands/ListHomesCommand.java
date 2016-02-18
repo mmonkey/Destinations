@@ -1,24 +1,21 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.ArrayList;
-
 import com.github.mmonkey.Destinations.Dams.HomeDam;
-import com.github.mmonkey.Destinations.Models.HomeModel;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextStyles;
+
+import java.util.ArrayList;
 
 public class ListHomesCommand implements CommandExecutor {
 	
@@ -42,20 +39,20 @@ public class ListHomesCommand implements CommandExecutor {
 		
 		// If this player doesn't have any homes, return with message
 		if (list.isEmpty()) {
-			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!").builder().build());
+			player.sendMessage(Text.of(FormatUtil.ERROR, "No home has been set!"));
 			return CommandResult.success();
 		}
 		
 		// Get utility classes and new PaginatedList
-		TextBuilder message = Texts.builder();
-		TextBuilder header = Texts.builder();
+		Text.Builder message = Text.builder();
+		Text.Builder header = Text.builder();
 		PaginatedList paginatedList = new PaginatedList("/listhomes");
 		
 		// Fill paginatedList with items
 		for (String name: list) {
 			
-			TextBuilder row = Texts.builder();
-			row.append(getHomeAction(name), Texts.of(" - "));
+			Text.Builder row = Text.builder();
+			row.append(getHomeAction(name), Text.of(" - "));
 			row.append(getDeleteHomeAction(name, "delete"));
 			
 			paginatedList.add(row.build());
@@ -64,9 +61,9 @@ public class ListHomesCommand implements CommandExecutor {
 		currentPage = currentPage > paginatedList.getTotalPages() ? paginatedList.getTotalPages() : currentPage;
 		
 		// Created header for paginatedList
-		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
-		header.append(Texts.of(FormatUtil.HEADLINE, " Showing homes page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
-		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
+		header.append(Text.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
+		header.append(Text.of(FormatUtil.HEADLINE, " Showing homes page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
+		header.append(Text.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
 		
 		// Add header to paginatedList
 		paginatedList.setHeader(header.build());
@@ -97,9 +94,9 @@ public class ListHomesCommand implements CommandExecutor {
 	
 	private Text getHomeAction(String name) {
 		
-		return Texts.builder(name)
+		return Text.builder(name)
 			.onClick(TextActions.runCommand("/home " + name))
-			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, name)))
+			.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, name)))
 			.color(FormatUtil.GENERIC_LINK)
 			.style(TextStyles.UNDERLINE)
 			.build();
@@ -108,9 +105,9 @@ public class ListHomesCommand implements CommandExecutor {
 	
 	private Text getDeleteHomeAction(String name, String linkText) {
 		
-		return Texts.builder(linkText)
+		return Text.builder(linkText)
 			.onClick(TextActions.runCommand("/delhome " + name))
-			.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Delete home ", FormatUtil.OBJECT, name)))
+			.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Delete home ", FormatUtil.OBJECT, name)))
 			.color(FormatUtil.DELETE)
 			.style(TextStyles.UNDERLINE)
 			.build();

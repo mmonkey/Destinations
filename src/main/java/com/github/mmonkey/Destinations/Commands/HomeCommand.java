@@ -1,21 +1,20 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.ArrayList;
-
 import com.github.mmonkey.Destinations.Dams.HomeDam;
+import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Events.PlayerBackLocationSaveEvent;
 import com.github.mmonkey.Destinations.Models.HomeModel;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
+import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
-import com.github.mmonkey.Destinations.Destinations;
-import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import java.util.ArrayList;
 
 public class HomeCommand implements CommandExecutor {
 	
@@ -33,14 +32,14 @@ public class HomeCommand implements CommandExecutor {
 		ArrayList<HomeModel> homes = homeDam.getPlayerHomes(player);
 
 		if (homes.isEmpty()) {	
-			player.sendMessage(Texts.of(FormatUtil.ERROR, "No home has been set!").builder().build());
+			player.sendMessage(Text.of(FormatUtil.ERROR, "No home has been set!"));
 			return CommandResult.success();
 		}
 			
 		HomeModel home = (name.equals("")) ? getClosestHome(player, homes) : getNamedHome(homes, name);
 
 		if (home == null) {
-			player.sendMessage(Texts.of(FormatUtil.ERROR, "You have no home named ", FormatUtil.OBJECT, name, FormatUtil.ERROR, "."));
+			player.sendMessage(Text.of(FormatUtil.ERROR, "You have no home named ", FormatUtil.OBJECT, name, FormatUtil.ERROR, "."));
 			return CommandResult.success();
 		}
 

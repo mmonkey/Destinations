@@ -1,24 +1,24 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.ArrayList;
-
 import com.github.mmonkey.Destinations.Dams.HomeDam;
-import com.github.mmonkey.Destinations.Models.HomeModel;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Models.HomeModel;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+
+import java.util.ArrayList;
 
 public class SetHomeCommand implements CommandExecutor {
 
 	private HomeDam homeDam;
-	
+
+
 	public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
 		if (!(src instanceof Player)) {
@@ -38,8 +38,7 @@ public class SetHomeCommand implements CommandExecutor {
             home = homeDam.updateHome(player, home);
 
 			player.sendMessage(
-				Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location!").builder()
-				.build()
+				Text.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location")
 			);
 
 			return CommandResult.success();
@@ -49,8 +48,7 @@ public class SetHomeCommand implements CommandExecutor {
 		if (home != null) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Home ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists!").builder()
-				.build()
+				Text.of(FormatUtil.ERROR, "Home ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists!")
 			);
 			
 			return CommandResult.success();
@@ -61,8 +59,7 @@ public class SetHomeCommand implements CommandExecutor {
 		home = homeDam.insertHome(player, name);
 		
 		player.sendMessage(
-			Texts.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully created!").builder()
-			.build()
+			Text.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " was successfully created!")
 		);
 		
 		return CommandResult.success();

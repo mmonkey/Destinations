@@ -1,21 +1,18 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import com.github.mmonkey.Destinations.Dams.WarpDam;
-import com.github.mmonkey.Destinations.Models.WarpModel;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-
-import com.github.mmonkey.Destinations.Models.DestinationModel;
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+
+import java.util.ArrayList;
 
 public class SetWarpCommand implements CommandExecutor {
 
@@ -34,7 +31,7 @@ public class SetWarpCommand implements CommandExecutor {
 		if (warpExists(name)) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.").builder().build()
+				Text.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.")
 			);
 
 			return CommandResult.success();
@@ -44,7 +41,7 @@ public class SetWarpCommand implements CommandExecutor {
 		WarpModel warp = warpDam.insertWarp(player, name, true);
 		
 		player.sendMessage(
-			Texts.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully created!").builder().build()
+			Text.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully created!")
 		);
 
 		// TODO: add private flag

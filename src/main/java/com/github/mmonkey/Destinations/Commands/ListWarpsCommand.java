@@ -1,24 +1,21 @@
 package com.github.mmonkey.Destinations.Commands;
 
-import java.util.ArrayList;
-
 import com.github.mmonkey.Destinations.Dams.WarpDam;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Models.WarpModel;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextStyles;
+
+import java.util.ArrayList;
 
 public class ListWarpsCommand implements CommandExecutor {
 
@@ -38,20 +35,20 @@ public class ListWarpsCommand implements CommandExecutor {
 		if (warps.size() == 0) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "No warps have been set.").builder().build()
+				Text.of(FormatUtil.ERROR, "No warps have been set.")
 			);
 			
 			return CommandResult.success();
 			
 		}
 
-		TextBuilder header = Texts.builder();
-		TextBuilder message = Texts.builder();
+		Text.Builder header = Text.builder();
+		Text.Builder message = Text.builder();
 		PaginatedList paginatedList = new PaginatedList("/listwarps");
 		
 		for (WarpModel warp: warps) {
 			
-			TextBuilder row = Texts.builder();
+			Text.Builder row = Text.builder();
 			row.append(getWarpAction(warp));
 			row.append(getDeleteWarpAction(warp, player));
 			
@@ -61,9 +58,9 @@ public class ListWarpsCommand implements CommandExecutor {
 
 		currentPage = currentPage > paginatedList.getTotalPages() ? paginatedList.getTotalPages() : currentPage;
 
-		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
-		header.append(Texts.of(FormatUtil.HEADLINE, " Showing warps page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
-		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
+		header.append(Text.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
+		header.append(Text.of(FormatUtil.HEADLINE, " Showing warps page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
+		header.append(Text.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
 		
 		paginatedList.setHeader(header.build());
 		
@@ -86,18 +83,18 @@ public class ListWarpsCommand implements CommandExecutor {
 		
 		if (warp.isPublic()) {
 			
-			return Texts.builder(warp.getName())
+			return Text.builder(warp.getName())
 				.onClick(TextActions.runCommand("/warp " + warp.getName()))
-				.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
+				.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
 				.color(FormatUtil.GENERIC_LINK)
 				.style(TextStyles.UNDERLINE)
 				.build();
 			
 		} else {
 			
-			return Texts.builder(warp.getName() + " (private)")
+			return Text.builder(warp.getName() + " (private)")
 				.onClick(TextActions.runCommand("/warp " + warp.getName()))
-				.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
+				.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
 				.color(FormatUtil.GENERIC_LINK)
 				.style(TextStyles.UNDERLINE)
 				.build();
@@ -110,11 +107,11 @@ public class ListWarpsCommand implements CommandExecutor {
 		
 		if (warp.getWhitelist().containsKey(player.getUniqueId()) || warp.getOwnerUniqueId().equals(player.getUniqueId())) {
 			
-			TextBuilder deleteAction = Texts.builder();
-			deleteAction.append(Texts.of(" - "));
-			deleteAction.append(Texts.builder("delete")
+			Text.Builder deleteAction = Text.builder();
+			deleteAction.append(Text.of(" - "));
+			deleteAction.append(Text.builder("delete")
 				.onClick(TextActions.runCommand("/delwarp " + warp.getName()))
-				.onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "Delete warp ", FormatUtil.OBJECT, warp.getName())))
+				.onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Delete warp ", FormatUtil.OBJECT, warp.getName())))
 				.color(FormatUtil.DELETE)
 				.style(TextStyles.UNDERLINE)
 				.build());
@@ -123,7 +120,7 @@ public class ListWarpsCommand implements CommandExecutor {
 			
 		}
 		
-		return Texts.of("");
+		return Text.of("");
 		
 	}
 	

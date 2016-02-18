@@ -1,11 +1,10 @@
 package com.github.mmonkey.Destinations.Configs;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.github.mmonkey.Destinations.Destinations;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 
-import com.github.mmonkey.Destinations.Destinations;
+import java.io.File;
+import java.io.IOException;
 
 public class DefaultConfig extends Config {
 	

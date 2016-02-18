@@ -4,17 +4,15 @@ import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Events.PlayerBackLocationSaveEvent;
 import com.github.mmonkey.Destinations.Pagination.PaginatedList;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import java.util.List;
 
@@ -37,11 +35,11 @@ public class BringCommand implements CommandExecutor {
 
             switch (numCallers) {
                 case 0:
-                    target.sendMessage(Texts.of(FormatUtil.ERROR, "You have no call requests."));
+                    target.sendMessage(Text.of(FormatUtil.ERROR, "You have no call requests."));
                     return CommandResult.success();
 
                 case 1:
-                    Player calling = (Player) plugin.getCallService().getFirstCaller(target);
+                    Player calling = plugin.getCallService().getFirstCaller(target);
                     return executeBring(calling, target);
 
                 default:
@@ -55,10 +53,10 @@ public class BringCommand implements CommandExecutor {
 
         } else {
 
-            TextBuilder message = Texts.builder();
-            message.append(Texts.of(FormatUtil.WARN, "You have no active requests from "));
-            message.append(Texts.of(FormatUtil.OBJECT, caller.getName()));
-            message.append(Texts.of(FormatUtil.WARN, "."));
+            Text.Builder message = Text.builder();
+            message.append(Text.of(FormatUtil.WARN, "You have no active requests from "));
+            message.append(Text.of(FormatUtil.OBJECT, caller.getName()));
+            message.append(Text.of(FormatUtil.WARN, "."));
 
             target.sendMessage(message.build());
             return CommandResult.success();
@@ -71,21 +69,21 @@ public class BringCommand implements CommandExecutor {
 		List<String> callList = plugin.getCallService().getCalling(target);
         int currentPage = (args.hasAny("page")) ? (Integer) args.getOne("page").get() : 1;
 
-        TextBuilder header = Texts.builder();
-        TextBuilder message = Texts.builder();
+        Text.Builder header = Text.builder();
+        Text.Builder message = Text.builder();
 		PaginatedList paginatedList = new PaginatedList("/bring");
 
 		for (String name : callList) {
-			TextBuilder row = Texts.builder();
+			Text.Builder row = Text.builder();
 			row.append(getBringAction(name));
             paginatedList.add(row.build());
 		}
 
         currentPage = currentPage > paginatedList.getTotalPages() ? paginatedList.getTotalPages() : currentPage;
 
-		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
-		header.append(Texts.of(FormatUtil.HEADLINE, " Showing callers page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
-		header.append(Texts.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
+		header.append(Text.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
+		header.append(Text.of(FormatUtil.HEADLINE, " Showing callers page " + currentPage + " of " + paginatedList.getTotalPages() + " "));
+		header.append(Text.of(FormatUtil.HEADLINE, FormatUtil.getFill(12, '-')));
         paginatedList.setHeader(header.build());
 		
 		// clear the chat
@@ -104,9 +102,9 @@ public class BringCommand implements CommandExecutor {
         caller.setRotation(target.getRotation());
 		caller.setLocation(target.getLocation());
 
-        TextBuilder message = Texts.builder();
-        message.append(Texts.of(FormatUtil.DIALOG, "You have been teleported to "));
-        message.append(Texts.of(FormatUtil.OBJECT, target.getName(), FormatUtil.DIALOG, "."));
+        Text.Builder message = Text.builder();
+        message.append(Text.of(FormatUtil.DIALOG, "You have been teleported to "));
+        message.append(Text.of(FormatUtil.OBJECT, target.getName(), FormatUtil.DIALOG, "."));
         caller.sendMessage(message.build());
 
 		return CommandResult.success();
@@ -114,9 +112,9 @@ public class BringCommand implements CommandExecutor {
 
 	public static Text getBringAction(String name) {
 
-        return Texts.builder("/bring " + name)
+        return Text.builder("/bring " + name)
                 .onClick(TextActions.runCommand("/bring " + name))
-                .onHover(TextActions.showText(Texts.of(FormatUtil.DIALOG, "/bring ", FormatUtil.OBJECT, name)))
+                .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "/bring ", FormatUtil.OBJECT, name)))
                 .color(FormatUtil.GENERIC_LINK).style(TextStyles.UNDERLINE)
                 .build();
 

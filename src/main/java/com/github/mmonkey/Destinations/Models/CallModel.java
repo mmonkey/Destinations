@@ -1,6 +1,7 @@
 package com.github.mmonkey.Destinations.Models;
 
-import org.spongepowered.api.entity.player.Player;
+
+import org.spongepowered.api.entity.living.player.Player;
 
 public class CallModel {
 

@@ -1,11 +1,8 @@
 package com.github.mmonkey.Destinations.Utilities;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.command.CommandMessageFormatting;
 
 public class FormatUtil {
 	
@@ -33,9 +30,9 @@ public class FormatUtil {
 	
 	public static Text empty() {
 		
-		TextBuilder text = Texts.builder();
+		Text.Builder text = Text.builder();
 		for (int i = 0; i < 20; i++) {
-			text.append(CommandMessageFormatting.NEWLINE_TEXT);
+			text.append(Text.of(System.lineSeparator()));
 		}
 		
 		return text.build();

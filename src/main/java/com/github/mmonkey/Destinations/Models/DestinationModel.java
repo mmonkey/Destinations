@@ -1,14 +1,13 @@
 package com.github.mmonkey.Destinations.Models;
 
-import java.util.Collection;
-import java.util.UUID;
-
+import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.flowpowered.math.vector.Vector3d;
+import java.util.Collection;
+import java.util.UUID;
 
 public class DestinationModel {
 
@@ -49,9 +48,9 @@ public class DestinationModel {
 		return new Vector3d(this.yaw, this.pitch, this.roll);
 	}
 	
-	public Location getLocation(Game game) {
+	public Location<World> getLocation(Game game) {
 		World world = getWorld(game);
-		return (world != null) ? new Location(world, this.x, this.y, this.z) : null;
+		return (world != null) ? new Location<World>(world, this.x, this.y, this.z) : null;
 	}
 	
 	public DestinationModel(int id, Player player) {

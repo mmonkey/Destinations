@@ -2,19 +2,17 @@ package com.github.mmonkey.Destinations.Commands;
 
 import com.github.mmonkey.Destinations.Dams.BackDam;
 import com.github.mmonkey.Destinations.Dams.WarpDam;
-import com.github.mmonkey.Destinations.Events.PlayerBackLocationSaveEvent;
-import com.github.mmonkey.Destinations.Models.BackModel;
-import com.github.mmonkey.Destinations.Models.WarpModel;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-
 import com.github.mmonkey.Destinations.Destinations;
+import com.github.mmonkey.Destinations.Events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.Destinations.Models.WarpModel;
 import com.github.mmonkey.Destinations.Utilities.FormatUtil;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 
@@ -39,7 +37,7 @@ public class WarpCommand implements CommandExecutor {
 		if (warp == null) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " does not exist.").builder().build()
+				Text.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " does not exist.")
 			);
 			
 			return CommandResult.success();
@@ -49,7 +47,7 @@ public class WarpCommand implements CommandExecutor {
 		if (!warp.isPublic() && !warp.getWhitelist().containsKey(player.getUniqueId()) && !warp.getOwnerUniqueId().equals(player.getUniqueId())) {
 			
 			player.sendMessage(
-				Texts.of(FormatUtil.ERROR, "You do not have access to warp: ", FormatUtil.OBJECT, name, FormatUtil.ERROR, ".").builder().build()
+				Text.of(FormatUtil.ERROR, "You do not have access to warp: ", FormatUtil.OBJECT, name, FormatUtil.ERROR, ".")
 			);
 			
 			return CommandResult.success();

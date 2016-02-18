@@ -1,7 +1,7 @@
 package com.github.mmonkey.Destinations.Migrations.ConfigMigrations;
 
-import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Configs.DefaultConfig;
+import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Migrations.Migration;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 

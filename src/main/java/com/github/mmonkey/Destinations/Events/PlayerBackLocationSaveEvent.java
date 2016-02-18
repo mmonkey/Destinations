@@ -1,8 +1,10 @@
 package com.github.mmonkey.Destinations.Events;
 
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.AbstractEvent;
+import com.github.mmonkey.Destinations.Destinations;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.impl.AbstractEvent;
 
 public class PlayerBackLocationSaveEvent extends AbstractEvent implements Cancellable {
 
@@ -30,4 +32,7 @@ public class PlayerBackLocationSaveEvent extends AbstractEvent implements Cancel
         this.player = player;
     }
 
+    public Cause getCause() {
+        return Cause.of(Destinations.getInstance());
+    }
 }
