@@ -34,12 +34,12 @@ public class Destinations {
 
     public static final String NAME = "Destinations";
     public static final String ID = "Destinations";
-    public static final String VERSION = "0.3.3";
-    public static final int CONFIG_VERSION = 4;
+    public static final String VERSION = "0.3.4-3.0.0";
+    public static final int CONFIG_VERSION = 3;
     public static final int DATABASE_VERSION = 1;
 
     /**
-     * The Destinations instance
+     * Destinations
      */
     private static Destinations instance;
 
@@ -103,7 +103,7 @@ public class Destinations {
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         Destinations.instance = this;
-        Destinations.logger = LoggerFactory.getLogger("Destinations");
+        Destinations.logger = LoggerFactory.getLogger(Destinations.NAME);
         getLogger().info(String.format("Starting up %s v%s.", Destinations.NAME, Destinations.VERSION));
 
         if (!this.configDir.isDirectory()) {
@@ -184,7 +184,6 @@ public class Destinations {
         // Register home commands if enabled
         if (this.getDefaultConfig().get().getNode(DefaultConfig.HOME_SETTINGS, DefaultConfig.ENABLED).getBoolean()) {
 
-            game.getCommandManager().register(this, homeCommand, "home", "h");
             game.getCommandManager().register(this, homeCommand, "home", "h");
             game.getCommandManager().register(this, setHomeCommand, "sethome");
             game.getCommandManager().register(this, listHomesCommand, "listhomes", "homes");

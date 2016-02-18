@@ -213,7 +213,7 @@ public class PaginatedList {
 			list.append(this.header);
 		}
 		
-		list.append(Text.of(System.lineSeparator()));
+		list.append(Text.NEW_LINE);
 		
 		for (Text item: items) {
 			
@@ -224,12 +224,12 @@ public class PaginatedList {
 			}
 			
 			list.append(item);
-			list.append(Text.of(System.lineSeparator()));
+			list.append(Text.NEW_LINE);
 			
 			itemIndex++;
 		}
 		
-		list.append(Text.of(System.lineSeparator()));
+		list.append(Text.NEW_LINE);
 		
 		list.append(Text.of(this.paginationColor, fill(18, this.paginationType)));
 		list.append(getPrevLinks(currentPage));
@@ -238,7 +238,7 @@ public class PaginatedList {
 		list.append(Text.of(this.paginationColor, fill(18, this.paginationType)));
 		
 		if (this.footer != null) {
-			list.append(Text.of(System.lineSeparator()));
+			list.append(Text.NEW_LINE);
 			list.append(footer);
 		}
 		

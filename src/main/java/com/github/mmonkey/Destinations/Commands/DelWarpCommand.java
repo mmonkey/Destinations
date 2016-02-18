@@ -54,12 +54,12 @@ public class DelWarpCommand implements CommandExecutor {
 		if (warp != null) {
 			
 			player.sendMessage(
-				Text.of(System.lineSeparator()).toBuilder()
+				Text.of(Text.NEW_LINE).toBuilder()
 				.append(Text.of(FormatUtil.DIALOG, "Are you sure you want to delete warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.DIALOG, "?  "))
 				.append(getDeleteWarpConfirmationAction(name, "Yes"))
 				.append(Text.of("  "))
 				.append(getDeleteWarpCancelAction(name, "No"))
-				.append(Text.of(System.lineSeparator()))
+				.append(Text.NEW_LINE)
 				.build()
 			);
 			

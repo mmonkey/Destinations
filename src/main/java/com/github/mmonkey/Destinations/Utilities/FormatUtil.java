@@ -32,7 +32,7 @@ public class FormatUtil {
 		
 		Text.Builder text = Text.builder();
 		for (int i = 0; i < 20; i++) {
-			text.append(Text.of(System.lineSeparator()));
+			text.append(Text.NEW_LINE);
 		}
 		
 		return text.build();

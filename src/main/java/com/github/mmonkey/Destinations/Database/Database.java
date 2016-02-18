@@ -11,25 +11,7 @@ public abstract class Database {
 	
 	private Game game;
 	private SqlService service;
-	private String username = null;
-	private String password = null;
 	private String jdbcUrl = null;
-	
-	private String getUsername() {
-		return (this.username != null) ? this.username : "";
-	}
-	
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	
-	private String getPassword() {
-		return (this.password != null) ? this.password : "";
-	}
-	
-	public void setPassword(String password) {
-		this.password = password;
-	}
 	
 	private String getJdbcUrl() {
 		return (this.jdbcUrl != null) ? this.jdbcUrl : "";
@@ -59,7 +41,7 @@ public abstract class Database {
 	public Connection getConnection() {
 		
 		try {
-			return this.getDataSource(this.getJdbcUrl()).getConnection(this.getUsername(), this.getPassword());
+			return this.getDataSource(this.getJdbcUrl()).getConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

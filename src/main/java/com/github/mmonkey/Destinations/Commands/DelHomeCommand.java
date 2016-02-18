@@ -52,12 +52,13 @@ public class DelHomeCommand implements CommandExecutor {
 		if (home != null) {
 			
 			player.sendMessage(
-				Text.builder(System.lineSeparator())
+				Text.builder()
+				.append(Text.NEW_LINE)
 				.append(Text.of(FormatUtil.DIALOG, "Are you sure you want to delete home ", FormatUtil.OBJECT, name, FormatUtil.DIALOG, "?  "))
 				.append(getDeleteHomeConfirmationAction(name, "Yes"))
 				.append(Text.of("  "))
 				.append(getDeleteHomeCancelAction(name, "No"))
-				.append(Text.of(System.lineSeparator()))
+				.append(Text.NEW_LINE)
 				.build()
 			);
 			

@@ -32,9 +32,6 @@ public class H2EmbeddedDatabase extends Database {
 	public Connection getConnection() {
 		
 		String path = (this.directory != null && this.directory.exists()) ? this.directory.getPath() : defaultPath;
-		
-		this.setUsername(this.username);
-		this.setPassword(this.password);
 		this.setJdbcUrl("jdbc:h2:file:" + path + File.separator + this.dbName + ";user=" + this.username + ";password=" + this.password);
 		return super.getConnection();
 		

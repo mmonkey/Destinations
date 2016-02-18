@@ -9,8 +9,6 @@ public class M01_AddDatabaseSettings extends Migration {
 
     public void up() {
         CommentedConfigurationNode config = this.plugin.getDefaultConfig().get();
-        config.getNode(DefaultConfig.DATABASE_SETTINGS, "password").setValue("");
-        config.getNode(DefaultConfig.DATABASE_SETTINGS, "username").setValue("admin");
         config.getNode(DefaultConfig.DATABASE_SETTINGS, DefaultConfig.WEBSERVER).setValue(false);
         this.plugin.getDefaultConfig().save();
 

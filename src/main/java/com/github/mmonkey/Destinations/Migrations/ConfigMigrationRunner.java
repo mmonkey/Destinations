@@ -3,8 +3,7 @@ package com.github.mmonkey.Destinations.Migrations;
 import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M01_AddDatabaseSettings;
 import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M02_AddCallBringSettings;
-import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M03_RemoveDatabaseUserCredentials;
-import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M04_UpdateExpiresAfterToSeconds;
+import com.github.mmonkey.Destinations.Migrations.ConfigMigrations.M03_UpdateExpiresAfterToSeconds;
 
 public class ConfigMigrationRunner extends MigrationRunner {
 
@@ -18,10 +17,7 @@ public class ConfigMigrationRunner extends MigrationRunner {
                 return new M02_AddCallBringSettings(plugin);
 
             case 2:
-                return new M03_RemoveDatabaseUserCredentials(plugin);
-
-            case 3:
-                return new M04_UpdateExpiresAfterToSeconds(plugin);
+                return new M03_UpdateExpiresAfterToSeconds(plugin);
 
             default:
                 return null;

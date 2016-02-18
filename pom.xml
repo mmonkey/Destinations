@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.mmonkey</groupId>
-  <version>0.3.3</version>
+  <version>0.3.4-3.0.0</version>
   <packaging>jar</packaging>
 
   <name>Destinations</name>
@@ -47,7 +47,7 @@
     <dependency>
 	    <groupId>com.github.mmonkey</groupId>
 	    <artifactId>Commando</artifactId>
-	    <version>v0.0.2-2.1</version>
+	    <version>v0.0.2-3.0.0</version>
 	</dependency>
 	<dependency>
 	    <groupId>com.h2database</groupId>

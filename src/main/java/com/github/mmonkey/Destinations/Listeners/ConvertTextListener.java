@@ -4,9 +4,10 @@ import com.github.mmonkey.Destinations.Destinations;
 import com.github.mmonkey.Destinations.Filters.WarpFilter;
 import com.gmail.mmonkey.Commando.Events.CommandoConvertTextEvent;
 import com.gmail.mmonkey.Commando.Events.TextType;
-import com.google.common.base.Optional;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+
+import java.util.Optional;
 
 public class ConvertTextListener {
 	
