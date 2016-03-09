@@ -33,6 +33,6 @@ public class PlayerBackLocationSaveEvent extends AbstractEvent implements Cancel
     }
 
     public Cause getCause() {
-        return Cause.of(Destinations.getInstance());
+        return Cause.builder().owner(player).build();
     }
 }

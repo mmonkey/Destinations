@@ -29,12 +29,13 @@ import org.spongepowered.api.text.Text;
 
 import java.io.File;
 
-@Plugin(id = Destinations.ID, name = Destinations.NAME, version = Destinations.VERSION)
+@Plugin(id = Destinations.ID, name = Destinations.NAME, version = Destinations.VERSION, description = Destinations.DESCRIPTION)
 public class Destinations {
 
+    public static final String ID = "com.github.mmonkey.destinations";
     public static final String NAME = "Destinations";
-    public static final String ID = "Destinations";
-    public static final String VERSION = "0.3.4-3.0.0";
+    public static final String VERSION = "0.4.0-4.1.0";
+    public static final String DESCRIPTION = "An all-in-one teleportation plugin, with smart features.";
     public static final int CONFIG_VERSION = 3;
     public static final int DATABASE_VERSION = 1;
 
