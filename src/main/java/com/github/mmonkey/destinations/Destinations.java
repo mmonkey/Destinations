@@ -1,16 +1,18 @@
 package com.github.mmonkey.destinations;
 
 import com.github.mmonkey.destinations.commands.*;
+import com.github.mmonkey.destinations.commands.elements.HomeCommandElement;
+import com.github.mmonkey.destinations.commands.elements.WarpCommandElement;
 import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.*;
 import com.github.mmonkey.destinations.listeners.PlayerListeners;
 import com.github.mmonkey.destinations.persistence.PersistenceService;
-import com.github.mmonkey.destinations.teleportation.TeleportationService;
 import com.google.inject.Inject;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
@@ -29,7 +31,7 @@ import java.io.IOException;
 public class Destinations {
 
     public static final String ID = "destinations";
-    public static final String NAME = "destinations";
+    public static final String NAME = "Destinations";
     public static final String VERSION = "1.0.0";
     public static final String DESCRIPTION = "An all-in-one teleportation plugin, with smart features.";
 
@@ -79,8 +81,7 @@ public class Destinations {
     public void onGameInitializationEvent(GameInitializationEvent event) {
 
         // Register Events
-        boolean saveOnBack = config.get().getNode(DestinationsConfig.BACK_SETTINGS, "saveOnDeath").getBoolean();
-        Sponge.getEventManager().registerListeners(this, new PlayerListeners(saveOnBack));
+        Sponge.getEventManager().registerListeners(this, new PlayerListeners());
 
         // Register Commands
         this.registerCommands();
@@ -159,132 +160,141 @@ public class Destinations {
      */
     private void registerCommands() {
 
-        // TODO: register all commands, then check the enabled flag in each command
+        CommandManager commandManager = Sponge.getCommandManager();
 
-        // /home [name]
-        CommandSpec homeCommand = CommandSpec.builder()
-                .description(Text.of("Teleport Home"))
-                .extendedDescription(Text.of("Teleport to the nearest home or to the named home. Optional: /home [name]"))
-                .executor(new HomeCommand())
-                .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("name"))))
-                .build();
+        // Register Back Command
+        if (DestinationsConfig.isBackCommandEnabled()) {
 
-        // /sethome [-f] [name]
-        CommandSpec setHomeCommand = CommandSpec.builder()
-                .description(Text.of("Set location as home"))
-                .extendedDescription(Text.of("Set this location as a home. Optional: /sethome [name]"))
-                .executor(new SetHomeCommand())
-                .arguments(GenericArguments.flags().flag("f").buildWith(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("name")))))
-                .build();
-
-        // /listhomes [page]
-        CommandSpec listHomesCommand = CommandSpec.builder()
-                .description(Text.of("Show list of homes"))
-                .extendedDescription(Text.of("Displays a list of your homes. Optional: /listhomes [page]"))
-                .executor(new ListHomesCommand())
-                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))))
-                .build();
-
-        // /delhome [-f] [-c] <name>
-        CommandSpec delHomeCommand = CommandSpec.builder()
-                .description(Text.of("Delete a home"))
-                .extendedDescription(Text.of("Delete a home by name. Required: /sethome <name>"))
-                .executor(new DelHomeCommand())
-                .arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Text.of("name"))))
-                .build();
-
-        // Register home commands if enabled
-        if (config.get().getNode(DestinationsConfig.HOME_SETTINGS, "enabled").getBoolean()) {
-            Sponge.getCommandManager().register(this, homeCommand, "home", "h");
-            Sponge.getCommandManager().register(this, setHomeCommand, "sethome");
-            Sponge.getCommandManager().register(this, listHomesCommand, "listhomes", "homes");
-            Sponge.getCommandManager().register(this, delHomeCommand, "delhome");
+            // /back
+            CommandSpec backCommand = CommandSpec.builder()
+                    .permission("destinations.back")
+                    .description(Text.of("/back"))
+                    .extendedDescription(Text.of("Returns you to your last position from a prior teleport."))
+                    .executor(new BackCommand())
+                    .build();
+            commandManager.register(this, backCommand, "back", "b");
         }
 
-        // /warp <name>
-        CommandSpec warpCommand = CommandSpec.builder()
-                .description(Text.of("Teleport to Warp"))
-                .extendedDescription(Text.of("Teleport to the warp of the provided name."))
-                .executor(new WarpCommand())
-                .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
-                .build();
+        // Register Home Commands
+        if (DestinationsConfig.isHomeCommandEnabled()) {
 
-        // /setwarp <name>
-        CommandSpec setWarpCommand = CommandSpec.builder()
-                .description(Text.of("Set a warp"))
-                .extendedDescription(Text.of("Set this location as a public warp."))
-                .executor(new SetWarpCommand())
-                .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
-                .build();
+            // /home [name]
+            CommandSpec homeCommand = CommandSpec.builder()
+                    .permission("destinations.home")
+                    .description(Text.of("/home [name]"))
+                    .extendedDescription(Text.of("Teleport to the nearest home or to the named home."))
+                    .executor(new HomeCommand())
+                    .arguments(GenericArguments.optional(new HomeCommandElement(Text.of("name"))))
+                    .build();
+            commandManager.register(this, homeCommand, "home", "h");
 
-        // /listwarps [page]
-        CommandSpec listWarpsCommand = CommandSpec.builder()
-                .description(Text.of("Show list of warps"))
-                .extendedDescription(Text.of("Displays a list of your warps. Optional: /listwarps [page]"))
-                .executor(new ListWarpsCommand())
-                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))))
-                .build();
+            // /sethome [-f] [name]
+            CommandSpec setHomeCommand = CommandSpec.builder()
+                    .permission("destinations.home")
+                    .description(Text.of("/sethome [-f force] [name]"))
+                    .extendedDescription(Text.of("Set this location as a home."))
+                    .executor(new SetHomeCommand())
+                    .arguments(GenericArguments.flags().flag("f").buildWith(
+                            GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("name")))
+                    )).build();
+            commandManager.register(this, setHomeCommand, "sethome");
 
-        // /delwarp [-f] [-c] <name>
-        CommandSpec delWarpCommand = CommandSpec.builder()
-                .description(Text.of("Delete a warp"))
-                .extendedDescription(Text.of("Delete a warp by name. Required: /delwarp <name>"))
-                .executor(new DelWarpCommand())
-                .arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Text.of("name"))))
-                .build();
+            // /homes
+            CommandSpec listHomesCommand = CommandSpec.builder()
+                    .permission("destinations.home")
+                    .description(Text.of("/homes or /listhomes"))
+                    .extendedDescription(Text.of("Displays a list of your homes."))
+                    .executor(new ListHomesCommand())
+                    .build();
+            commandManager.register(this, listHomesCommand, "homes", "listhomes");
 
-        // Register warp commands if enabled
-        if (config.get().getNode(DestinationsConfig.WARP_SETTINGS, "enabled").getBoolean()) {
-            Sponge.getCommandManager().register(this, warpCommand, "warp", "w");
-            Sponge.getCommandManager().register(this, setWarpCommand, "setwarp");
-            Sponge.getCommandManager().register(this, listWarpsCommand, "listwarps", "warps");
-            Sponge.getCommandManager().register(this, delWarpCommand, "delwarp");
+            // /delhome [-f] [-c] <name>
+            CommandSpec delHomeCommand = CommandSpec.builder()
+                    .permission("destinations.home")
+                    .description(Text.of("/delhome [-c cancel] [-f force] <name>"))
+                    .extendedDescription(Text.of("Delete a home by name."))
+                    .executor(new DelHomeCommand())
+                    .arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Text.of("name"))))
+                    .build();
+            commandManager.register(this, delHomeCommand, "delhome");
         }
 
-        // /call <player>, /tpa <player>
-        CommandSpec callCommand = CommandSpec.builder()
-                .description(Text.of("Requests a player to teleport you."))
-                .extendedDescription(Text.of("Requests a player to teleport you to their current location. Required: /call <player>"))
-                .executor(new CallCommand())
-                .arguments(GenericArguments.player(Text.of("player")))
-                .build();
+        // Register Warp Commands
+        if (DestinationsConfig.isWarpCommandEnabled()) {
 
-        // /bring [player] [page]
-        CommandSpec bringCommand = CommandSpec.builder()
-                .description(Text.of("Bring a calling player to you."))
-                .extendedDescription(Text.of("Teleports a player that has issued a call request to your current location."))
-                .executor(new BringCommand())
-                .arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Text.of("player")), GenericArguments.integer(Text
-                        .of("page")))))
-                .build();
+            // /warp <name>
+            CommandSpec warpCommand = CommandSpec.builder()
+                    .permission("destinations.warp.use")
+                    .description(Text.of("/warp <name>"))
+                    .extendedDescription(Text.of("Teleport to the warp of the provided name."))
+                    .executor(new WarpCommand())
+                    .arguments(new WarpCommandElement(Text.of("name")))
+                    .build();
+            commandManager.register(this, warpCommand, "warp", "w");
 
-        // /grab <player>, /tphere <player>
-        CommandSpec grabCommand = CommandSpec.builder()
-                .description(Text.of("Teleport a player to you."))
-                .extendedDescription(Text.of("Teleports a player to your current location. Required: /tphere <name>"))
-                .executor(new GrabCommand())
-                .arguments(GenericArguments.player(Text.of("player")))
-                .build();
+            // /warps
+            CommandSpec listWarpsCommand = CommandSpec.builder()
+                    .permission("destionations.warp.use")
+                    .description(Text.of("/warps or /listwarps"))
+                    .extendedDescription(Text.of("Displays a list of your warps."))
+                    .executor(new ListWarpsCommand())
+                    .build();
+            commandManager.register(this, listWarpsCommand, "warps", "listwarps");
 
-        // Start teleportation service and register commands
-        if (config.get().getNode(DestinationsConfig.TELEPORT_SETTINGS, "enabled").getBoolean(false)) {
-            Sponge.getCommandManager().register(this, callCommand, "call", "tpa");
-            Sponge.getCommandManager().register(this, bringCommand, "bring");
-            Sponge.getCommandManager().register(this, grabCommand, "grab", "tphere");
+            // /setwarp <name>
+            CommandSpec setWarpCommand = CommandSpec.builder()
+                    .permission("destinations.warp.create")
+                    .description(Text.of("/setwarp <name>"))
+                    .extendedDescription(Text.of("Set this location as a public warp."))
+                    .executor(new SetWarpCommand())
+                    .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
+                    .build();
+            commandManager.register(this, setWarpCommand, "setwarp");
+
+            // /delwarp [-f] [-c] <name>
+            CommandSpec delWarpCommand = CommandSpec.builder()
+                    .permission("destinations.warp.create")
+                    .description(Text.of("Delete a warp"))
+                    .extendedDescription(Text.of("Delete a warp by name."))
+                    .executor(new DelWarpCommand())
+                    .arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Text.of("name"))))
+                    .build();
+            commandManager.register(this, delWarpCommand, "delwarp");
         }
 
-        // /back
-        CommandSpec backCommand = CommandSpec.builder()
-                .description(Text.of("Teleport back."))
-                .extendedDescription(Text.of("Teleport to your previous location."))
-                .executor(new BackCommand())
-                .build();
+        // Register Teleport Commands
+        if (DestinationsConfig.isTeleportCommandEnabled()) {
 
-        // Register back command if enabled
-        if (config.get().getNode(DestinationsConfig.BACK_SETTINGS, "enabled").getBoolean()) {
-            Sponge.getCommandManager().register(this, backCommand, "back", "b");
+            // /call <player> or /tpa <player>
+            CommandSpec callCommand = CommandSpec.builder()
+                    .permission("destinations.tpa")
+                    .description(Text.of("/call <player> or /tpa <player>"))
+                    .extendedDescription(Text.of("Requests a player to teleport you to their current location."))
+                    .executor(new CallCommand())
+                    .arguments(GenericArguments.player(Text.of("player")))
+                    .build();
+            commandManager.register(this, callCommand, "call", "tpa");
+
+            // /bring [player] or /tpaccept [player]
+            CommandSpec bringCommand = CommandSpec.builder()
+                    .permission("destinations.tpa")
+                    .description(Text.of("/bring [player] or /tpaccept [player] or /tpyes [player]"))
+                    .extendedDescription(Text.of("Teleports a player that has issued a call request to your current location."))
+                    .executor(new BringCommand())
+                    .arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Text.of("player")))))
+                    .build();
+            commandManager.register(this, bringCommand, "bring", "tpaccept");
+
+            // /grab <player> or /tphere <player>
+            CommandSpec grabCommand = CommandSpec.builder()
+                    .permission("destinations.tphere")
+                    .description(Text.of("/grab <player> or /tphere <player>"))
+                    .extendedDescription(Text.of("Teleports a player to your current location."))
+                    .executor(new GrabCommand())
+                    .arguments(GenericArguments.player(Text.of("player")))
+                    .build();
+            commandManager.register(this, grabCommand, "grab", "tphere");
         }
-
     }
 
 }

@@ -45,14 +45,12 @@ public class ListWarpsCommand implements CommandExecutor {
 
         PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
         paginationService.builder().title(Text.of("Warps")).contents(list).padding(Text.of("-")).sendTo(player);
-
         return CommandResult.success();
     }
 
     private Text getWarpAction(WarpEntity warp) {
 
         if (!warp.isPrivate()) {
-
             return Text.builder(warp.getName())
                     .onClick(TextActions.runCommand("/warp " + warp.getName()))
                     .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
@@ -61,16 +59,13 @@ public class ListWarpsCommand implements CommandExecutor {
                     .build();
 
         } else {
-
             return Text.builder(warp.getName() + " (private)")
                     .onClick(TextActions.runCommand("/warp " + warp.getName()))
                     .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
                     .color(FormatUtil.GENERIC_LINK)
                     .style(TextStyles.UNDERLINE)
                     .build();
-
         }
-
     }
 
     private Text getDeleteWarpAction(WarpEntity warp, PlayerEntity player) {

@@ -26,7 +26,8 @@ public class WarpCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
+        String name = (String) args.getOne("name").orElse("");
+
         Player player = (Player) src;
         PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
         WarpEntity warp = this.searchWarps(name);
@@ -55,11 +56,8 @@ public class WarpCommand implements CommandExecutor {
         }
 
         Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(player));
-        player.setRotation(warp.getLocation().getRotation());
-        player.setLocation(warp.getLocation().getLocation());
-
+        player.setLocationAndRotationSafely(warp.getLocation().getLocation(), warp.getLocation().getRotation());
         return CommandResult.success();
-
     }
 
     private WarpEntity searchWarps(String name) {

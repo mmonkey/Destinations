@@ -23,14 +23,13 @@ public class SetWarpCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
+        String name = (String) args.getOne("name").orElse("");
         Player player = (Player) src;
 
         if (warpExists(name)) {
             player.sendMessage(
                     Text.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.")
             );
-
             return CommandResult.success();
         }
 

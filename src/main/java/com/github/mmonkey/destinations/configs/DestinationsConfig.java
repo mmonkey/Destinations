@@ -53,4 +53,39 @@ public class DestinationsConfig extends Config {
         get().getNode(WARP_SETTINGS, "enabled").setValue(true);
     }
 
+    /**
+     * @return whether or not the back command is enabled
+     */
+    public static boolean isBackCommandEnabled() {
+        return getInstance().get().getNode(BACK_SETTINGS, "enabled").getBoolean(false);
+    }
+
+    /**
+     * @return whether or not the player's back locations will be saved on death
+     */
+    public static boolean allowBackOnDeath() {
+        return getInstance().get().getNode(BACK_SETTINGS, "saveOnDeath").getBoolean(false);
+    }
+
+    /**
+     * @return whether or not the home command is enabled
+     */
+    public static boolean isHomeCommandEnabled() {
+        return getInstance().get().getNode(HOME_SETTINGS, "enabled").getBoolean(false);
+    }
+
+    /**
+     * @return whether or not the teleport command is enabled
+     */
+    public static boolean isTeleportCommandEnabled() {
+        return getInstance().get().getNode(TELEPORT_SETTINGS, "enabled").getBoolean(false);
+    }
+
+    /**
+     * @return whether or not the warp command is enabled
+     */
+    public static boolean isWarpCommandEnabled() {
+        return getInstance().get().getNode(WARP_SETTINGS, "enabled").getBoolean(false);
+    }
+
 }

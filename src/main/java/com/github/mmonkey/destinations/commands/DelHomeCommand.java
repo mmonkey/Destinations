@@ -23,9 +23,9 @@ public class DelHomeCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        boolean force = (args.hasAny("f")) ? (Boolean) args.getOne("f").get() : false;
-        boolean cancel = (args.hasAny("c")) ? (Boolean) args.getOne("c").get() : false;
-        String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
+        boolean cancel = args.hasAny("c");
+        boolean force = args.hasAny("f");
+        String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
         PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);

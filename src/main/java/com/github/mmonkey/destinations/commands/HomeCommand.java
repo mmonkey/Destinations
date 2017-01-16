@@ -1,10 +1,9 @@
 package com.github.mmonkey.destinations.commands;
 
-import com.github.mmonkey.destinations.utilities.FormatUtil;
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
-import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
+import com.github.mmonkey.destinations.utilities.FormatUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -16,7 +15,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class HomeCommand implements CommandExecutor {
@@ -24,10 +22,11 @@ public class HomeCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-            return CommandResult.success();
+            return CommandResult.empty();
         }
 
-        String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
+        String name = (String) args.getOne("name").orElse("");
+
         Player player = (Player) src;
         PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
         Set<HomeEntity> homes = playerEntity.getHomes();
@@ -45,9 +44,7 @@ public class HomeCommand implements CommandExecutor {
         }
 
         Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(player));
-        player.setRotation(home.getLocation().getRotation());
-        player.setLocation(home.getLocation().getLocation());
-
+        player.setLocationAndRotationSafely(home.getLocation().getLocation(), home.getLocation().getRotation());
         return CommandResult.success();
     }
 

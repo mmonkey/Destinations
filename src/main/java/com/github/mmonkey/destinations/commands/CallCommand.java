@@ -46,7 +46,6 @@ public class CallCommand implements CommandExecutor {
         caller.sendMessage(Text.of(FormatUtil.OBJECT, target.getName(), FormatUtil.DIALOG, " was called."));
 
         TeleportationService.instance.call(caller, target);
-
         return CommandResult.success();
     }
 

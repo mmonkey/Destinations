@@ -14,23 +14,29 @@ import org.spongepowered.api.entity.living.player.Player;
 
 public class BackCommand implements CommandExecutor {
 
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    @Override
+    public CommandResult execute(CommandSource source, CommandContext arguments) throws CommandException {
 
-        if (!(src instanceof Player)) {
-            return CommandResult.success();
+        if (!(source instanceof Player)) {
+            return CommandResult.empty();
         }
 
-        Player player = (Player) src;
+        BackEntity back = null;
+        Player player = (Player) source;
         PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        for (BackEntity backEntity : playerEntity.getBacks()) {
+            if (backEntity.getLocation().getWorld().getIdentifier().equals(player.getWorld().getUniqueId().toString())) {
+                back = backEntity;
+            }
+        }
+
         Sponge.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(player));
 
-        playerEntity.getBacks().forEach((BackEntity back) -> {
-            if (back.getLocation().getWorld().getIdentifier().equals(player.getWorld().getUniqueId().toString())) {
-                player.setRotation(back.getLocation().getRotation());
-                player.setLocation(back.getLocation().getLocation());
-            }
-        });
+        if (back == null) {
+            return CommandResult.empty();
+        }
 
+        player.setLocationAndRotationSafely(back.getLocation().getLocation(), back.getLocation().getRotation());
         return CommandResult.success();
     }
 

@@ -25,8 +25,8 @@ public class SetHomeCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        boolean force = (args.hasAny("f")) ? (Boolean) args.getOne("f").get() : false;
-        String name = (args.hasAny("name")) ? ((String) args.getOne("name").get()) : "";
+        boolean force = args.hasAny("f");
+        String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
         PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);

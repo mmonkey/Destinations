@@ -1,8 +1,8 @@
 package com.github.mmonkey.destinations.commands;
 
-import com.github.mmonkey.destinations.utilities.FormatUtil;
 import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
 import com.github.mmonkey.destinations.teleportation.TeleportationService;
+import com.github.mmonkey.destinations.utilities.FormatUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -80,8 +80,7 @@ public class BringCommand implements CommandExecutor {
 
         TeleportationService.instance.removeCall(caller, target);
         Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(caller));
-        caller.setRotation(target.getRotation());
-        caller.setLocation(target.getLocation());
+        caller.setLocationAndRotationSafely(target.getLocation(), target.getRotation());
 
         Text.Builder message = Text.builder();
         message.append(Text.of(FormatUtil.DIALOG, "You have been teleported to "));

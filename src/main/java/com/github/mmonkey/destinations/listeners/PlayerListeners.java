@@ -1,5 +1,6 @@
 package com.github.mmonkey.destinations.listeners;
 
+import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.BackEntity;
 import com.github.mmonkey.destinations.entities.LocationEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
@@ -15,17 +16,6 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import java.util.Optional;
 
 public class PlayerListeners {
-
-    private final boolean saveOnBack;
-
-    /**
-     * PlayerListeners constructor
-     *
-     * @param saveOnBack boolean
-     */
-    public PlayerListeners(boolean saveOnBack) {
-        this.saveOnBack = saveOnBack;
-    }
 
     @Listener
     public void onClientConnectionEventLogin(ClientConnectionEvent.Login event) {
@@ -64,7 +54,7 @@ public class PlayerListeners {
 
     @Listener
     public void onDestructEntityEvent(DestructEntityEvent event) {
-        if (this.saveOnBack && event.getTargetEntity() instanceof Player) {
+        if (DestinationsConfig.isBackCommandEnabled() && DestinationsConfig.allowBackOnDeath() && event.getTargetEntity() instanceof Player) {
             Sponge.getGame().getEventManager().post(new PlayerBackLocationSaveEvent((Player) event.getTargetEntity()));
         }
     }
