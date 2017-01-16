@@ -1,6 +1,7 @@
-/target/
-/.idea/
-/.classpath
-/.project
-/.settings/
-Destinations.iml
+# project settings
+.idea
+.gradle
+
+# build paths
+build
+server
