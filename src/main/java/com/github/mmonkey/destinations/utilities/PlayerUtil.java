@@ -1,5 +1,8 @@
 package com.github.mmonkey.destinations.utilities;
 
+import com.github.mmonkey.destinations.Destinations;
+import com.github.mmonkey.destinations.comparators.BedComparator;
+import com.github.mmonkey.destinations.entities.BedEntity;
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
@@ -7,11 +10,13 @@ import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository
 import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PlayerUtil {
 
@@ -24,6 +29,87 @@ public class PlayerUtil {
     public static PlayerEntity getPlayerEntity(Player player) {
         Optional<PlayerEntity> optional = PlayerRepository.instance.get(player);
         return optional.orElseGet(() -> PlayerRepository.instance.save(new PlayerEntity(player)));
+    }
+
+    /**
+     * Get the PlayerEntity with BackEntities in storage for this player
+     *
+     * @param player Player
+     * @return PlayerEntity
+     */
+    public static PlayerEntity getPlayerEntityWithBacks(Player player) {
+        Optional<PlayerEntity> optional = PlayerRepository.instance.getWithBacks(player);
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            PlayerEntity playerEntity = getPlayerEntity(player);
+            playerEntity.setBacks(new HashSet<>());
+            return PlayerRepository.instance.save(playerEntity);
+        }
+    }
+
+    /**
+     * Get the PlayerEntity with BedEntities in storage for this player
+     *
+     * @param player Player
+     * @return PlayerEntity
+     */
+    public static PlayerEntity getPlayerEntityWithBeds(Player player) {
+        Optional<PlayerEntity> optional = PlayerRepository.instance.getWithBeds(player);
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            PlayerEntity playerEntity = getPlayerEntity(player);
+            playerEntity.setBeds(new HashSet<>());
+            return PlayerRepository.instance.save(playerEntity);
+        }
+    }
+
+    /**
+     * Get the PlayerEntity with HomeEntities in storage for this player
+     *
+     * @param player Player
+     * @return PlayerEntity
+     */
+    public static PlayerEntity getPlayerEntityWithHomes(Player player) {
+        Optional<PlayerEntity> optional = PlayerRepository.instance.getWithHomes(player);
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            PlayerEntity playerEntity = getPlayerEntity(player);
+            playerEntity.setHomes(new HashSet<>());
+            return PlayerRepository.instance.save(playerEntity);
+        }
+    }
+
+    /**
+     * Get the last used bed for this player in the current world
+     * If the last used bed has been deleted, or is currently occupied, get the next last bed (and so on)
+     *
+     * @param playerEntity PlayerEntity
+     * @param player       Player
+     * @return BedEntity|null
+     */
+    public static BedEntity getBed(PlayerEntity playerEntity, Player player) {
+        List<BedEntity> beds = new CopyOnWriteArrayList<>(playerEntity.getBeds());
+        beds.sort(new BedComparator());
+
+        Destinations.getInstance().getLogger().info("Beds: " + beds.size());
+
+        for (BedEntity bed : beds) {
+            if (bed.getLocation().getWorld().getIdentifier().equals(player.getWorld().getUniqueId().toString())) {
+                Location<World> block = player.getWorld().getLocation(bed.getLocation().getLocation().getBlockPosition());
+                if (BlockUtil.isBed(block)) {
+                    if (!BlockUtil.isBedOccupied(block)) {
+                        return bed;
+                    }
+                } else {
+                    playerEntity.getBeds().remove(bed);
+                    PlayerRepository.instance.save(playerEntity);
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -44,14 +130,14 @@ public class PlayerUtil {
     }
 
     /**
-     * Get a Player's home by name
+     * Get a player's home by name
      *
-     * @param player PlayerEntity
-     * @param name   String
+     * @param playerEntity PlayerEntity
+     * @param name         String
      * @return HomeEntity
      */
-    public static HomeEntity getPlayerHomeByName(PlayerEntity player, String name) {
-        for (HomeEntity home : player.getHomes()) {
+    public static HomeEntity getPlayerHomeByName(PlayerEntity playerEntity, String name) {
+        for (HomeEntity home : playerEntity.getHomes()) {
             if (home.getName().equalsIgnoreCase(name)) {
                 return home;
             }
@@ -62,12 +148,12 @@ public class PlayerUtil {
     /**
      * Get the next available name for a player's home
      *
-     * @param player PlayerEntity
+     * @param playerEntity PlayerEntity
      * @return String
      */
-    public static String getPlayerHomeAvailableName(PlayerEntity player) {
+    public static String getPlayerHomeAvailableName(PlayerEntity playerEntity) {
         int max = 0, temp = 0;
-        for (HomeEntity home : player.getHomes()) {
+        for (HomeEntity home : playerEntity.getHomes()) {
             if (home.getName().startsWith("home") && home.getName().matches(".*\\d.*")) {
                 temp = Integer.parseInt(home.getName().replaceAll("[\\D]", ""));
             }
@@ -75,29 +161,29 @@ public class PlayerUtil {
                 max = temp;
             }
         }
-        if (player.getHomes().size() > max) {
-            max = player.getHomes().size();
+        if (playerEntity.getHomes().size() > max) {
+            max = playerEntity.getHomes().size();
         }
-        return (player.getHomes().size() == 0) ? "home" : "home" + Integer.toString(max + 1);
+        return (playerEntity.getHomes().size() == 0) ? "home" : "home" + Integer.toString(max + 1);
     }
 
     /**
      * Get a list of warps that this player can use
      *
-     * @param player PlayerEntity
+     * @param playerEntity PlayerEntity
      * @return Set<WarpEntity>
      */
-    public static Set<WarpEntity> getPlayerWarps(PlayerEntity player) {
+    public static Set<WarpEntity> getPlayerWarps(PlayerEntity playerEntity) {
         Set<WarpEntity> results = new HashSet<>();
         List<WarpEntity> warps = WarpRepository.instance.getAllWarps();
         warps.forEach(warp -> {
             if (!warp.isPrivate()) {
                 results.add(warp);
-            } else if (warp.getOwner().getIdentifier().equals(player.getIdentifier())) {
+            } else if (warp.getOwner().getIdentifier().equals(playerEntity.getIdentifier())) {
                 results.add(warp);
             } else {
                 warp.getAccess().forEach(access -> {
-                    if (access.getPlayer().getIdentifier().equals(player.getIdentifier())) {
+                    if (access.getPlayer().getIdentifier().equals(playerEntity.getIdentifier())) {
                         results.add(warp);
                     }
                 });

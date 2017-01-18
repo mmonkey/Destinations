@@ -75,6 +75,22 @@ public class LocationEntity implements Serializable {
     }
 
     /**
+     * LocationEntity constructor
+     *
+     * @param location Location<World>
+     */
+    public LocationEntity(Location<World> location) {
+        Preconditions.checkNotNull(location);
+
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+
+        Optional<WorldEntity> optional = WorldRepository.instance.get(location.getExtent().getUniqueId().toString());
+        this.world = optional.orElseGet(() -> WorldRepository.instance.save(new WorldEntity(location.getExtent())));
+    }
+
+    /**
      * @return long
      */
     public long getId() {

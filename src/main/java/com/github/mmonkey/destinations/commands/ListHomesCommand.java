@@ -29,7 +29,7 @@ public class ListHomesCommand implements CommandExecutor {
         }
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
 
         List<Text> list = new CopyOnWriteArrayList<>();
         Set<HomeEntity> homes = playerEntity.getHomes();

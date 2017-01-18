@@ -15,7 +15,10 @@ import java.util.Set;
         @UniqueConstraint(columnNames = "player_id")
 })
 @NamedQueries({
-        @NamedQuery(name = "getPlayerByIdentifier", query = "from PlayerEntity p where p.identifier = :identifier"),
+        @NamedQuery(name = "getPlayer", query = "from PlayerEntity p where p.identifier = :identifier"),
+        @NamedQuery(name = "getPlayerBacks", query = "select p from PlayerEntity p join fetch p.backs where p.identifier = :identifier"),
+        @NamedQuery(name = "getPlayerBeds", query = "select p from PlayerEntity p join fetch p.beds where p.identifier = :identifier"),
+        @NamedQuery(name = "getPlayerHomes", query = "select p from PlayerEntity p join fetch p.homes where p.identifier = :identifier")
 })
 public class PlayerEntity implements Serializable {
 
@@ -32,14 +35,14 @@ public class PlayerEntity implements Serializable {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<BackEntity> backs = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<HomeEntity> homes = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<BedEntity> beds = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<WarpEntity> warps = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<HomeEntity> homes = new HashSet<>();
 
     /**
      * PlayerEntity default constructor
@@ -124,6 +127,22 @@ public class PlayerEntity implements Serializable {
     }
 
     /**
+     * @return Set<BedEntity>
+     */
+    public Set<BedEntity> getBeds() {
+        return beds;
+    }
+
+    /**
+     * @param beds Set<BedEntity>
+     */
+    public void setBeds(Set<BedEntity> beds) {
+        Preconditions.checkNotNull(beds);
+
+        this.beds = beds;
+    }
+
+    /**
      * @return Set<HomeEntity>
      */
     public Set<HomeEntity> getHomes() {
@@ -137,21 +156,5 @@ public class PlayerEntity implements Serializable {
         Preconditions.checkNotNull(homes);
 
         this.homes = homes;
-    }
-
-    /**
-     * @return Set<WarpEntity>
-     */
-    public Set<WarpEntity> getWarps() {
-        return warps;
-    }
-
-    /**
-     * @param warps Set<WarpEntity>
-     */
-    public void setWarps(Set<WarpEntity> warps) {
-        Preconditions.checkNotNull(warps);
-
-        this.warps = warps;
     }
 }

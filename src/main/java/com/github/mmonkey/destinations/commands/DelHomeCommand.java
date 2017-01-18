@@ -28,7 +28,7 @@ public class DelHomeCommand implements CommandExecutor {
         String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
         HomeEntity home = getPlayerHomeByName(playerEntity, name);
 
         if (cancel) {

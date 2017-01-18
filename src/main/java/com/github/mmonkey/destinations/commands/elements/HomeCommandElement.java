@@ -32,7 +32,7 @@ public class HomeCommandElement extends SelectorCommandElement {
         }
 
         List<String> list = new CopyOnWriteArrayList<>();
-        PlayerUtil.getPlayerEntity((Player) source).getHomes().forEach(home -> list.add(home.getName()));
+        PlayerUtil.getPlayerEntityWithHomes((Player) source).getHomes().forEach(home -> list.add(home.getName()));
 
         return list;
     }

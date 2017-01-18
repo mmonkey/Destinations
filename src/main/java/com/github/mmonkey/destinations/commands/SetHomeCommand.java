@@ -29,7 +29,7 @@ public class SetHomeCommand implements CommandExecutor {
         String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
         Set<HomeEntity> homes = playerEntity.getHomes();
         Set<String> homeNames = new HashSet<>();
         homes.forEach(home -> homeNames.add(home.getName()));

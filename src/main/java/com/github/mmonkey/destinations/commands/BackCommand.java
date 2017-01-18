@@ -23,7 +23,7 @@ public class BackCommand implements CommandExecutor {
 
         BackEntity back = null;
         Player player = (Player) source;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithBacks(player);
         for (BackEntity backEntity : playerEntity.getBacks()) {
             if (backEntity.getLocation().getWorld().getIdentifier().equals(player.getWorld().getUniqueId().toString())) {
                 back = backEntity;

@@ -135,6 +135,7 @@ public class Destinations {
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(AccessEntity.class);
         configuration.addAnnotatedClass(BackEntity.class);
+        configuration.addAnnotatedClass(BedEntity.class);
         configuration.addAnnotatedClass(HomeEntity.class);
         configuration.addAnnotatedClass(LocationEntity.class);
         configuration.addAnnotatedClass(PlayerEntity.class);
@@ -161,6 +162,33 @@ public class Destinations {
     private void registerCommands() {
 
         CommandManager commandManager = Sponge.getCommandManager();
+
+        // /jump
+        CommandSpec jumpCommand = CommandSpec.builder()
+                .permission("destinations.jump")
+                .description(Text.of("/jump"))
+                .extendedDescription(Text.of("Teleports the player where they are looking."))
+                .executor(new JumpCommand())
+                .build();
+        commandManager.register(this, jumpCommand, "jump", "j");
+
+        // /top
+        CommandSpec topCommand = CommandSpec.builder()
+                .permission("destinations.top")
+                .description(Text.of("/top"))
+                .extendedDescription(Text.of("Teleports the player to the highest block at current location."))
+                .executor(new TopCommand())
+                .build();
+        commandManager.register(this, topCommand, "top");
+
+        // /bed
+        CommandSpec bedCommand = CommandSpec.builder()
+                .permission("destinations.bed")
+                .description(Text.of("/bed"))
+                .extendedDescription(Text.of("Teleports the player to the last bed they used."))
+                .executor(new BedCommand())
+                .build();
+        commandManager.register(this, bedCommand, "bed");
 
         // Register Back Command
         if (DestinationsConfig.isBackCommandEnabled()) {

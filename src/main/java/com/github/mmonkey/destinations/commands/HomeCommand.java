@@ -28,7 +28,7 @@ public class HomeCommand implements CommandExecutor {
         String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
         Set<HomeEntity> homes = playerEntity.getHomes();
 
         if (homes.isEmpty()) {
