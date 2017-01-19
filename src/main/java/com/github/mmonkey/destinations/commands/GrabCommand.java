@@ -1,6 +1,7 @@
 package com.github.mmonkey.destinations.commands;
 
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportGrabEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -27,8 +28,8 @@ public class GrabCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
-        Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(target));
-        target.setLocationAndRotationSafely(requester.getLocation(), requester.getRotation());
+        Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(target, target.getLocation(), target.getRotation()));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportGrabEvent(target, requester.getLocation(), requester.getRotation()));
 
         Text.Builder message = Text.builder();
         message.append(Text.of(FormatUtil.DIALOG, "You have been teleported to "));

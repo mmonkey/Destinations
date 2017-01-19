@@ -2,8 +2,9 @@ package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.entities.BackEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
-import com.github.mmonkey.destinations.utilities.PlayerUtil;
+import com.github.mmonkey.destinations.events.PlayerTeleportBackEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -23,21 +24,20 @@ public class BackCommand implements CommandExecutor {
 
         BackEntity back = null;
         Player player = (Player) source;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithBacks(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         for (BackEntity backEntity : playerEntity.getBacks()) {
             if (backEntity.getLocation().getWorld().getIdentifier().equals(player.getWorld().getUniqueId().toString())) {
                 back = backEntity;
             }
         }
 
-        Sponge.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(player));
-
-        if (back == null) {
-            return CommandResult.empty();
+        Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
+        if (back != null) {
+            Sponge.getGame().getEventManager().post(new PlayerTeleportBackEvent(player, back.getLocation().getLocation(), back.getLocation().getRotation()));
+            return CommandResult.success();
         }
 
-        player.setLocationAndRotationSafely(back.getLocation().getLocation(), back.getLocation().getRotation());
-        return CommandResult.success();
+        return CommandResult.empty();
     }
 
 }

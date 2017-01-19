@@ -3,6 +3,7 @@ package com.github.mmonkey.destinations.commands;
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.LocationEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
@@ -29,7 +30,7 @@ public class SetHomeCommand implements CommandExecutor {
         String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         Set<HomeEntity> homes = playerEntity.getHomes();
         Set<String> homeNames = new HashSet<>();
         homes.forEach(home -> homeNames.add(home.getName()));
@@ -38,7 +39,8 @@ public class SetHomeCommand implements CommandExecutor {
         if (force && home != null) {
             home.setLocation(new LocationEntity(player));
             playerEntity.getHomes().add(home);
-            PlayerRepository.instance.save(playerEntity);
+            playerEntity = PlayerRepository.instance.save(playerEntity);
+            PlayerCache.instance.set(player, playerEntity);
             player.sendMessage(
                     Text.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location")
             );
@@ -54,14 +56,13 @@ public class SetHomeCommand implements CommandExecutor {
 
         name = name.isEmpty() ? PlayerUtil.getPlayerHomeAvailableName(playerEntity) : name;
         playerEntity.getHomes().add(new HomeEntity(name, new LocationEntity(player)));
-        PlayerRepository.instance.save(playerEntity);
+        playerEntity = PlayerRepository.instance.save(playerEntity);
+        PlayerCache.instance.set(player, playerEntity);
 
         player.sendMessage(
                 Text.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!")
         );
-
         return CommandResult.success();
-
     }
 
 }

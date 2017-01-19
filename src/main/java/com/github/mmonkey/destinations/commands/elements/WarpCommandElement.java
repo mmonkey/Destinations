@@ -1,6 +1,7 @@
 package com.github.mmonkey.destinations.commands.elements;
 
 import com.github.mmonkey.destinations.entities.PlayerEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -31,8 +32,9 @@ public class WarpCommandElement extends SelectorCommandElement {
             return null;
         }
 
+        Player player = (Player) source;
         List<String> list = new CopyOnWriteArrayList<>();
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity((Player) source);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         PlayerUtil.getPlayerWarps(playerEntity).forEach(warp -> list.add(warp.getName()));
 
         return list;

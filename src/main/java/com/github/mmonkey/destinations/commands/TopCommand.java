@@ -1,7 +1,8 @@
 package com.github.mmonkey.destinations.commands;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportTopEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.utilities.BlockUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -39,8 +40,8 @@ public class TopCommand implements CommandExecutor {
         }
 
         if (location != null && (location.getBlockY() != player.getLocation().getBlockY() - 1)) {
-            Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(player));
-            player.setLocationSafely(location);
+            Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
+            Sponge.getGame().getEventManager().post(new PlayerTeleportTopEvent(player, location, player.getRotation()));
             return CommandResult.success();
         }
 

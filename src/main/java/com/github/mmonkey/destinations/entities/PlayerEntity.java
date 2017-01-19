@@ -15,10 +15,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = "player_id")
 })
 @NamedQueries({
-        @NamedQuery(name = "getPlayer", query = "from PlayerEntity p where p.identifier = :identifier"),
-        @NamedQuery(name = "getPlayerBacks", query = "select p from PlayerEntity p join fetch p.backs where p.identifier = :identifier"),
-        @NamedQuery(name = "getPlayerBeds", query = "select p from PlayerEntity p join fetch p.beds where p.identifier = :identifier"),
-        @NamedQuery(name = "getPlayerHomes", query = "select p from PlayerEntity p join fetch p.homes where p.identifier = :identifier")
+        @NamedQuery(name = "getPlayer", query = "from PlayerEntity p where p.identifier = :identifier")
 })
 public class PlayerEntity implements Serializable {
 
@@ -35,13 +32,13 @@ public class PlayerEntity implements Serializable {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<BackEntity> backs = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<BedEntity> beds = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<HomeEntity> homes = new HashSet<>();
 
     /**

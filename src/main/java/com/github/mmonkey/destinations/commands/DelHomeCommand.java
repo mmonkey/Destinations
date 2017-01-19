@@ -2,9 +2,9 @@ package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
-import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -28,7 +28,7 @@ public class DelHomeCommand implements CommandExecutor {
         String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         HomeEntity home = getPlayerHomeByName(playerEntity, name);
 
         if (cancel) {
@@ -40,7 +40,8 @@ public class DelHomeCommand implements CommandExecutor {
 
         if (force && home != null) {
             playerEntity.getHomes().remove(home);
-            PlayerRepository.instance.save(playerEntity);
+            playerEntity = PlayerRepository.instance.save(playerEntity);
+            PlayerCache.instance.set(player, playerEntity);
             player.sendMessage(
                     Text.of(FormatUtil.empty(), FormatUtil.SUCCESS, "Home ", FormatUtil.DELETED_OBJECT, home.getName(), FormatUtil.SUCCESS, " was " +
                             "successfully deleted!")

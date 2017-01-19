@@ -91,6 +91,25 @@ public class LocationEntity implements Serializable {
     }
 
     /**
+     * LocationEntity constructor
+     *
+     * @param location Location<World>
+     */
+    public LocationEntity(Location<World> location, Vector3d rotation) {
+        Preconditions.checkNotNull(location);
+
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.yaw = rotation.getX();
+        this.pitch = rotation.getY();
+        this.roll = rotation.getZ();
+
+        Optional<WorldEntity> optional = WorldRepository.instance.get(location.getExtent().getUniqueId().toString());
+        this.world = optional.orElseGet(() -> WorldRepository.instance.save(new WorldEntity(location.getExtent())));
+    }
+
+    /**
      * @return long
      */
     public long getId() {
@@ -209,7 +228,7 @@ public class LocationEntity implements Serializable {
      * @return Vector3d
      */
     public Vector3d getRotation() {
-        return new Vector3d(this.yaw, this.pitch, this.roll);
+        return (this.yaw == null || this.pitch == null || this.roll == null) ? new Vector3d(0, 0, 0) : new Vector3d(this.yaw, this.pitch, this.roll);
     }
 
     /**

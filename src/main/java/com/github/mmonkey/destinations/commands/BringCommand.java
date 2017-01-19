@@ -1,6 +1,7 @@
 package com.github.mmonkey.destinations.commands;
 
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportBringEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.teleportation.TeleportationService;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
 import org.spongepowered.api.Sponge;
@@ -79,8 +80,8 @@ public class BringCommand implements CommandExecutor {
     private CommandResult executeBring(Player caller, Player target) {
 
         TeleportationService.instance.removeCall(caller, target);
-        Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(caller));
-        caller.setLocationAndRotationSafely(target.getLocation(), target.getRotation());
+        Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(caller, caller.getLocation(), caller.getRotation()));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportBringEvent(caller, target.getLocation(), target.getRotation()));
 
         Text.Builder message = Text.builder();
         message.append(Text.of(FormatUtil.DIALOG, "You have been teleported to "));
@@ -91,7 +92,6 @@ public class BringCommand implements CommandExecutor {
     }
 
     public static Text getBringAction(String name) {
-
         return Text.builder("/bring " + name)
                 .onClick(TextActions.runCommand("/bring " + name))
                 .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "/bring ", FormatUtil.OBJECT, name)))

@@ -2,7 +2,9 @@ package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportHomeEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
@@ -28,7 +30,7 @@ public class HomeCommand implements CommandExecutor {
         String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         Set<HomeEntity> homes = playerEntity.getHomes();
 
         if (homes.isEmpty()) {
@@ -43,8 +45,8 @@ public class HomeCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
-        Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(player));
-        player.setLocationAndRotationSafely(home.getLocation().getLocation(), home.getLocation().getRotation());
+        Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportHomeEvent(player, home.getLocation().getLocation(), home.getLocation().getRotation()));
         return CommandResult.success();
     }
 

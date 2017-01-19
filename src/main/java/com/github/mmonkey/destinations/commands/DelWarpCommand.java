@@ -2,6 +2,8 @@ package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
+import com.github.mmonkey.destinations.persistence.cache.WarpCache;
 import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
@@ -28,7 +30,7 @@ public class DelWarpCommand implements CommandExecutor {
         String name = (String) args.getOne("name").orElse("");
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         WarpEntity warp = this.searchWarps(playerEntity, name);
 
         if (cancel) {
@@ -39,7 +41,10 @@ public class DelWarpCommand implements CommandExecutor {
         }
 
         if (force && warp != null) {
+            WarpCache.instance.get().remove(warp);
             WarpRepository.instance.remove(warp);
+
+            // TODO: Send confirmation message
             return CommandResult.success();
         }
 

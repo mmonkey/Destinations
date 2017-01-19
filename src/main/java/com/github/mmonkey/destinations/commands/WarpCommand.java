@@ -3,10 +3,11 @@ package com.github.mmonkey.destinations.commands;
 import com.github.mmonkey.destinations.entities.AccessEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
-import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportWarpEvent;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
+import com.github.mmonkey.destinations.persistence.cache.WarpCache;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
-import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -15,8 +16,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-import java.util.List;
 
 public class WarpCommand implements CommandExecutor {
 
@@ -27,9 +26,8 @@ public class WarpCommand implements CommandExecutor {
         }
 
         String name = (String) args.getOne("name").orElse("");
-
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         WarpEntity warp = this.searchWarps(name);
 
         if (warp == null) {
@@ -55,14 +53,13 @@ public class WarpCommand implements CommandExecutor {
             }
         }
 
-        Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(player));
-        player.setLocationAndRotationSafely(warp.getLocation().getLocation(), warp.getLocation().getRotation());
+        Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportWarpEvent(player, warp.getLocation().getLocation(), warp.getLocation().getRotation()));
         return CommandResult.success();
     }
 
     private WarpEntity searchWarps(String name) {
-        List<WarpEntity> warps = WarpRepository.instance.getAllWarps();
-        for (WarpEntity warp : warps) {
+        for (WarpEntity warp : WarpCache.instance.get()) {
             if (warp.getName().equalsIgnoreCase(name)) {
                 return warp;
             }

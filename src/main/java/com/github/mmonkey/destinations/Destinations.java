@@ -6,7 +6,10 @@ import com.github.mmonkey.destinations.commands.elements.WarpCommandElement;
 import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.*;
 import com.github.mmonkey.destinations.listeners.PlayerListeners;
+import com.github.mmonkey.destinations.listeners.TeleportListeners;
 import com.github.mmonkey.destinations.persistence.PersistenceService;
+import com.github.mmonkey.destinations.persistence.cache.WarpCache;
+import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
 import com.google.inject.Inject;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -75,6 +78,9 @@ public class Destinations {
 
         // Setup database
         this.setupDatabase();
+
+        // Load data
+        this.load();
     }
 
     @Listener
@@ -82,6 +88,7 @@ public class Destinations {
 
         // Register Events
         Sponge.getEventManager().registerListeners(this, new PlayerListeners());
+        Sponge.getEventManager().registerListeners(this, new TeleportListeners());
 
         // Register Commands
         this.registerCommands();
@@ -154,6 +161,15 @@ public class Destinations {
             this.getLogger().error(String.format("Please check you database settings in the %s config.", Destinations.NAME));
             Sponge.getServer().shutdown();
         }
+    }
+
+    /**
+     * Load data into cache
+     */
+    private void load() {
+
+        // Load warps into cache
+        WarpCache.instance.get().addAll(WarpRepository.instance.getAllWarps());
     }
 
     /**

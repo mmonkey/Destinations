@@ -1,13 +1,12 @@
 package com.github.mmonkey.destinations.listeners;
 
 import com.github.mmonkey.destinations.configs.DestinationsConfig;
-import com.github.mmonkey.destinations.entities.BackEntity;
 import com.github.mmonkey.destinations.entities.BedEntity;
 import com.github.mmonkey.destinations.entities.LocationEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
-import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
@@ -33,39 +32,19 @@ public class PlayerListeners {
         Optional<Player> optionalPlayer = event.getTargetUser().getPlayer();
         if (optionalPlayer.isPresent()) {
             Player player = optionalPlayer.get();
-            Optional<PlayerEntity> optionalEntity = PlayerRepository.instance.get(player.getIdentifier());
-            if (optionalEntity.isPresent()) {
-                PlayerEntity playerEntity = optionalEntity.get();
-                if (!playerEntity.getName().equals(player.getName())) {
-                    playerEntity.setName(player.getName());
-                    PlayerRepository.instance.save(playerEntity);
-                }
-            } else {
-                PlayerRepository.instance.save(new PlayerEntity(player));
+            PlayerEntity playerEntity = PlayerCache.instance.get(player);
+            if (!playerEntity.getName().equals(player.getName())) {
+                playerEntity.setName(player.getName());
+                playerEntity = PlayerRepository.instance.save(playerEntity);
+                PlayerCache.instance.set(player, playerEntity);
             }
         }
     }
 
     @Listener
-    @IsCancelled(Tristate.FALSE)
-    public void onPlayerBackLocationSaveEvent(PlayerBackLocationSaveEvent event) {
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithBacks(event.getPlayer());
-
-        String worldIdentifier = event.getPlayer().getWorld().getUniqueId().toString();
-        playerEntity.getBacks().forEach(back -> {
-            if (back.getLocation().getWorld().getIdentifier().equals(worldIdentifier)) {
-                playerEntity.getBacks().remove(back);
-            }
-        });
-
-        playerEntity.getBacks().add(new BackEntity(new LocationEntity(event.getPlayer())));
-        PlayerRepository.instance.save(playerEntity);
-    }
-
-    @Listener
     public void onDestructEntityEvent(DestructEntityEvent event, @Root Player player) {
         if (DestinationsConfig.isBackCommandEnabled() && DestinationsConfig.allowBackOnDeath()) {
-            Sponge.getGame().getEventManager().post(new PlayerBackLocationSaveEvent(player));
+            Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
         }
     }
 
@@ -77,7 +56,7 @@ public class PlayerListeners {
         }
 
         Player player = (Player) event.getTargetEntity();
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithBeds(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         BlockSnapshot blockSnapshot = event.getBed();
         Optional<Location<World>> optional = blockSnapshot.getLocation();
         if (!optional.isPresent()) {
@@ -90,14 +69,16 @@ public class PlayerListeners {
                 Location<World> bedLocation = bed.getLocation().getLocation();
                 if (location.getBlockPosition().equals(bedLocation.getBlockPosition())) {
                     bed.setLastUse(new Timestamp(new Date().getTime()));
-                    PlayerRepository.instance.save(playerEntity);
+                    playerEntity = PlayerRepository.instance.save(playerEntity);
+                    PlayerCache.instance.set(player, playerEntity);
                     return;
                 }
             }
         }
 
         playerEntity.getBeds().add(new BedEntity(new LocationEntity(location)));
-        PlayerRepository.instance.save(playerEntity);
+        playerEntity = PlayerRepository.instance.save(playerEntity);
+        PlayerCache.instance.set(player, playerEntity);
     }
 
 }

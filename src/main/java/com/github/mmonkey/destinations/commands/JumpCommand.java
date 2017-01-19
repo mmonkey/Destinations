@@ -1,6 +1,7 @@
 package com.github.mmonkey.destinations.commands;
 
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportJumpEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.utilities.BlockUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -35,8 +36,8 @@ public class JumpCommand implements CommandExecutor {
         }
 
         if (location != null) {
-            Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(player));
-            player.setLocationSafely(location);
+            Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
+            Sponge.getGame().getEventManager().post(new PlayerTeleportJumpEvent(player, location, player.getRotation()));
             return CommandResult.success();
         }
 

@@ -2,9 +2,10 @@ package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.entities.LocationEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
+import com.github.mmonkey.destinations.persistence.cache.WarpCache;
 import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
-import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -12,8 +13,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-import java.util.List;
 
 public class SetWarpCommand implements CommandExecutor {
 
@@ -33,8 +32,9 @@ public class SetWarpCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
-        WarpEntity warp = new WarpEntity(name, false, new LocationEntity(player), PlayerUtil.getPlayerEntity(player));
-        WarpRepository.instance.save(warp);
+        WarpEntity warp = new WarpEntity(name, false, new LocationEntity(player), PlayerCache.instance.get(player));
+        warp = WarpRepository.instance.save(warp);
+        WarpCache.instance.get().add(warp);
 
         player.sendMessage(
                 Text.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully created!")
@@ -46,8 +46,7 @@ public class SetWarpCommand implements CommandExecutor {
     }
 
     private boolean warpExists(String name) {
-        List<WarpEntity> warps = WarpRepository.instance.getAllWarps();
-        for (WarpEntity warp : warps) {
+        for (WarpEntity warp : WarpCache.instance.get()) {
             if (warp.getName().equalsIgnoreCase(name)) {
                 return true;
             }

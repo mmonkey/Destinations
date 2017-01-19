@@ -3,6 +3,7 @@ package com.github.mmonkey.destinations.commands;
 import com.github.mmonkey.destinations.entities.AccessEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
@@ -30,7 +31,7 @@ public class ListWarpsCommand implements CommandExecutor {
         }
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntity(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         Set<WarpEntity> warps = PlayerUtil.getPlayerWarps(playerEntity);
 
         if (warps.size() == 0) {

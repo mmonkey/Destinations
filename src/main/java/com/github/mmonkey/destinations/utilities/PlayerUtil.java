@@ -6,8 +6,9 @@ import com.github.mmonkey.destinations.entities.BedEntity;
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
+import com.github.mmonkey.destinations.persistence.cache.WarpCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
-import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -29,57 +30,6 @@ public class PlayerUtil {
     public static PlayerEntity getPlayerEntity(Player player) {
         Optional<PlayerEntity> optional = PlayerRepository.instance.get(player);
         return optional.orElseGet(() -> PlayerRepository.instance.save(new PlayerEntity(player)));
-    }
-
-    /**
-     * Get the PlayerEntity with BackEntities in storage for this player
-     *
-     * @param player Player
-     * @return PlayerEntity
-     */
-    public static PlayerEntity getPlayerEntityWithBacks(Player player) {
-        Optional<PlayerEntity> optional = PlayerRepository.instance.getWithBacks(player);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            PlayerEntity playerEntity = getPlayerEntity(player);
-            playerEntity.setBacks(new HashSet<>());
-            return PlayerRepository.instance.save(playerEntity);
-        }
-    }
-
-    /**
-     * Get the PlayerEntity with BedEntities in storage for this player
-     *
-     * @param player Player
-     * @return PlayerEntity
-     */
-    public static PlayerEntity getPlayerEntityWithBeds(Player player) {
-        Optional<PlayerEntity> optional = PlayerRepository.instance.getWithBeds(player);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            PlayerEntity playerEntity = getPlayerEntity(player);
-            playerEntity.setBeds(new HashSet<>());
-            return PlayerRepository.instance.save(playerEntity);
-        }
-    }
-
-    /**
-     * Get the PlayerEntity with HomeEntities in storage for this player
-     *
-     * @param player Player
-     * @return PlayerEntity
-     */
-    public static PlayerEntity getPlayerEntityWithHomes(Player player) {
-        Optional<PlayerEntity> optional = PlayerRepository.instance.getWithHomes(player);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            PlayerEntity playerEntity = getPlayerEntity(player);
-            playerEntity.setHomes(new HashSet<>());
-            return PlayerRepository.instance.save(playerEntity);
-        }
     }
 
     /**
@@ -105,7 +55,8 @@ public class PlayerUtil {
                     }
                 } else {
                     playerEntity.getBeds().remove(bed);
-                    PlayerRepository.instance.save(playerEntity);
+                    playerEntity = PlayerRepository.instance.save(playerEntity);
+                    PlayerCache.instance.set(player, playerEntity);
                 }
             }
         }
@@ -115,13 +66,13 @@ public class PlayerUtil {
     /**
      * Get a list of Player's homes from the world that player is currently in
      *
-     * @param player   PlayerEntity
-     * @param location Location
+     * @param playerEntity PlayerEntity
+     * @param location     Location
      * @return Set<HomeEntity>
      */
-    public static Set<HomeEntity> getFilteredHomes(PlayerEntity player, Location location) {
+    public static Set<HomeEntity> getFilteredHomes(PlayerEntity playerEntity, Location location) {
         Set<HomeEntity> filtered = new HashSet<>();
-        player.getHomes().forEach(home -> {
+        playerEntity.getHomes().forEach(home -> {
             if (home.getLocation().getWorld().getIdentifier().equals(location.getExtent().getUniqueId().toString())) {
                 filtered.add(home);
             }
@@ -175,8 +126,7 @@ public class PlayerUtil {
      */
     public static Set<WarpEntity> getPlayerWarps(PlayerEntity playerEntity) {
         Set<WarpEntity> results = new HashSet<>();
-        List<WarpEntity> warps = WarpRepository.instance.getAllWarps();
-        warps.forEach(warp -> {
+        WarpCache.instance.get().forEach(warp -> {
             if (!warp.isPrivate()) {
                 results.add(warp);
             } else if (warp.getOwner().getIdentifier().equals(playerEntity.getIdentifier())) {

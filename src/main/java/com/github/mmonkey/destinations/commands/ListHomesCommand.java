@@ -2,8 +2,8 @@ package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
-import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -29,7 +29,7 @@ public class ListHomesCommand implements CommandExecutor {
         }
 
         Player player = (Player) src;
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithHomes(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
 
         List<Text> list = new CopyOnWriteArrayList<>();
         Set<HomeEntity> homes = playerEntity.getHomes();

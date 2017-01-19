@@ -2,7 +2,9 @@ package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.entities.BedEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
-import com.github.mmonkey.destinations.events.PlayerBackLocationSaveEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportBedEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -30,11 +32,11 @@ public class BedCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        PlayerEntity playerEntity = PlayerUtil.getPlayerEntityWithBeds(player);
+        PlayerEntity playerEntity = PlayerCache.instance.get(player);
         BedEntity bed = PlayerUtil.getBed(playerEntity, player);
         if (bed != null) {
-            Sponge.getEventManager().post(new PlayerBackLocationSaveEvent(player));
-            player.setLocationSafely(bed.getLocation().getLocation());
+            Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
+            Sponge.getGame().getEventManager().post(new PlayerTeleportBedEvent(player, bed.getLocation().getLocation(), player.getRotation()));
             return CommandResult.success();
         }
 

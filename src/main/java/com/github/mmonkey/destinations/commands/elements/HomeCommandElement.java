@@ -1,6 +1,6 @@
 package com.github.mmonkey.destinations.commands.elements;
 
-import com.github.mmonkey.destinations.utilities.PlayerUtil;
+import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
@@ -11,7 +11,6 @@ import org.spongepowered.api.text.Text;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 
 public class HomeCommandElement extends SelectorCommandElement {
 
@@ -31,8 +30,9 @@ public class HomeCommandElement extends SelectorCommandElement {
             return null;
         }
 
+        Player player = (Player) source;
         List<String> list = new CopyOnWriteArrayList<>();
-        PlayerUtil.getPlayerEntityWithHomes((Player) source).getHomes().forEach(home -> list.add(home.getName()));
+        PlayerCache.instance.get(player).getHomes().forEach(home -> list.add(home.getName()));
 
         return list;
     }
