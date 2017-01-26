@@ -6,6 +6,8 @@ import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.interfaces.PlayerTeleportEvent;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
+import org.spongepowered.api.data.manipulator.mutable.entity.SleepingData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -13,6 +15,8 @@ import org.spongepowered.api.event.filter.IsCancelled;
 import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.util.Tristate;
+
+import java.util.Optional;
 
 public class TeleportListeners {
 
@@ -38,6 +42,12 @@ public class TeleportListeners {
     @IsCancelled(Tristate.FALSE)
     @Exclude(PlayerTeleportEvent.Pre.class)
     public void onPlayerTeleportEvent(PlayerTeleportEvent event) {
+        Optional<SleepingData> optional = event.getTargetEntity().get(SleepingData.class);
+        if (optional.isPresent() && optional.get().asImmutable().sleeping().get()) {
+            event.getTargetEntity().sendMessage(MessagesUtil.get(event.getTargetEntity(), "teleport.sleeping"));
+            return;
+        }
+
         if (event.getRotation() == null) {
             event.getTargetEntity().setLocationSafely(event.getLocation());
         } else {

@@ -2,11 +2,10 @@ package com.github.mmonkey.destinations.teleportation;
 
 import com.github.mmonkey.destinations.Destinations;
 import com.github.mmonkey.destinations.configs.DestinationsConfig;
-import com.github.mmonkey.destinations.utilities.FormatUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import com.google.common.base.Preconditions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -101,21 +100,8 @@ public class TeleportationService {
         Optional<Player> optionalCaller = Sponge.getServer().getPlayer(caller.getUniqueId());
         Optional<Player> optionalTarget = Sponge.getServer().getPlayer(target.getUniqueId());
 
-        if (optionalCaller.isPresent()) {
-            Text.Builder message = Text.builder();
-            message.append(Text.of(FormatUtil.WARN, "Your call to "));
-            message.append(Text.of(FormatUtil.OBJECT, target.getName()));
-            message.append(Text.of(FormatUtil.WARN, " has expired."));
-            optionalCaller.get().sendMessage(message.build());
-        }
-
-        if (optionalTarget.isPresent()) {
-            Text.Builder message = Text.builder();
-            message.append(Text.of(FormatUtil.WARN, " The request from "));
-            message.append(Text.of(FormatUtil.OBJECT, caller.getName()));
-            message.append(Text.of(FormatUtil.WARN, " has expired."));
-            optionalTarget.get().sendMessage(message.build());
-        }
+        optionalCaller.ifPresent(player -> player.sendMessage(MessagesUtil.warning(player, "call.request_expire_to", target.getName())));
+        optionalTarget.ifPresent(player -> player.sendMessage(MessagesUtil.warning(player, "call.request_expire_from", caller.getName())));
     }
 
     public void call(Player caller, Player target) {
@@ -125,7 +111,6 @@ public class TeleportationService {
     }
 
     public void removeCall(Player caller, Player target) {
-
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
             if (call.getKey().getCaller().getUniqueId().equals(caller.getUniqueId())
                     && call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
@@ -135,7 +120,6 @@ public class TeleportationService {
     }
 
     public Player getFirstCaller(Player target) {
-
         Player caller = null;
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
             if (call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
@@ -147,7 +131,6 @@ public class TeleportationService {
     }
 
     public int getNumCallers(Player target) {
-
         int callers = 0;
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
             if (call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
@@ -159,9 +142,7 @@ public class TeleportationService {
     }
 
     public List<String> getCalling(Player target) {
-
-        List<String> list = new ArrayList<String>();
-
+        List<String> list = new ArrayList<>();
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
             if (call.getKey().getTarget().getUniqueId().equals(target.getUniqueId())) {
                 list.add(call.getKey().getCaller().getName());

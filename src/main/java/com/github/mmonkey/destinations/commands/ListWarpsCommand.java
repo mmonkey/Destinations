@@ -5,6 +5,7 @@ import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -24,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ListWarpsCommand implements CommandExecutor {
 
+    @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
@@ -35,47 +37,34 @@ public class ListWarpsCommand implements CommandExecutor {
         Set<WarpEntity> warps = PlayerUtil.getPlayerWarps(playerEntity);
 
         if (warps.size() == 0) {
-            player.sendMessage(
-                    Text.of(FormatUtil.ERROR, "No warps have been set.")
-            );
+            player.sendMessage(MessagesUtil.error(player, "warp.empty"));
             return CommandResult.success();
         }
 
         List<Text> list = new CopyOnWriteArrayList<>();
-        warps.forEach(warp -> list.add(Text.of(getWarpAction(warp), getDeleteWarpAction(warp, playerEntity))));
+        warps.forEach(warp -> list.add(Text.of(getWarpAction(player, warp), getDeleteWarpAction(player, warp, playerEntity))));
 
         PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
-        paginationService.builder().title(Text.of("Warps")).contents(list).padding(Text.of("-")).sendTo(player);
+        paginationService.builder().title(MessagesUtil.get(player, "warp.title")).contents(list).padding(Text.of("-")).sendTo(player);
         return CommandResult.success();
     }
 
-    private Text getWarpAction(WarpEntity warp) {
-
-        if (!warp.isPrivate()) {
-            return Text.builder(warp.getName())
-                    .onClick(TextActions.runCommand("/warp " + warp.getName()))
-                    .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
-                    .color(FormatUtil.GENERIC_LINK)
-                    .style(TextStyles.UNDERLINE)
-                    .build();
-
-        } else {
-            return Text.builder(warp.getName() + " (private)")
-                    .onClick(TextActions.runCommand("/warp " + warp.getName()))
-                    .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Teleport to ", FormatUtil.OBJECT, warp.getName())))
-                    .color(FormatUtil.GENERIC_LINK)
-                    .style(TextStyles.UNDERLINE)
-                    .build();
-        }
+    private Text getWarpAction(Player player, WarpEntity warp) {
+        Text.Builder builder = warp.isPrivate() ? Text.builder(warp.getName() + " (private)") : Text.builder(warp.getName());
+        return builder.onClick(TextActions.runCommand("/warp " + warp.getName()))
+                .onHover(TextActions.showText(MessagesUtil.get(player, "warp.teleport", warp.getName())))
+                .color(FormatUtil.GENERIC_LINK)
+                .style(TextStyles.UNDERLINE)
+                .build();
     }
 
-    private Text getDeleteWarpAction(WarpEntity warp, PlayerEntity player) {
+    private Text getDeleteWarpAction(Player player, WarpEntity warp, PlayerEntity playerEntity) {
         boolean canAdministrate = false;
-        if (warp.getOwner().getIdentifier().equals(player.getIdentifier())) {
+        if (warp.getOwner().getIdentifier().equals(playerEntity.getIdentifier())) {
             canAdministrate = true;
         } else {
             for (AccessEntity access : warp.getAccess()) {
-                if (access.getPlayer().getIdentifier().equals(player.getIdentifier()) && access.isCanAdministrate()) {
+                if (access.getPlayer().getIdentifier().equals(playerEntity.getIdentifier()) && access.isCanAdministrate()) {
                     canAdministrate = true;
                 }
             }
@@ -86,14 +75,15 @@ public class ListWarpsCommand implements CommandExecutor {
             deleteAction.append(Text.of(" - "));
             deleteAction.append(Text.builder("delete")
                     .onClick(TextActions.runCommand("/delwarp " + warp.getName()))
-                    .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Delete warp ", FormatUtil.OBJECT, warp.getName())))
+                    .onHover(TextActions.showText(MessagesUtil.get(player, "warp.delete_confirm_yes", warp.getName())))
                     .color(FormatUtil.DELETE)
                     .style(TextStyles.UNDERLINE)
                     .build());
 
             return deleteAction.build();
         }
-        return Text.of("");
+
+        return Text.EMPTY;
     }
 
 }

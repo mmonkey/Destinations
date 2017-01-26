@@ -5,6 +5,7 @@ import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.PlayerTeleportBackEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -37,6 +38,7 @@ public class BackCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
+        player.sendMessage(MessagesUtil.error(player, "back.error"));
         return CommandResult.empty();
     }
 

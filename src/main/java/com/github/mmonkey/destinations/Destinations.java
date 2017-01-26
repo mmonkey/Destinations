@@ -8,7 +8,9 @@ import com.github.mmonkey.destinations.entities.*;
 import com.github.mmonkey.destinations.listeners.PlayerListeners;
 import com.github.mmonkey.destinations.listeners.TeleportListeners;
 import com.github.mmonkey.destinations.persistence.PersistenceService;
+import com.github.mmonkey.destinations.persistence.cache.SpawnCache;
 import com.github.mmonkey.destinations.persistence.cache.WarpCache;
+import com.github.mmonkey.destinations.persistence.repositories.SpawnRepository;
 import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
 import com.google.inject.Inject;
 import org.hibernate.cfg.Configuration;
@@ -146,6 +148,7 @@ public class Destinations {
         configuration.addAnnotatedClass(HomeEntity.class);
         configuration.addAnnotatedClass(LocationEntity.class);
         configuration.addAnnotatedClass(PlayerEntity.class);
+        configuration.addAnnotatedClass(SpawnEntity.class);
         configuration.addAnnotatedClass(WarpEntity.class);
         configuration.addAnnotatedClass(WorldEntity.class);
 
@@ -168,6 +171,9 @@ public class Destinations {
      */
     private void load() {
 
+        // Load spawns into cache
+        SpawnCache.instance.get().addAll(SpawnRepository.instance.getAllSpawns());
+
         // Load warps into cache
         WarpCache.instance.get().addAll(WarpRepository.instance.getAllWarps());
     }
@@ -179,6 +185,15 @@ public class Destinations {
 
         CommandManager commandManager = Sponge.getCommandManager();
 
+        // /bed
+        CommandSpec bedCommand = CommandSpec.builder()
+                .permission("destinations.bed")
+                .description(Text.of("/bed"))
+                .extendedDescription(Text.of("Teleports the player to the last bed they used."))
+                .executor(new BedCommand())
+                .build();
+        commandManager.register(this, bedCommand, "bed");
+
         // /jump
         CommandSpec jumpCommand = CommandSpec.builder()
                 .permission("destinations.jump")
@@ -188,6 +203,24 @@ public class Destinations {
                 .build();
         commandManager.register(this, jumpCommand, "jump", "j");
 
+        // /spawn
+        CommandSpec spawnCommand = CommandSpec.builder()
+                .permission("destinations.spawn.use")
+                .description(Text.of("/spawn"))
+                .extendedDescription(Text.of("Teleports the player to their current world's spawn location."))
+                .executor(new SpawnCommand())
+                .build();
+        commandManager.register(this, spawnCommand, "spawn");
+
+        // /setspawn
+        CommandSpec setSpawnCommand = CommandSpec.builder()
+                .permission("destinations.spawn.create")
+                .description(Text.of("/setspawn"))
+                .extendedDescription(Text.of("Set this worlds spawn location."))
+                .executor(new SetSpawnCommand())
+                .build();
+        commandManager.register(this, setSpawnCommand, "setspawn");
+
         // /top
         CommandSpec topCommand = CommandSpec.builder()
                 .permission("destinations.top")
@@ -196,15 +229,6 @@ public class Destinations {
                 .executor(new TopCommand())
                 .build();
         commandManager.register(this, topCommand, "top");
-
-        // /bed
-        CommandSpec bedCommand = CommandSpec.builder()
-                .permission("destinations.bed")
-                .description(Text.of("/bed"))
-                .extendedDescription(Text.of("Teleports the player to the last bed they used."))
-                .executor(new BedCommand())
-                .build();
-        commandManager.register(this, bedCommand, "bed");
 
         // Register Back Command
         if (DestinationsConfig.isBackCommandEnabled()) {
@@ -224,24 +248,13 @@ public class Destinations {
 
             // /home [name]
             CommandSpec homeCommand = CommandSpec.builder()
-                    .permission("destinations.home")
+                    .permission("destinations.home.use")
                     .description(Text.of("/home [name]"))
                     .extendedDescription(Text.of("Teleport to the nearest home or to the named home."))
                     .executor(new HomeCommand())
                     .arguments(GenericArguments.optional(new HomeCommandElement(Text.of("name"))))
                     .build();
             commandManager.register(this, homeCommand, "home", "h");
-
-            // /sethome [-f] [name]
-            CommandSpec setHomeCommand = CommandSpec.builder()
-                    .permission("destinations.home")
-                    .description(Text.of("/sethome [-f force] [name]"))
-                    .extendedDescription(Text.of("Set this location as a home."))
-                    .executor(new SetHomeCommand())
-                    .arguments(GenericArguments.flags().flag("f").buildWith(
-                            GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("name")))
-                    )).build();
-            commandManager.register(this, setHomeCommand, "sethome");
 
             // /homes
             CommandSpec listHomesCommand = CommandSpec.builder()
@@ -252,9 +265,20 @@ public class Destinations {
                     .build();
             commandManager.register(this, listHomesCommand, "homes", "listhomes");
 
+            // /sethome [-f] [name]
+            CommandSpec setHomeCommand = CommandSpec.builder()
+                    .permission("destinations.home.create")
+                    .description(Text.of("/sethome [-f force] [name]"))
+                    .extendedDescription(Text.of("Set this location as a home."))
+                    .executor(new SetHomeCommand())
+                    .arguments(GenericArguments.flags().flag("f").buildWith(
+                            GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("name")))
+                    )).build();
+            commandManager.register(this, setHomeCommand, "sethome");
+
             // /delhome [-f] [-c] <name>
             CommandSpec delHomeCommand = CommandSpec.builder()
-                    .permission("destinations.home")
+                    .permission("destinations.home.remove")
                     .description(Text.of("/delhome [-c cancel] [-f force] <name>"))
                     .extendedDescription(Text.of("Delete a home by name."))
                     .executor(new DelHomeCommand())
@@ -297,7 +321,7 @@ public class Destinations {
 
             // /delwarp [-f] [-c] <name>
             CommandSpec delWarpCommand = CommandSpec.builder()
-                    .permission("destinations.warp.create")
+                    .permission("destinations.warp.remove")
                     .description(Text.of("Delete a warp"))
                     .extendedDescription(Text.of("Delete a warp by name."))
                     .executor(new DelWarpCommand())

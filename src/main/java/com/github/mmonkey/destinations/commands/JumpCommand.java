@@ -3,6 +3,7 @@ package com.github.mmonkey.destinations.commands;
 import com.github.mmonkey.destinations.events.PlayerTeleportJumpEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.utilities.BlockUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -25,7 +26,7 @@ public class JumpCommand implements CommandExecutor {
         }
 
         Player player = (Player) src;
-        BlockRay<World> blockRay = BlockRay.from(player).skipFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1)).build();
+        BlockRay<World> blockRay = BlockRay.from(player).skipFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 5)).build();
         Location<World> location = null;
 
         while (blockRay.hasNext() && location == null) {
@@ -41,6 +42,7 @@ public class JumpCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
+        player.sendMessage(MessagesUtil.error(player, "jump.error"));
         return CommandResult.empty();
     }
 

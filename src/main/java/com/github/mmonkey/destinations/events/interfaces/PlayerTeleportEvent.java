@@ -60,6 +60,12 @@ public interface PlayerTeleportEvent extends TargetPlayerEvent, Cancellable {
     }
 
     /**
+     * Called when a player is teleported to a spawn location.
+     */
+    interface Spawn extends PlayerTeleportEvent {
+    }
+
+    /**
      * Called when a player is teleported to a top location.
      */
     interface Top extends PlayerTeleportEvent {

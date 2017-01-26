@@ -6,6 +6,7 @@ import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.cache.WarpCache;
 import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -19,6 +20,7 @@ import org.spongepowered.api.text.format.TextStyles;
 
 public class DelWarpCommand implements CommandExecutor {
 
+    @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
@@ -34,9 +36,7 @@ public class DelWarpCommand implements CommandExecutor {
         WarpEntity warp = this.searchWarps(playerEntity, name);
 
         if (cancel) {
-            player.sendMessage(
-                    Text.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.")
-            );
+            player.sendMessage(MessagesUtil.success(player, "warp.delete_cancel", name));
             return CommandResult.success();
         }
 
@@ -44,30 +44,25 @@ public class DelWarpCommand implements CommandExecutor {
             WarpCache.instance.get().remove(warp);
             WarpRepository.instance.remove(warp);
 
-            // TODO: Send confirmation message
+            player.sendMessage(MessagesUtil.success(player, "warp.delete", name));
             return CommandResult.success();
         }
 
         if (warp != null) {
             player.sendMessage(
                     Text.of(Text.NEW_LINE).toBuilder()
-                            .append(Text.of(FormatUtil.DIALOG, "Are you sure you want to delete warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.DIALOG,
-                                    "?  "))
-                            .append(getDeleteWarpConfirmationAction(name))
                             .append(Text.of("  "))
-                            .append(getDeleteWarpCancelAction(name))
-                            .append(Text.NEW_LINE)
+                            .append(Text.of(MessagesUtil.get(player, "warp.delete_confirm", name)))
+                            .append(getDeleteWarpConfirmationAction(player, name))
+                            .append(Text.of("  "))
+                            .append(getDeleteWarpCancelAction(player, name))
                             .build()
-            );
-            return CommandResult.success();
-        } else {
-            player.sendMessage(
-                    Text.of(FormatUtil.ERROR, "Warp ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist, or you don't have permissions to " +
-                            "delete it.")
             );
             return CommandResult.success();
         }
 
+        player.sendMessage(MessagesUtil.error(player, "warp.does_not_exist", name));
+        return CommandResult.success();
     }
 
     private WarpEntity searchWarps(PlayerEntity playerEntity, String name) {
@@ -79,19 +74,19 @@ public class DelWarpCommand implements CommandExecutor {
         return null;
     }
 
-    private Text getDeleteWarpConfirmationAction(String name) {
+    private Text getDeleteWarpConfirmationAction(Player player, String name) {
         return Text.builder("Yes")
                 .onClick(TextActions.runCommand("/delwarp -f " + name))
-                .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Delete warp ", FormatUtil.OBJECT, name)))
+                .onHover(TextActions.showText(MessagesUtil.get(player, "warp.delete_confirm_yes", name)))
                 .color(FormatUtil.CONFIRM)
                 .style(TextStyles.UNDERLINE)
                 .build();
     }
 
-    private Text getDeleteWarpCancelAction(String name) {
+    private Text getDeleteWarpCancelAction(Player player, String name) {
         return Text.builder("No")
                 .onClick(TextActions.runCommand("/delwarp -c " + name))
-                .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Do not delete warp ", FormatUtil.OBJECT, name)))
+                .onHover(TextActions.showText(MessagesUtil.get(player, "warp.delete_confirm_no", name)))
                 .color(FormatUtil.CANCEL)
                 .style(TextStyles.UNDERLINE)
                 .build();

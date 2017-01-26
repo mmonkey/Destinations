@@ -5,17 +5,17 @@ import com.github.mmonkey.destinations.entities.WarpEntity;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.cache.WarpCache;
 import com.github.mmonkey.destinations.persistence.repositories.WarpRepository;
-import com.github.mmonkey.destinations.utilities.FormatUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
 
 public class SetWarpCommand implements CommandExecutor {
 
+    @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
@@ -26,9 +26,7 @@ public class SetWarpCommand implements CommandExecutor {
         Player player = (Player) src;
 
         if (warpExists(name)) {
-            player.sendMessage(
-                    Text.of(FormatUtil.ERROR, "Warp ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists and cannot be added.")
-            );
+            player.sendMessage(MessagesUtil.error(player, "warp.exist", name));
             return CommandResult.success();
         }
 
@@ -36,10 +34,7 @@ public class SetWarpCommand implements CommandExecutor {
         warp = WarpRepository.instance.save(warp);
         WarpCache.instance.get().add(warp);
 
-        player.sendMessage(
-                Text.of(FormatUtil.SUCCESS, "Warp ", FormatUtil.OBJECT, warp.getName(), FormatUtil.SUCCESS, " was successfully created!")
-        );
-
+        player.sendMessage(MessagesUtil.success(player, "warp.create", name));
         // TODO: add private flag
 
         return CommandResult.success();

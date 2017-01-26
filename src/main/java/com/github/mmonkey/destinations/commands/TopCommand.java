@@ -1,9 +1,10 @@
 package com.github.mmonkey.destinations.commands;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.github.mmonkey.destinations.events.PlayerTeleportTopEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
+import com.github.mmonkey.destinations.events.PlayerTeleportTopEvent;
 import com.github.mmonkey.destinations.utilities.BlockUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -30,7 +31,7 @@ public class TopCommand implements CommandExecutor {
         Vector3d start = new Vector3d(player.getLocation().getPosition().getX(), 256, player.getLocation().getPosition().getZ());
         Vector3d end = new Vector3d(player.getLocation().getPosition().getX(), 0, player.getLocation().getPosition().getZ());
         BlockRay<World> blockRay = BlockRay.from(player.getWorld(), start).to(end)
-                .skipFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1)).build();
+                .skipFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 5)).build();
 
         while (blockRay.hasNext() && location == null) {
             BlockRayHit<World> hit = blockRay.next();
@@ -45,6 +46,7 @@ public class TopCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
+        player.sendMessage(MessagesUtil.error(player, "top.error"));
         return CommandResult.empty();
     }
 

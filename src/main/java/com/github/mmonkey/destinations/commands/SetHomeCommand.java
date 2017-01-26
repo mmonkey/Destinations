@@ -5,7 +5,7 @@ import com.github.mmonkey.destinations.entities.LocationEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
-import com.github.mmonkey.destinations.utilities.FormatUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -13,13 +13,13 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class SetHomeCommand implements CommandExecutor {
 
+    @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
@@ -41,16 +41,13 @@ public class SetHomeCommand implements CommandExecutor {
             playerEntity.getHomes().add(home);
             playerEntity = PlayerRepository.instance.save(playerEntity);
             PlayerCache.instance.set(player, playerEntity);
-            player.sendMessage(
-                    Text.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, home.getName(), FormatUtil.SUCCESS, " has been updated to this location")
-            );
+
+            player.sendMessage(MessagesUtil.success(player, "home.update", home.getName()));
             return CommandResult.success();
         }
 
         if (home != null) {
-            player.sendMessage(
-                    Text.of(FormatUtil.ERROR, "Home ", FormatUtil.OBJECT, name, FormatUtil.ERROR, " already exists!")
-            );
+            player.sendMessage(MessagesUtil.error(player, "home.exist", home.getName()));
             return CommandResult.success();
         }
 
@@ -59,9 +56,7 @@ public class SetHomeCommand implements CommandExecutor {
         playerEntity = PlayerRepository.instance.save(playerEntity);
         PlayerCache.instance.set(player, playerEntity);
 
-        player.sendMessage(
-                Text.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was successfully created!")
-        );
+        player.sendMessage(MessagesUtil.success(player, "home.create", name));
         return CommandResult.success();
     }
 

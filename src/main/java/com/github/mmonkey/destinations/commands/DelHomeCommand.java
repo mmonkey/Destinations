@@ -5,6 +5,7 @@ import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
 import com.github.mmonkey.destinations.utilities.FormatUtil;
+import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -17,6 +18,7 @@ import org.spongepowered.api.text.format.TextStyles;
 
 public class DelHomeCommand implements CommandExecutor {
 
+    @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
@@ -32,9 +34,7 @@ public class DelHomeCommand implements CommandExecutor {
         HomeEntity home = getPlayerHomeByName(playerEntity, name);
 
         if (cancel) {
-            player.sendMessage(
-                    Text.of(FormatUtil.SUCCESS, "Home ", FormatUtil.OBJECT, name, FormatUtil.SUCCESS, " was not deleted.")
-            );
+            player.sendMessage(MessagesUtil.success(player, "home.delete_cancel", name));
             return CommandResult.success();
         }
 
@@ -42,60 +42,45 @@ public class DelHomeCommand implements CommandExecutor {
             playerEntity.getHomes().remove(home);
             playerEntity = PlayerRepository.instance.save(playerEntity);
             PlayerCache.instance.set(player, playerEntity);
-            player.sendMessage(
-                    Text.of(FormatUtil.empty(), FormatUtil.SUCCESS, "Home ", FormatUtil.DELETED_OBJECT, home.getName(), FormatUtil.SUCCESS, " was " +
-                            "successfully deleted!")
-            );
+
+            player.sendMessage(MessagesUtil.success(player, "home.delete", home.getName()));
             return CommandResult.success();
         }
 
         if (home != null) {
-
             player.sendMessage(
                     Text.builder()
-                            .append(Text.NEW_LINE)
-                            .append(Text.of(FormatUtil.DIALOG, "Are you sure you want to delete home ", FormatUtil.OBJECT, name, FormatUtil.DIALOG, "?  "))
-                            .append(getDeleteHomeConfirmationAction(name))
                             .append(Text.of("  "))
-                            .append(getDeleteHomeCancelAction(name))
-                            .append(Text.NEW_LINE)
+                            .append(MessagesUtil.warning(player, "home.delete_confirm", home.getName()))
+                            .append(getDeleteHomeConfirmationAction(player, home.getName()))
+                            .append(Text.of("  "))
+                            .append(getDeleteHomeCancelAction(player, home.getName()))
                             .build()
             );
-
             return CommandResult.success();
-
-        } else {
-
-            player.sendMessage(
-                    Text.of(FormatUtil.ERROR, "Home ", FormatUtil.DELETED_OBJECT, name, FormatUtil.ERROR, " doesn't exist.")
-            );
-
-            return CommandResult.success();
-
         }
+
+        player.sendMessage(MessagesUtil.error(player, "home.does_not_exist", name));
+        return CommandResult.success();
 
     }
 
-    private Text getDeleteHomeConfirmationAction(String name) {
-
+    private Text getDeleteHomeConfirmationAction(Player player, String name) {
         return Text.builder("Yes")
                 .onClick(TextActions.runCommand("/delhome -f " + name))
-                .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Delete home ", FormatUtil.OBJECT, name)))
+                .onHover(TextActions.showText(MessagesUtil.get(player, "home.delete_confirm_yes", name)))
                 .color(FormatUtil.CONFIRM)
                 .style(TextStyles.UNDERLINE)
                 .build();
-
     }
 
-    private Text getDeleteHomeCancelAction(String name) {
-
+    private Text getDeleteHomeCancelAction(Player player, String name) {
         return Text.builder("No")
                 .onClick(TextActions.runCommand("/delhome -c " + name))
-                .onHover(TextActions.showText(Text.of(FormatUtil.DIALOG, "Do not delete home ", FormatUtil.OBJECT, name)))
+                .onHover(TextActions.showText(MessagesUtil.get(player, "home.delete_confirm_no", name)))
                 .color(FormatUtil.CANCEL)
                 .style(TextStyles.UNDERLINE)
                 .build();
-
     }
 
     private HomeEntity getPlayerHomeByName(PlayerEntity player, String name) {
