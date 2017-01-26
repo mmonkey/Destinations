@@ -44,7 +44,7 @@ public class TeleportListeners {
     public void onPlayerTeleportEvent(PlayerTeleportEvent event) {
         Optional<SleepingData> optional = event.getTargetEntity().get(SleepingData.class);
         if (optional.isPresent() && optional.get().asImmutable().sleeping().get()) {
-            event.getTargetEntity().sendMessage(MessagesUtil.get(event.getTargetEntity(), "teleport.sleeping"));
+            event.getTargetEntity().sendMessage(MessagesUtil.get(event.getTargetEntity(), "teleport.sleep"));
             return;
         }
 
