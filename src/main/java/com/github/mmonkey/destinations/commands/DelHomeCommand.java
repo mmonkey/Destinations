@@ -10,13 +10,32 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
 
 public class DelHomeCommand implements CommandExecutor {
+
+    public static final String[] ALIASES = {"delhome", "removehome"};
+
+    /**
+     * Get the Command Specifications for this command
+     *
+     * @return CommandSpec
+     */
+    public static CommandSpec getCommandSpec() {
+        return CommandSpec.builder()
+                .permission("destinations.home.remove")
+                .description(Text.of("/delhome [-c cancel] [-f force] <name>"))
+                .extendedDescription(Text.of("Delete a home by name."))
+                .executor(new DelHomeCommand())
+                .arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Text.of("name"))))
+                .build();
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

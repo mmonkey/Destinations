@@ -25,7 +25,7 @@ public class TeleportationService {
      * TeleportationService constructor
      */
     private TeleportationService() {
-        expires = DestinationsConfig.getInstance().get().getNode(DestinationsConfig.TELEPORT_SETTINGS, "expires").getInt(30);
+        expires = DestinationsConfig.getTeleportRequestExpiration();
         this.startCleanupTask();
     }
 

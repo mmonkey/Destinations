@@ -49,7 +49,7 @@ public class PlayerListeners {
 
     @Listener
     public void onDestructEntityEvent(DestructEntityEvent event, @Root Player player) {
-        if (DestinationsConfig.isBackCommandEnabled() && DestinationsConfig.allowBackOnDeath()) {
+        if (DestinationsConfig.allowBackOnDeath()) {
             Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
         }
     }

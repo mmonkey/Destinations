@@ -10,7 +10,9 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
@@ -21,6 +23,23 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BringCommand implements CommandExecutor {
+
+    public static final String[] ALIASES = {"bring", "tpaccept", "tpyes"};
+
+    /**
+     * Get the Command Specifications for this command
+     *
+     * @return CommandSpec
+     */
+    public static CommandSpec getCommandSpec() {
+        return CommandSpec.builder()
+                .permission("destinations.tpa")
+                .description(Text.of("/bring [player] or /tpaccept [player] or /tpyes [player]"))
+                .extendedDescription(Text.of("Teleports a player that has issued a call request to your current location."))
+                .executor(new BringCommand())
+                .arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Text.of("player")))))
+                .build();
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

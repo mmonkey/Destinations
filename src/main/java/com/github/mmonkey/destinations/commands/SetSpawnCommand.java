@@ -9,9 +9,27 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
 public class SetSpawnCommand implements CommandExecutor {
+
+    public static final String[] ALIASES = {"setspawn"};
+
+    /**
+     * Get the Command Specifications for this command
+     *
+     * @return CommandSpec
+     */
+    public static CommandSpec getCommandSpec() {
+        return CommandSpec.builder()
+                .permission("destinations.spawn.create")
+                .description(Text.of("/setspawn"))
+                .extendedDescription(Text.of("Set this worlds spawn location."))
+                .executor(new SetSpawnCommand())
+                .build();
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

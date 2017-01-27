@@ -1,5 +1,6 @@
 package com.github.mmonkey.destinations.commands;
 
+import com.github.mmonkey.destinations.commands.elements.WarpCommandElement;
 import com.github.mmonkey.destinations.entities.AccessEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
@@ -14,9 +15,28 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
 public class WarpCommand implements CommandExecutor {
+
+    public static final String[] ALIASES = {"warp", "w"};
+
+    /**
+     * Get the Command Specifications for this command
+     *
+     * @return CommandSpec
+     */
+    public static CommandSpec getCommandSpec() {
+        return CommandSpec.builder()
+                .permission("destinations.warp.use")
+                .description(Text.of("/warp <name>"))
+                .extendedDescription(Text.of("Teleport to the warp of the provided name."))
+                .executor(new WarpCommand())
+                .arguments(new WarpCommandElement(Text.of("name")))
+                .build();
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

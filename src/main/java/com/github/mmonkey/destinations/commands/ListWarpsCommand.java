@@ -13,6 +13,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
@@ -24,6 +25,22 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ListWarpsCommand implements CommandExecutor {
+
+    public static final String[] ALIASES = {"warps", "listwarps"};
+
+    /**
+     * Get the Command Specifications for this command
+     *
+     * @return CommandSpec
+     */
+    public static CommandSpec getCommandSpec() {
+        return CommandSpec.builder()
+                .permission("destionations.warp.use")
+                .description(Text.of("/warps or /listwarps"))
+                .extendedDescription(Text.of("Displays a list of your warps."))
+                .executor(new ListWarpsCommand())
+                .build();
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

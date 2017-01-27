@@ -1,8 +1,6 @@
 package com.github.mmonkey.destinations;
 
 import com.github.mmonkey.destinations.commands.*;
-import com.github.mmonkey.destinations.commands.elements.HomeCommandElement;
-import com.github.mmonkey.destinations.commands.elements.WarpCommandElement;
 import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.*;
 import com.github.mmonkey.destinations.listeners.PlayerListeners;
@@ -18,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
@@ -27,7 +23,6 @@ import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +39,7 @@ public class Destinations {
 
     private DestinationsConfig config;
     private PersistenceService persistenceService;
+    private boolean loaded = false;
 
     @Inject
     private Logger logger;
@@ -76,24 +72,20 @@ public class Destinations {
         getLogger().info(String.format("Starting up %s v%s.", Destinations.NAME, Destinations.VERSION));
 
         // Load configs
-        this.setupConfigs();
-
-        // Setup database
-        this.setupDatabase();
-
-        // Load data
-        this.load();
+        if (this.setupConfigs() && this.setupDatabase()) {
+            this.load();
+            this.getLogger().info(String.format("%s loaded successfully.", Destinations.NAME));
+        } else {
+            this.getLogger().error(String.format("%s has failed to load.", Destinations.NAME));
+        }
     }
 
     @Listener
     public void onGameInitializationEvent(GameInitializationEvent event) {
-
-        // Register Events
-        Sponge.getEventManager().registerListeners(this, new PlayerListeners());
-        Sponge.getEventManager().registerListeners(this, new TeleportListeners());
-
-        // Register Commands
-        this.registerCommands();
+        if (this.loaded) {
+            this.registerListeners();
+            this.registerCommands();
+        }
     }
 
     @Listener
@@ -104,13 +96,16 @@ public class Destinations {
             this.persistenceService.getSessionFactory().close();
         }
 
-        // Reload configs
-        this.setupConfigs();
-
-        // Reload database
-        this.setupDatabase();
-
-        this.getLogger().info(String.format("%s was reloaded", Destinations.NAME));
+        if (this.setupConfigs() && this.setupDatabase()) {
+            if (!this.loaded) {
+                this.load();
+                this.registerListeners();
+                this.registerCommands();
+            }
+            this.getLogger().info(String.format("%s was reloaded.", Destinations.NAME));
+        } else {
+            this.getLogger().error(String.format("There was an error reloading %s.", Destinations.NAME));
+        }
     }
 
     @Listener
@@ -123,24 +118,27 @@ public class Destinations {
     /**
      * Setup the configs
      */
-    private void setupConfigs() {
+    private boolean setupConfigs() {
 
         if (!this.configDir.isDirectory() && !this.configDir.mkdirs()) {
             this.getLogger().error(String.format("Unable to create %s config directory, please check file permissions.", Destinations.NAME));
-            Sponge.getServer().shutdown();
+            return false;
         }
 
         try {
             this.config = new DestinationsConfig(this.configDir, "destinations.conf");
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
     /**
      * Setup the database
      */
-    private void setupDatabase() {
+    private boolean setupDatabase() {
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(AccessEntity.class);
         configuration.addAnnotatedClass(BackEntity.class);
@@ -160,9 +158,10 @@ public class Destinations {
 
         try {
             this.persistenceService = new PersistenceService(configuration, type, url, database, username, password);
+            return true;
         } catch (Exception e) {
             this.getLogger().error(String.format("Please check you database settings in the %s config.", Destinations.NAME));
-            Sponge.getServer().shutdown();
+            return false;
         }
     }
 
@@ -176,193 +175,50 @@ public class Destinations {
 
         // Load warps into cache
         WarpCache.instance.get().addAll(WarpRepository.instance.getAllWarps());
+
+        this.loaded = true;
+    }
+
+    /**
+     * Register event listeners
+     */
+    private void registerListeners() {
+        Sponge.getEventManager().registerListeners(this, new PlayerListeners());
+        Sponge.getEventManager().registerListeners(this, new TeleportListeners());
     }
 
     /**
      * Register commands
      */
     private void registerCommands() {
-
         CommandManager commandManager = Sponge.getCommandManager();
 
-        // /bed
-        CommandSpec bedCommand = CommandSpec.builder()
-                .permission("destinations.bed")
-                .description(Text.of("/bed"))
-                .extendedDescription(Text.of("Teleports the player to the last bed they used."))
-                .executor(new BedCommand())
-                .build();
-        commandManager.register(this, bedCommand, "bed");
+        // General Commands
+        commandManager.register(this, BackCommand.getCommandSpec(), BackCommand.ALIASES);
+        commandManager.register(this, BedCommand.getCommandSpec(), BedCommand.ALIASES);
+        commandManager.register(this, JumpCommand.getCommandSpec(), JumpCommand.ALIASES);
+        commandManager.register(this, TopCommand.getCommandSpec(), TopCommand.ALIASES);
 
-        // /jump
-        CommandSpec jumpCommand = CommandSpec.builder()
-                .permission("destinations.jump")
-                .description(Text.of("/jump"))
-                .extendedDescription(Text.of("Teleports the player where they are looking."))
-                .executor(new JumpCommand())
-                .build();
-        commandManager.register(this, jumpCommand, "jump", "j");
+        // Home Commands
+        commandManager.register(this, DelHomeCommand.getCommandSpec(), DelHomeCommand.ALIASES);
+        commandManager.register(this, HomeCommand.getCommandSpec(), HomeCommand.ALIASES);
+        commandManager.register(this, ListHomesCommand.getCommandSpec(), ListHomesCommand.ALIASES);
+        commandManager.register(this, SetHomeCommand.getCommandSpec(), SetHomeCommand.ALIASES);
 
-        // /spawn
-        CommandSpec spawnCommand = CommandSpec.builder()
-                .permission("destinations.spawn.use")
-                .description(Text.of("/spawn"))
-                .extendedDescription(Text.of("Teleports the player to their current world's spawn location."))
-                .executor(new SpawnCommand())
-                .build();
-        commandManager.register(this, spawnCommand, "spawn");
+        // Spawn Commands
+        commandManager.register(this, SetSpawnCommand.getCommandSpec(), SetSpawnCommand.ALIASES);
+        commandManager.register(this, SpawnCommand.getCommandSpec(), SpawnCommand.ALIASES);
 
-        // /setspawn
-        CommandSpec setSpawnCommand = CommandSpec.builder()
-                .permission("destinations.spawn.create")
-                .description(Text.of("/setspawn"))
-                .extendedDescription(Text.of("Set this worlds spawn location."))
-                .executor(new SetSpawnCommand())
-                .build();
-        commandManager.register(this, setSpawnCommand, "setspawn");
+        // Teleport Commands
+        commandManager.register(this, BringCommand.getCommandSpec(), BringCommand.ALIASES);
+        commandManager.register(this, CallCommand.getCommandSpec(), CallCommand.ALIASES);
+        commandManager.register(this, GrabCommand.getCommandSpec(), GrabCommand.ALIASES);
 
-        // /top
-        CommandSpec topCommand = CommandSpec.builder()
-                .permission("destinations.top")
-                .description(Text.of("/top"))
-                .extendedDescription(Text.of("Teleports the player to the highest block at current location."))
-                .executor(new TopCommand())
-                .build();
-        commandManager.register(this, topCommand, "top");
-
-        // Register Back Command
-        if (DestinationsConfig.isBackCommandEnabled()) {
-
-            // /back
-            CommandSpec backCommand = CommandSpec.builder()
-                    .permission("destinations.back")
-                    .description(Text.of("/back"))
-                    .extendedDescription(Text.of("Returns you to your last position from a prior teleport."))
-                    .executor(new BackCommand())
-                    .build();
-            commandManager.register(this, backCommand, "back", "b");
-        }
-
-        // Register Home Commands
-        if (DestinationsConfig.isHomeCommandEnabled()) {
-
-            // /home [name]
-            CommandSpec homeCommand = CommandSpec.builder()
-                    .permission("destinations.home.use")
-                    .description(Text.of("/home [name]"))
-                    .extendedDescription(Text.of("Teleport to the nearest home or to the named home."))
-                    .executor(new HomeCommand())
-                    .arguments(GenericArguments.optional(new HomeCommandElement(Text.of("name"))))
-                    .build();
-            commandManager.register(this, homeCommand, "home", "h");
-
-            // /homes
-            CommandSpec listHomesCommand = CommandSpec.builder()
-                    .permission("destinations.home")
-                    .description(Text.of("/homes or /listhomes"))
-                    .extendedDescription(Text.of("Displays a list of your homes."))
-                    .executor(new ListHomesCommand())
-                    .build();
-            commandManager.register(this, listHomesCommand, "homes", "listhomes");
-
-            // /sethome [-f] [name]
-            CommandSpec setHomeCommand = CommandSpec.builder()
-                    .permission("destinations.home.create")
-                    .description(Text.of("/sethome [-f force] [name]"))
-                    .extendedDescription(Text.of("Set this location as a home."))
-                    .executor(new SetHomeCommand())
-                    .arguments(GenericArguments.flags().flag("f").buildWith(
-                            GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("name")))
-                    )).build();
-            commandManager.register(this, setHomeCommand, "sethome");
-
-            // /delhome [-f] [-c] <name>
-            CommandSpec delHomeCommand = CommandSpec.builder()
-                    .permission("destinations.home.remove")
-                    .description(Text.of("/delhome [-c cancel] [-f force] <name>"))
-                    .extendedDescription(Text.of("Delete a home by name."))
-                    .executor(new DelHomeCommand())
-                    .arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Text.of("name"))))
-                    .build();
-            commandManager.register(this, delHomeCommand, "delhome");
-        }
-
-        // Register Warp Commands
-        if (DestinationsConfig.isWarpCommandEnabled()) {
-
-            // /warp <name>
-            CommandSpec warpCommand = CommandSpec.builder()
-                    .permission("destinations.warp.use")
-                    .description(Text.of("/warp <name>"))
-                    .extendedDescription(Text.of("Teleport to the warp of the provided name."))
-                    .executor(new WarpCommand())
-                    .arguments(new WarpCommandElement(Text.of("name")))
-                    .build();
-            commandManager.register(this, warpCommand, "warp", "w");
-
-            // /warps
-            CommandSpec listWarpsCommand = CommandSpec.builder()
-                    .permission("destionations.warp.use")
-                    .description(Text.of("/warps or /listwarps"))
-                    .extendedDescription(Text.of("Displays a list of your warps."))
-                    .executor(new ListWarpsCommand())
-                    .build();
-            commandManager.register(this, listWarpsCommand, "warps", "listwarps");
-
-            // /setwarp <name>
-            CommandSpec setWarpCommand = CommandSpec.builder()
-                    .permission("destinations.warp.create")
-                    .description(Text.of("/setwarp <name>"))
-                    .extendedDescription(Text.of("Set this location as a public warp."))
-                    .executor(new SetWarpCommand())
-                    .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
-                    .build();
-            commandManager.register(this, setWarpCommand, "setwarp");
-
-            // /delwarp [-f] [-c] <name>
-            CommandSpec delWarpCommand = CommandSpec.builder()
-                    .permission("destinations.warp.remove")
-                    .description(Text.of("Delete a warp"))
-                    .extendedDescription(Text.of("Delete a warp by name."))
-                    .executor(new DelWarpCommand())
-                    .arguments(GenericArguments.flags().flag("c").flag("f").buildWith(GenericArguments.remainingJoinedStrings(Text.of("name"))))
-                    .build();
-            commandManager.register(this, delWarpCommand, "delwarp");
-        }
-
-        // Register Teleport Commands
-        if (DestinationsConfig.isTeleportCommandEnabled()) {
-
-            // /call <player> or /tpa <player>
-            CommandSpec callCommand = CommandSpec.builder()
-                    .permission("destinations.tpa")
-                    .description(Text.of("/call <player> or /tpa <player>"))
-                    .extendedDescription(Text.of("Requests a player to teleport you to their current location."))
-                    .executor(new CallCommand())
-                    .arguments(GenericArguments.player(Text.of("player")))
-                    .build();
-            commandManager.register(this, callCommand, "call", "tpa");
-
-            // /bring [player] or /tpaccept [player]
-            CommandSpec bringCommand = CommandSpec.builder()
-                    .permission("destinations.tpa")
-                    .description(Text.of("/bring [player] or /tpaccept [player] or /tpyes [player]"))
-                    .extendedDescription(Text.of("Teleports a player that has issued a call request to your current location."))
-                    .executor(new BringCommand())
-                    .arguments(GenericArguments.optional(GenericArguments.firstParsing(GenericArguments.player(Text.of("player")))))
-                    .build();
-            commandManager.register(this, bringCommand, "bring", "tpaccept");
-
-            // /grab <player> or /tphere <player>
-            CommandSpec grabCommand = CommandSpec.builder()
-                    .permission("destinations.tphere")
-                    .description(Text.of("/grab <player> or /tphere <player>"))
-                    .extendedDescription(Text.of("Teleports a player to your current location."))
-                    .executor(new GrabCommand())
-                    .arguments(GenericArguments.player(Text.of("player")))
-                    .build();
-            commandManager.register(this, grabCommand, "grab", "tphere");
-        }
+        // Warp Commands
+        commandManager.register(this, DelWarpCommand.getCommandSpec(), DelWarpCommand.ALIASES);
+        commandManager.register(this, ListWarpsCommand.getCommandSpec(), ListWarpsCommand.ALIASES);
+        commandManager.register(this, SetWarpCommand.getCommandSpec(), SetWarpCommand.ALIASES);
+        commandManager.register(this, WarpCommand.getCommandSpec(), WarpCommand.ALIASES);
     }
 
 }

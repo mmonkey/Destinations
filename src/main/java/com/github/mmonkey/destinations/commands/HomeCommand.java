@@ -1,5 +1,6 @@
 package com.github.mmonkey.destinations.commands;
 
+import com.github.mmonkey.destinations.commands.elements.HomeCommandElement;
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.PlayerTeleportHomeEvent;
@@ -12,13 +13,33 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
 import java.util.Set;
 
 public class HomeCommand implements CommandExecutor {
+
+    public static final String[] ALIASES = {"home", "h"};
+
+    /**
+     * Get the Command Specifications for this command
+     *
+     * @return CommandSpec
+     */
+    public static CommandSpec getCommandSpec() {
+        return CommandSpec.builder()
+                .permission("destinations.home.use")
+                .description(Text.of("/home [name]"))
+                .extendedDescription(Text.of("Teleport to the nearest home or to the named home."))
+                .executor(new HomeCommand())
+                .arguments(GenericArguments.optional(new HomeCommandElement(Text.of("name"))))
+                .build();
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

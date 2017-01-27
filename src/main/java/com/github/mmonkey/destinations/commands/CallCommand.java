@@ -6,11 +6,30 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 public class CallCommand implements CommandExecutor {
+
+    public static final String[] ALIASES = {"call", "tpa"};
+
+    /**
+     * Get the Command Specifications for this command
+     *
+     * @return CommandSpec
+     */
+    public static CommandSpec getCommandSpec() {
+        return CommandSpec.builder()
+                .permission("destinations.tpa")
+                .description(Text.of("/call <player> or /tpa <player>"))
+                .extendedDescription(Text.of("Requests a player to teleport you to their current location."))
+                .executor(new CallCommand())
+                .arguments(GenericArguments.player(Text.of("player")))
+                .build();
+    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

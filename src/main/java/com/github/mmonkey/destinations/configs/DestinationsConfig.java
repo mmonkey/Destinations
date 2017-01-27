@@ -6,10 +6,7 @@ import java.io.IOException;
 public class DestinationsConfig extends Config {
 
     public static final String DATABASE_SETTINGS = "Database Settings";
-    public static final String BACK_SETTINGS = "Back Settings";
-    public static final String HOME_SETTINGS = "Home Settings";
-    public static final String TELEPORT_SETTINGS = "Teleport Settings";
-    public static final String WARP_SETTINGS = "Warp Settings";
+    public static final String COMMAND_SETTINGS = "Command Settings";
 
     private static DestinationsConfig instance;
 
@@ -41,51 +38,30 @@ public class DestinationsConfig extends Config {
         get().getNode(DATABASE_SETTINGS, "username").setValue("");
         get().getNode(DATABASE_SETTINGS, "password").setValue("");
 
-        get().getNode(BACK_SETTINGS, "enabled").setValue(true);
-        get().getNode(BACK_SETTINGS, "saveOnDeath").setValue(true);
-
-        get().getNode(HOME_SETTINGS, "enabled").setValue(true);
-        get().getNode(HOME_SETTINGS, "maxHomes").setValue(0);
-
-        get().getNode(TELEPORT_SETTINGS, "enabled").setValue(true);
-        get().getNode(TELEPORT_SETTINGS, "expires").setValue(30).setComment("Number of seconds before teleport requests expire.");
-
-        get().getNode(WARP_SETTINGS, "enabled").setValue(true);
-    }
-
-    /**
-     * @return whether or not the back command is enabled
-     */
-    public static boolean isBackCommandEnabled() {
-        return getInstance().get().getNode(BACK_SETTINGS, "enabled").getBoolean(false);
+        get().getNode(COMMAND_SETTINGS, "saveBackLocationOnDeath").setValue(true);
+        get().getNode(COMMAND_SETTINGS, "maximumHomes").setValue(0).setComment("Setting this to 0 will allow unlimited homes.");
+        get().getNode(COMMAND_SETTINGS, "teleportRequestExpiration").setValue(30).setComment("Number of seconds before teleport requests expire.");
     }
 
     /**
      * @return whether or not the player's back locations will be saved on death
      */
     public static boolean allowBackOnDeath() {
-        return getInstance().get().getNode(BACK_SETTINGS, "saveOnDeath").getBoolean(false);
+        return getInstance().get().getNode(COMMAND_SETTINGS, "saveBackLocationOnDeath").getBoolean(false);
     }
 
     /**
-     * @return whether or not the home command is enabled
+     * @return the maximum number of homes for any player
      */
-    public static boolean isHomeCommandEnabled() {
-        return getInstance().get().getNode(HOME_SETTINGS, "enabled").getBoolean(false);
+    public static int getMaximumHomes() {
+        return getInstance().get().getNode(COMMAND_SETTINGS, "maximumHomes").getInt(0);
     }
 
     /**
-     * @return whether or not the teleport command is enabled
+     * @return the request expiration time for teleport request (in seconds)
      */
-    public static boolean isTeleportCommandEnabled() {
-        return getInstance().get().getNode(TELEPORT_SETTINGS, "enabled").getBoolean(false);
-    }
-
-    /**
-     * @return whether or not the warp command is enabled
-     */
-    public static boolean isWarpCommandEnabled() {
-        return getInstance().get().getNode(WARP_SETTINGS, "enabled").getBoolean(false);
+    public static int getTeleportRequestExpiration() {
+        return getInstance().get().getNode(COMMAND_SETTINGS, "teleportRequestExpiration").getInt(30);
     }
 
 }
