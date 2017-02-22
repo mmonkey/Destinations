@@ -19,6 +19,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -90,7 +91,7 @@ public class BringCommand implements CommandExecutor {
     private CommandResult executeBring(Player caller, Player target) {
         TeleportationService.instance.removeCall(caller, target);
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(caller, caller.getLocation(), caller.getRotation()));
-        Sponge.getGame().getEventManager().post(new PlayerTeleportBringEvent(caller, target.getLocation(), target.getRotation()));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportBringEvent(caller, target.getLocation(), target.getRotation(), BigDecimal.ZERO));
 
         caller.sendMessage(MessagesUtil.success(caller, "bring.teleport", target.getName()));
         return CommandResult.success();

@@ -1,11 +1,15 @@
 package com.github.mmonkey.destinations.listeners;
 
+import com.github.mmonkey.destinations.Destinations;
+import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.BackEntity;
 import com.github.mmonkey.destinations.entities.LocationEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.interfaces.PlayerTeleportEvent;
+import com.github.mmonkey.destinations.exceptions.EconomyServiceNotFoundException;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
 import com.github.mmonkey.destinations.persistence.repositories.PlayerRepository;
+import com.github.mmonkey.destinations.utilities.EconomyUtil;
 import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import org.spongepowered.api.data.manipulator.mutable.entity.SleepingData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -16,6 +20,7 @@ import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.util.Tristate;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public class TeleportListeners {
@@ -46,6 +51,17 @@ public class TeleportListeners {
         if (optional.isPresent() && optional.get().asImmutable().sleeping().get()) {
             event.getTargetEntity().sendMessage(MessagesUtil.get(event.getTargetEntity(), "teleport.sleep"));
             return;
+        }
+
+        if (DestinationsConfig.isEconomyEnabled() && event.getCost().compareTo(BigDecimal.ZERO) > 0) {
+            try {
+                if (!EconomyUtil.instance.chargePlayer(event.getTargetEntity(), event.getCost())) {
+                    event.getTargetEntity().sendMessage(MessagesUtil.error(event.getTargetEntity(), "economy.not_enough_funds"));
+                    return;
+                }
+            } catch (EconomyServiceNotFoundException e) {
+                Destinations.getInstance().getLogger().error(e.getMessage());
+            }
         }
 
         if (event.getRotation() == null) {

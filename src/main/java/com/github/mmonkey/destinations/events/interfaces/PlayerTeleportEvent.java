@@ -6,6 +6,8 @@ import org.spongepowered.api.event.entity.living.humanoid.player.TargetPlayerEve
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.math.BigDecimal;
+
 public interface PlayerTeleportEvent extends TargetPlayerEvent, Cancellable {
 
     Location<World> getLocation();
@@ -15,6 +17,10 @@ public interface PlayerTeleportEvent extends TargetPlayerEvent, Cancellable {
     Vector3d getRotation();
 
     void setRotation(Vector3d rotation);
+
+    BigDecimal getCost();
+
+    void setCost(BigDecimal cost);
 
     /**
      * Called before a player is teleported.

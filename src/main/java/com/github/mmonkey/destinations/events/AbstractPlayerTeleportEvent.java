@@ -10,12 +10,15 @@ import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.math.BigDecimal;
+
 abstract class AbstractPlayerTeleportEvent extends AbstractEvent implements TargetPlayerEvent, Cancellable {
 
     private boolean cancelled = false;
     private final Player player;
     private Location<World> location;
     private Vector3d rotation;
+    private BigDecimal cost = BigDecimal.ZERO;
 
     /**
      * AbstractPlayerTeleportEvent constructor
@@ -23,14 +26,18 @@ abstract class AbstractPlayerTeleportEvent extends AbstractEvent implements Targ
      * @param player   Player
      * @param location Location
      * @param rotation Vector3d|null
+     * @param cost     BigDecimal|null
      */
-    AbstractPlayerTeleportEvent(Player player, Location<World> location, Vector3d rotation) {
+    AbstractPlayerTeleportEvent(Player player, Location<World> location, Vector3d rotation, BigDecimal cost) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(location);
 
         this.player = player;
         this.location = location;
         this.rotation = rotation;
+        if (cost != null) {
+            this.cost = cost;
+        }
     }
 
     @Override
@@ -67,6 +74,14 @@ abstract class AbstractPlayerTeleportEvent extends AbstractEvent implements Targ
 
     public void setRotation(Vector3d rotation) {
         this.rotation = rotation;
+    }
+
+    public BigDecimal getCost() {
+        return this.cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
     }
 
 }

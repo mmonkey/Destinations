@@ -119,7 +119,6 @@ public class Destinations {
      * Setup the configs
      */
     private boolean setupConfigs() {
-
         if (!this.configDir.isDirectory() && !this.configDir.mkdirs()) {
             this.getLogger().error(String.format("Unable to create %s config directory, please check file permissions.", Destinations.NAME));
             return false;
@@ -169,7 +168,6 @@ public class Destinations {
      * Load data into cache
      */
     private void load() {
-
         // Load spawns into cache
         SpawnCache.instance.get().addAll(SpawnRepository.instance.getAllSpawns());
 

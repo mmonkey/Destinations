@@ -1,6 +1,7 @@
 package com.github.mmonkey.destinations.commands;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.SpawnEntity;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportSpawnEvent;
@@ -16,6 +17,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.math.BigDecimal;
 
 public class SpawnCommand implements CommandExecutor {
 
@@ -51,8 +54,11 @@ public class SpawnCommand implements CommandExecutor {
             }
         }
 
+        BigDecimal cost = BigDecimal.valueOf(
+                DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costSpawnCommand").getDouble(0)
+        );
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
-        Sponge.getGame().getEventManager().post(new PlayerTeleportSpawnEvent(player, location, rotation));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportSpawnEvent(player, location, rotation, cost));
         return CommandResult.empty();
     }
 

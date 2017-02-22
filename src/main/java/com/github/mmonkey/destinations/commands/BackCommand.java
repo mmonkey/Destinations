@@ -1,5 +1,6 @@
 package com.github.mmonkey.destinations.commands;
 
+import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.BackEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.PlayerTeleportBackEvent;
@@ -15,6 +16,8 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+
+import java.math.BigDecimal;
 
 public class BackCommand implements CommandExecutor {
 
@@ -52,7 +55,12 @@ public class BackCommand implements CommandExecutor {
 
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
         if (back != null) {
-            Sponge.getGame().getEventManager().post(new PlayerTeleportBackEvent(player, back.getLocation().getLocation(), back.getLocation().getRotation()));
+            BigDecimal cost = BigDecimal.valueOf(
+                    DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costBackCommand").getDouble(0)
+            );
+            Sponge.getGame().getEventManager().post(
+                    new PlayerTeleportBackEvent(player, back.getLocation().getLocation(), back.getLocation().getRotation(), cost)
+            );
             return CommandResult.success();
         }
 

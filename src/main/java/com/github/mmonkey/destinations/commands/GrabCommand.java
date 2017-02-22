@@ -14,6 +14,8 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+import java.math.BigDecimal;
+
 public class GrabCommand implements CommandExecutor {
 
     public static final String[] ALIASES = {"grab", "tphere"};
@@ -49,7 +51,7 @@ public class GrabCommand implements CommandExecutor {
         }
 
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(target, target.getLocation(), target.getRotation()));
-        Sponge.getGame().getEventManager().post(new PlayerTeleportGrabEvent(target, requester.getLocation(), requester.getRotation()));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportGrabEvent(target, requester.getLocation(), requester.getRotation(), BigDecimal.ZERO));
 
         target.sendMessage(MessagesUtil.success(target, "grab.teleport", requester.getName()));
         return CommandResult.success();

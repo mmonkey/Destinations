@@ -13,10 +13,10 @@ public class PlayerTeleportPreEvent extends AbstractPlayerTeleportEvent implemen
      *
      * @param player   Player
      * @param location Location
-     * @param rotation Vector3d
+     * @param rotation Vector3d|null
      */
     public PlayerTeleportPreEvent(Player player, Location<World> location, Vector3d rotation) {
-        super(player, location, rotation);
+        super(player, location, rotation, null);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.commands.elements.WarpCommandElement;
+import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.AccessEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.entities.WarpEntity;
@@ -18,6 +19,8 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+
+import java.math.BigDecimal;
 
 public class WarpCommand implements CommandExecutor {
 
@@ -69,8 +72,11 @@ public class WarpCommand implements CommandExecutor {
             }
         }
 
+        BigDecimal cost = BigDecimal.valueOf(
+                DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costWarpCommand").getDouble(0)
+        );
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
-        Sponge.getGame().getEventManager().post(new PlayerTeleportWarpEvent(player, warp.getLocation().getLocation(), warp.getLocation().getRotation()));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportWarpEvent(player, warp.getLocation().getLocation(), warp.getLocation().getRotation(), cost));
         return CommandResult.success();
     }
 

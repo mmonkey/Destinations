@@ -6,6 +6,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.math.BigDecimal;
+
 public class PlayerTeleportJumpEvent extends AbstractPlayerTeleportEvent implements PlayerTeleportEvent.Jump {
 
     /**
@@ -13,9 +15,10 @@ public class PlayerTeleportJumpEvent extends AbstractPlayerTeleportEvent impleme
      *
      * @param player   Player
      * @param location Location
-     * @param rotation Vector3d
+     * @param rotation Vector3d|null
+     * @param cost     BigDecimal|null
      */
-    public PlayerTeleportJumpEvent(Player player, Location<World> location, Vector3d rotation) {
-        super(player, location, rotation);
+    public PlayerTeleportJumpEvent(Player player, Location<World> location, Vector3d rotation, BigDecimal cost) {
+        super(player, location, rotation, cost);
     }
 }
