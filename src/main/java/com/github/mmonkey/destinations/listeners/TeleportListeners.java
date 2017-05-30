@@ -53,9 +53,10 @@ public class TeleportListeners {
             return;
         }
 
-        if (DestinationsConfig.isEconomyEnabled() && event.getCost().compareTo(BigDecimal.ZERO) > 0) {
+        BigDecimal cost = event.calculateCost(event.getLocationType());
+        if (DestinationsConfig.isEconomyEnabled() && cost.compareTo(BigDecimal.ZERO) > 0) {
             try {
-                if (!EconomyUtil.instance.chargePlayer(event.getTargetEntity(), event.getCost())) {
+                if (!EconomyUtil.instance.chargePlayer(event.getTargetEntity(), cost)) {
                     event.getTargetEntity().sendMessage(MessagesUtil.error(event.getTargetEntity(), "economy.not_enough_funds"));
                     return;
                 }

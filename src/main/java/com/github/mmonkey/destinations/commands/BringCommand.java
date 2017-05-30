@@ -91,7 +91,7 @@ public class BringCommand implements CommandExecutor {
     private CommandResult executeBring(Player caller, Player target) {
         TeleportationService.instance.removeCall(caller, target);
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(caller, caller.getLocation(), caller.getRotation()));
-        Sponge.getGame().getEventManager().post(new PlayerTeleportBringEvent(caller, target.getLocation(), target.getRotation(), BigDecimal.ZERO));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportBringEvent(caller, target.getLocation(), target.getRotation()));
 
         caller.sendMessage(MessagesUtil.success(caller, "bring.teleport", target.getName()));
         return CommandResult.success();

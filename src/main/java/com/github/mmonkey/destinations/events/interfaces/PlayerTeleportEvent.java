@@ -18,9 +18,9 @@ public interface PlayerTeleportEvent extends TargetPlayerEvent, Cancellable {
 
     void setRotation(Vector3d rotation);
 
-    BigDecimal getCost();
+    String getLocationType();
 
-    void setCost(BigDecimal cost);
+    BigDecimal calculateCost(String locationType);
 
     /**
      * Called before a player is teleported.

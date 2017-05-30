@@ -1,6 +1,5 @@
 package com.github.mmonkey.destinations.commands;
 
-import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.BedEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.PlayerTeleportBedEvent;
@@ -17,8 +16,6 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-import java.math.BigDecimal;
 
 public class BedCommand implements CommandExecutor {
 
@@ -49,11 +46,8 @@ public class BedCommand implements CommandExecutor {
         PlayerEntity playerEntity = PlayerCache.instance.get(player);
         BedEntity bed = PlayerUtil.getBed(playerEntity, player);
         if (bed != null) {
-            BigDecimal cost = BigDecimal.valueOf(
-                    DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costBedCommand").getDouble(0)
-            );
             Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
-            Sponge.getGame().getEventManager().post(new PlayerTeleportBedEvent(player, bed.getLocation().getLocation(), player.getRotation(), cost));
+            Sponge.getGame().getEventManager().post(new PlayerTeleportBedEvent(player, bed.getLocation().getLocation(), player.getRotation()));
             return CommandResult.success();
         }
 

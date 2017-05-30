@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 
 public class BackCommand implements CommandExecutor {
 
-    public static final String[] ALIASES = {"back"};
+    public static final String[] ALIASES = {"back", "b"};
 
     /**
      * Get the Command Specifications for this command
@@ -55,11 +55,8 @@ public class BackCommand implements CommandExecutor {
 
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
         if (back != null) {
-            BigDecimal cost = BigDecimal.valueOf(
-                    DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costBackCommand").getDouble(0)
-            );
             Sponge.getGame().getEventManager().post(
-                    new PlayerTeleportBackEvent(player, back.getLocation().getLocation(), back.getLocation().getRotation(), cost)
+                    new PlayerTeleportBackEvent(player, back.getLocation().getLocation(), back.getLocation().getRotation())
             );
             return CommandResult.success();
         }

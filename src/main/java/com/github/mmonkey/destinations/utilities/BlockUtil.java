@@ -42,4 +42,18 @@ public class BlockUtil {
         return isBed(blockLoc) ? blockLoc.getBlock().getTraitValue(BooleanTraits.BED_OCCUPIED).orElse(false) : false;
     }
 
+    /**
+     * Get the distance between to locations
+     *
+     * @param a Location
+     * @param b Location
+     * @return double
+     */
+    public static double distance(Location a, Location b) {
+        double x = Math.pow((a.getX() - b.getX()), 2);
+        double y = Math.pow((a.getY() - b.getY()), 2);
+        double z = Math.pow((a.getZ() - b.getZ()), 2);
+        return Math.sqrt(x + y + z);
+    }
+
 }

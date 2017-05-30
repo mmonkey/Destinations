@@ -1,6 +1,5 @@
 package com.github.mmonkey.destinations.commands;
 
-import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.events.PlayerTeleportJumpEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.utilities.BlockUtil;
@@ -18,8 +17,6 @@ import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.math.BigDecimal;
 
 public class JumpCommand implements CommandExecutor {
 
@@ -58,11 +55,8 @@ public class JumpCommand implements CommandExecutor {
         }
 
         if (location != null) {
-            BigDecimal cost = BigDecimal.valueOf(
-                    DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costJumpCommand").getDouble(0)
-            );
             Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
-            Sponge.getGame().getEventManager().post(new PlayerTeleportJumpEvent(player, location, player.getRotation(), cost));
+            Sponge.getGame().getEventManager().post(new PlayerTeleportJumpEvent(player, location, player.getRotation()));
             return CommandResult.success();
         }
 

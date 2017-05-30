@@ -42,6 +42,10 @@ public class EconomyUtil {
             BigDecimal balance = account.getBalance(this.currency);
             if (balance.compareTo(amount) >= 0) {
                 account.withdraw(this.currency, amount, Cause.of(NamedCause.owner(player)));
+
+                String chargedAmount = this.currency.format(amount, 2).toPlain();
+                String newBal = this.currency.format(account.getBalance(this.currency), 2).toPlain();
+                player.sendMessage(MessagesUtil.success(player, "economy.charge", chargedAmount, newBal));
                 return true;
             }
         }

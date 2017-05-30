@@ -1,6 +1,8 @@
 package com.github.mmonkey.destinations.events;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.github.mmonkey.destinations.configs.DestinationsConfig;
+import com.github.mmonkey.destinations.utilities.BlockUtil;
 import com.google.common.base.Preconditions;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
@@ -18,7 +20,7 @@ abstract class AbstractPlayerTeleportEvent extends AbstractEvent implements Targ
     private final Player player;
     private Location<World> location;
     private Vector3d rotation;
-    private BigDecimal cost = BigDecimal.ZERO;
+    private String locationType;
 
     /**
      * AbstractPlayerTeleportEvent constructor
@@ -26,18 +28,15 @@ abstract class AbstractPlayerTeleportEvent extends AbstractEvent implements Targ
      * @param player   Player
      * @param location Location
      * @param rotation Vector3d|null
-     * @param cost     BigDecimal|null
      */
-    AbstractPlayerTeleportEvent(Player player, Location<World> location, Vector3d rotation, BigDecimal cost) {
+    AbstractPlayerTeleportEvent(Player player, Location<World> location, Vector3d rotation, String locationType) {
         Preconditions.checkNotNull(player);
         Preconditions.checkNotNull(location);
 
         this.player = player;
         this.location = location;
         this.rotation = rotation;
-        if (cost != null) {
-            this.cost = cost;
-        }
+        this.locationType = locationType;
     }
 
     @Override
@@ -76,12 +75,24 @@ abstract class AbstractPlayerTeleportEvent extends AbstractEvent implements Targ
         this.rotation = rotation;
     }
 
-    public BigDecimal getCost() {
-        return this.cost;
+    public String getLocationType() {
+        return this.locationType;
     }
 
-    public void setCost(BigDecimal cost) {
-        this.cost = cost;
+    public BigDecimal calculateCost(String locationType) {
+        String type = DestinationsConfig.getLocationTypeEconomyType(locationType);
+        Double rate = DestinationsConfig.getLocationTypeEconomyRate(locationType);
+
+        if (rate <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        if (type.toLowerCase().equals("variable")) {
+            double distance = BlockUtil.distance(this.getTargetEntity().getLocation(), this.getLocation());
+            return BigDecimal.valueOf(Math.ceil(distance / 100 * rate));
+        }
+
+        return BigDecimal.valueOf(rate);
     }
 
 }

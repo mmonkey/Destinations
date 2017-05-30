@@ -51,7 +51,7 @@ public class GrabCommand implements CommandExecutor {
         }
 
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(target, target.getLocation(), target.getRotation()));
-        Sponge.getGame().getEventManager().post(new PlayerTeleportGrabEvent(target, requester.getLocation(), requester.getRotation(), BigDecimal.ZERO));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportGrabEvent(target, requester.getLocation(), requester.getRotation()));
 
         target.sendMessage(MessagesUtil.success(target, "grab.teleport", requester.getName()));
         return CommandResult.success();

@@ -35,48 +35,41 @@ public class DestinationsConfig extends Config {
 
     @Override
     protected void setDefaults() {
-        get().getNode(DATABASE_SETTINGS, "type").setValue("H2").setComment("Accepted Types: H2");
+        get().getNode(DATABASE_SETTINGS).setComment("Accepted Database Types: H2");
+        get().getNode(DATABASE_SETTINGS, "type").setValue("H2");
         get().getNode(DATABASE_SETTINGS, "url").setValue("jdbc:h2:file:." + File.separator + "destinations" + File.separator);
         get().getNode(DATABASE_SETTINGS, "database").setValue("data");
         get().getNode(DATABASE_SETTINGS, "username").setValue("");
         get().getNode(DATABASE_SETTINGS, "password").setValue("");
 
-        get().getNode(COMMAND_SETTINGS, "saveBackLocationOnDeath").setValue(true);
         get().getNode(COMMAND_SETTINGS, "maximumHomes").setValue(0).setComment("Setting this to 0 will allow unlimited homes.");
+        get().getNode(COMMAND_SETTINGS, "saveBackLocationOnDeath").setValue(true);
         get().getNode(COMMAND_SETTINGS, "teleportRequestExpiration").setValue(30).setComment("Time (seconds) before teleport requests expire.");
 
         CommentedConfigurationNode econ = get().getNode(ECONOMY_SETTINGS);
+        econ.setComment("For more information about Economy Settings, see the readme: https://github.com/mmonkey/Destinations");
         econ.getNode("enabled").setValue(false);
-        econ.getNode("distance").setValue(100).setComment("When calculating variable cost: A: the distance between player location and teleport location." +
-                "B: this distance. C: the location type rate (see below). Formula: ( A / B ) * C = COST.");
 
-        econ.getNode("locations", "back", "rate").setValue(0);
-        econ.getNode("locations", "back", "type").setValue("fixed").setComment("Accepted Types: fixed, variable, none");
-        econ.getNode("locations", "back", "cooldown").setValue(60).setComment("Time (seconds) before teleport to this location for no cost.");
+        econ.getNode("locationTypes", "back", "rate").setValue(1.00);
+        econ.getNode("locationTypes", "back", "type").setValue("fixed");
 
-        econ.getNode("locations", "bed", "rate").setValue(0);
-        econ.getNode("locations", "bed", "type").setValue("fixed").setComment("Accepted Types: fixed, variable, none");
-        econ.getNode("locations", "bed", "cooldown").setValue(60).setComment("Time (seconds) before teleport to this location for no cost.");
+        econ.getNode("locationTypes", "bed", "rate").setValue(1.00);
+        econ.getNode("locationTypes", "bed", "type").setValue("fixed");
 
-        econ.getNode("locations", "home", "rate").setValue(0);
-        econ.getNode("locations", "home", "type").setValue("fixed").setComment("Accepted Types: fixed, variable, none");
-        econ.getNode("locations", "home", "cooldown").setValue(60).setComment("Time (seconds) before teleport to this location for no cost.");
+        econ.getNode("locationTypes", "home", "rate").setValue(1.00);
+        econ.getNode("locationTypes", "home", "type").setValue("fixed");
 
-        econ.getNode("locations", "jump", "rate").setValue(0);
-        econ.getNode("locations", "jump", "type").setValue("fixed").setComment("Accepted Types: fixed, variable, none");
-        econ.getNode("locations", "jump", "cooldown").setValue(60).setComment("Time (seconds) before teleport to this location for no cost.");
+        econ.getNode("locationTypes", "jump", "rate").setValue(1.00);
+        econ.getNode("locationTypes", "jump", "type").setValue("fixed");
 
-        econ.getNode("locations", "spawn", "rate").setValue(0);
-        econ.getNode("locations", "spawn", "type").setValue("fixed").setComment("Accepted Types: fixed, variable, none");
-        econ.getNode("locations", "spawn", "cooldown").setValue(60).setComment("Time (seconds) before teleport to this location for no cost.");
+        econ.getNode("locationTypes", "spawn", "rate").setValue(1.00);
+        econ.getNode("locationTypes", "spawn", "type").setValue("fixed");
 
-        econ.getNode("locations", "top", "rate").setValue(0);
-        econ.getNode("locations", "top", "type").setValue("fixed").setComment("Accepted Types: fixed, variable, none");
-        econ.getNode("locations", "top", "cooldown").setValue(60).setComment("Time (seconds) before teleport to this location for no cost.");
+        econ.getNode("locationTypes", "top", "rate").setValue(1.00);
+        econ.getNode("locationTypes", "top", "type").setValue("fixed");
 
-        econ.getNode("locations", "warp", "rate").setValue(0);
-        econ.getNode("locations", "warp", "type").setValue("fixed").setComment("Accepted Types: fixed, variable, none");
-        econ.getNode("locations", "warp", "cooldown").setValue(60).setComment("Time (seconds) before teleport to this location for no cost.");
+        econ.getNode("locationTypes", "warp", "rate").setValue(1.00);
+        econ.getNode("locationTypes", "warp", "type").setValue("fixed");
     }
 
     /**
@@ -111,24 +104,16 @@ public class DestinationsConfig extends Config {
      * @param locationType String type of location
      * @return The cost type used to calculate the teleport cost
      */
-    public static String getCostType(String locationType) {
-        return getInstance().get().getNode(ECONOMY_SETTINGS, "locations", locationType, "type").getString("fixed");
+    public static String getLocationTypeEconomyType(String locationType) {
+        return getInstance().get().getNode(ECONOMY_SETTINGS, "locationTypes", locationType, "type").getString("fixed");
     }
 
     /**
      * @param locationType String type of location
      * @return The rate used to calculate the teleport cost
      */
-    public static double getRate(String locationType) {
-        return getInstance().get().getNode(ECONOMY_SETTINGS, "locations", locationType, "rate").getDouble(0);
-    }
-
-    /**
-     * @param locationType String type of location
-     * @return The cooldown used to calculate the teleport cost
-     */
-    public static int getCooldown(String locationType) {
-        return getInstance().get().getNode(ECONOMY_SETTINGS, "locations", locationType, "cooldown").getInt(60);
+    public static double getLocationTypeEconomyRate(String locationType) {
+        return getInstance().get().getNode(ECONOMY_SETTINGS, "locationTypes", locationType, "rate").getDouble(0);
     }
 
 }

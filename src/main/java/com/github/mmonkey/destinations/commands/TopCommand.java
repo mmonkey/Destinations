@@ -1,7 +1,6 @@
 package com.github.mmonkey.destinations.commands;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportTopEvent;
 import com.github.mmonkey.destinations.utilities.BlockUtil;
@@ -19,8 +18,6 @@ import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.math.BigDecimal;
 
 public class TopCommand implements CommandExecutor {
 
@@ -62,11 +59,8 @@ public class TopCommand implements CommandExecutor {
         }
 
         if (location != null && (location.getBlockY() != player.getLocation().getBlockY() - 1)) {
-            BigDecimal cost = BigDecimal.valueOf(
-                    DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costTopCommand").getDouble(0)
-            );
             Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
-            Sponge.getGame().getEventManager().post(new PlayerTeleportTopEvent(player, location, player.getRotation(), cost));
+            Sponge.getGame().getEventManager().post(new PlayerTeleportTopEvent(player, location, player.getRotation()));
             return CommandResult.success();
         }
 

@@ -1,12 +1,12 @@
 package com.github.mmonkey.destinations.commands;
 
 import com.github.mmonkey.destinations.commands.elements.HomeCommandElement;
-import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.PlayerTeleportHomeEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
+import com.github.mmonkey.destinations.utilities.BlockUtil;
 import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
@@ -21,7 +21,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
-import java.math.BigDecimal;
 import java.util.Set;
 
 public class HomeCommand implements CommandExecutor {
@@ -67,11 +66,8 @@ public class HomeCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
-        BigDecimal cost = BigDecimal.valueOf(
-                DestinationsConfig.getInstance().get().getNode(DestinationsConfig.ECONOMY_SETTINGS, "costHomeCommand").getDouble(0)
-        );
         Sponge.getGame().getEventManager().post(new PlayerTeleportPreEvent(player, player.getLocation(), player.getRotation()));
-        Sponge.getGame().getEventManager().post(new PlayerTeleportHomeEvent(player, home.getLocation().getLocation(), home.getLocation().getRotation(), cost));
+        Sponge.getGame().getEventManager().post(new PlayerTeleportHomeEvent(player, home.getLocation().getLocation(), home.getLocation().getRotation()));
         return CommandResult.success();
     }
 
@@ -92,10 +88,7 @@ public class HomeCommand implements CommandExecutor {
         for (HomeEntity home : player.getHomes()) {
 
             Location location = home.getLocation().getLocation();
-            double x = Math.pow((playerLocation.getX() - location.getX()), 2);
-            double y = Math.pow((playerLocation.getY() - location.getY()), 2);
-            double z = Math.pow((playerLocation.getZ() - location.getZ()), 2);
-            tmp = Math.sqrt(x + y + z);
+            tmp = BlockUtil.distance(playerLocation, location);
 
             if (min == -1 || tmp < min) {
                 min = tmp;

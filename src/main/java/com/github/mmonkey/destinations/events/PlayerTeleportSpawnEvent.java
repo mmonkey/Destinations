@@ -6,9 +6,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.math.BigDecimal;
-
 public class PlayerTeleportSpawnEvent extends AbstractPlayerTeleportEvent implements PlayerTeleportEvent.Spawn {
+
+    public static final String LOCATION_TYPE = "spawn";
 
     /**
      * PlayerTeleportSpawnEvent constructor
@@ -16,10 +16,9 @@ public class PlayerTeleportSpawnEvent extends AbstractPlayerTeleportEvent implem
      * @param player   Player
      * @param location Location
      * @param rotation Vector3d|null
-     * @param cost     BigDecimal|null
      */
-    public PlayerTeleportSpawnEvent(Player player, Location<World> location, Vector3d rotation, BigDecimal cost) {
-        super(player, location, rotation, cost);
+    public PlayerTeleportSpawnEvent(Player player, Location<World> location, Vector3d rotation) {
+        super(player, location, rotation, LOCATION_TYPE);
     }
 
 }
