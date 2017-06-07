@@ -33,7 +33,7 @@ public class ListHomesCommand implements CommandExecutor {
      */
     public static CommandSpec getCommandSpec() {
         return CommandSpec.builder()
-                .permission("destinations.home")
+                .permission("destinations.home.use")
                 .description(Text.of("/homes or /listhomes"))
                 .extendedDescription(Text.of("Displays a list of your homes."))
                 .executor(new ListHomesCommand())

@@ -6,6 +6,7 @@ import com.github.mmonkey.destinations.entities.PlayerEntity;
 import com.github.mmonkey.destinations.events.PlayerTeleportHomeEvent;
 import com.github.mmonkey.destinations.events.PlayerTeleportPreEvent;
 import com.github.mmonkey.destinations.persistence.cache.PlayerCache;
+import com.github.mmonkey.destinations.utilities.BlockUtil;
 import com.github.mmonkey.destinations.utilities.MessagesUtil;
 import com.github.mmonkey.destinations.utilities.PlayerUtil;
 import org.spongepowered.api.Sponge;
@@ -87,10 +88,7 @@ public class HomeCommand implements CommandExecutor {
         for (HomeEntity home : player.getHomes()) {
 
             Location location = home.getLocation().getLocation();
-            double x = Math.pow((playerLocation.getX() - location.getX()), 2);
-            double y = Math.pow((playerLocation.getY() - location.getY()), 2);
-            double z = Math.pow((playerLocation.getZ() - location.getZ()), 2);
-            tmp = Math.sqrt(x + y + z);
+            tmp = BlockUtil.distance(playerLocation, location);
 
             if (min == -1 || tmp < min) {
                 min = tmp;

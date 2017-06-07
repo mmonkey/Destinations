@@ -32,9 +32,9 @@ public class DestinationsConfig extends Config {
 
     @Override
     protected void setDefaults() {
-        get().getNode(DATABASE_SETTINGS, "type").setValue("H2").setComment("Accepted Types: H2");
-        get().getNode(DATABASE_SETTINGS, "url").setValue("jdbc:h2:file:." + File.separator + "destinations" + File.separator);
-        get().getNode(DATABASE_SETTINGS, "database").setValue("data");
+        get().getNode(DATABASE_SETTINGS, "type").setValue("H2").setComment("Accepted Types: H2, MySQL");
+        get().getNode(DATABASE_SETTINGS, "url").setValue("jdbc:h2:file:." + File.separator + "config" + File.separator + "destinations" + File.separator);
+        get().getNode(DATABASE_SETTINGS, "database").setValue("destinations");
         get().getNode(DATABASE_SETTINGS, "username").setValue("");
         get().getNode(DATABASE_SETTINGS, "password").setValue("");
 

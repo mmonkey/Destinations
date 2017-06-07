@@ -104,12 +104,24 @@ public class TeleportationService {
         optionalTarget.ifPresent(player -> player.sendMessage(MessagesUtil.warning(player, "call.request_expire_from", caller.getName())));
     }
 
+    /**
+     * Add a call transaction
+     *
+     * @param caller Player
+     * @param target Player
+     */
     public void call(Player caller, Player target) {
         Transaction call = new Transaction(caller, target);
         Timestamp expireTime = new Timestamp(System.currentTimeMillis() + this.expires * 1000);
         this.transactions.put(call, expireTime);
     }
 
+    /**
+     * Remove a call transaction
+     *
+     * @param caller Player
+     * @param target Player
+     */
     public void removeCall(Player caller, Player target) {
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
             if (call.getKey().getCaller().getUniqueId().equals(caller.getUniqueId())
@@ -119,6 +131,12 @@ public class TeleportationService {
         }
     }
 
+    /**
+     * Get the first caller from this player's current calls
+     *
+     * @param target Player
+     * @return Player
+     */
     public Player getFirstCaller(Player target) {
         Player caller = null;
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
@@ -130,6 +148,12 @@ public class TeleportationService {
         return caller;
     }
 
+    /**
+     * Get the total number of current callers
+     *
+     * @param target Player
+     * @return int
+     */
     public int getNumCallers(Player target) {
         int callers = 0;
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
@@ -141,6 +165,12 @@ public class TeleportationService {
         return callers;
     }
 
+    /**
+     * Get the current list of callers
+     *
+     * @param target Player
+     * @return List<String>
+     */
     public List<String> getCalling(Player target) {
         List<String> list = new ArrayList<>();
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {
@@ -152,6 +182,13 @@ public class TeleportationService {
         return list;
     }
 
+    /**
+     * Get whether or not a Player is currently waiting for a call reply
+     *
+     * @param caller Player
+     * @param target Player
+     * @return bool
+     */
     public boolean isCalling(Player caller, Player target) {
 
         for (Map.Entry<Transaction, Timestamp> call : this.transactions.entrySet()) {

@@ -18,7 +18,7 @@ import org.spongepowered.api.text.Text;
 
 public class BackCommand implements CommandExecutor {
 
-    public static final String[] ALIASES = {"back"};
+    public static final String[] ALIASES = {"back", "b"};
 
     /**
      * Get the Command Specifications for this command

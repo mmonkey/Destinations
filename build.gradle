@@ -25,6 +25,7 @@ dependencies {
     compile 'org.spongepowered:spongeapi:5.0.0'
     compile 'com.github.mmonkey:Commando:v0.0.2-3.0.0'
     shadow 'com.zaxxer:HikariCP:2.5.1'
+    shadow 'mysql:mysql-connector-java:5.1.6'
     shadow 'org.hibernate:hibernate-entitymanager:5.2.6.Final'
     shadow 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
 }

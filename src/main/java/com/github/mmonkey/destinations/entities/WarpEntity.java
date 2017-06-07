@@ -38,7 +38,7 @@ public class WarpEntity implements Serializable {
     @JoinColumn(name = "owner_id", nullable = false)
     private PlayerEntity owner;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<AccessEntity> access;
 
     /**
