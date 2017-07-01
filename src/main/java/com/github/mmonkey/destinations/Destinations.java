@@ -32,7 +32,7 @@ public class Destinations {
 
     public static final String ID = "destinations";
     public static final String NAME = "Destinations";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.0.1";
     public static final String DESCRIPTION = "An all-in-one teleportation plugin, with smart features.";
 
     private static Destinations instance;

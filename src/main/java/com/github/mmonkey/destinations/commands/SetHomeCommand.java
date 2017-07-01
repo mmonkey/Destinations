@@ -1,5 +1,6 @@
 package com.github.mmonkey.destinations.commands;
 
+import com.github.mmonkey.destinations.configs.DestinationsConfig;
 import com.github.mmonkey.destinations.entities.HomeEntity;
 import com.github.mmonkey.destinations.entities.LocationEntity;
 import com.github.mmonkey.destinations.entities.PlayerEntity;
@@ -53,6 +54,13 @@ public class SetHomeCommand implements CommandExecutor {
         Player player = (Player) src;
         PlayerEntity playerEntity = PlayerCache.instance.get(player);
         Set<HomeEntity> homes = playerEntity.getHomes();
+
+        int maxHomes = DestinationsConfig.getMaximumHomes();
+        if (maxHomes != 0 && homes.size() >= maxHomes) {
+            player.sendMessage(MessagesUtil.error(player, "home.max", maxHomes));
+            return CommandResult.success();
+        }
+
         Set<String> homeNames = new HashSet<>();
         homes.forEach(home -> homeNames.add(home.getName()));
 
